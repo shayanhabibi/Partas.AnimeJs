@@ -267,14 +267,14 @@ type Callbacks<'T> = {
     member inline this.andThen handler = { this with Then = handler }
     
 type AnimationBuilder<'T> = {
-    Properties: Style<'T> list
+    Values: Style<'T> list
     DefaultTweenProps: AnimationBuilder.TweenProps option
     PlaybackProps: PlaybackProps option
     Callbacks: Callbacks<Animation> option
 } with
     static member init: AnimationBuilder<'T> = createEmpty 
     member this.toPojo: AnimationOptions =
-        let props = this.Properties |> unbox |> createObj
+        let props = this.Values |> unbox |> createObj
         let tweenProps = this.DefaultTweenProps |> Option.map _.toPojo |> Option.defaultValue createEmpty
         let playbackProps = this.PlaybackProps |> Option.map _.toPojo |> Option.defaultValue createEmpty
         let callbacks = this.Callbacks |> Option.map _.toPojo |> Option.defaultValue createEmpty

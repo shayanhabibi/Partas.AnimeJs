@@ -506,7 +506,7 @@ module Types =
             ?modifier: FloatModifier
             ) = TweenValue(Noop.noop)
         [<Emit("$0")>]
-        new(_: TweenValue[]) = TweenValue(Noop.noop)
+        new(_: TweenValue * TweenValue) = TweenValue(Noop.noop)
         // TODO - Duration based keyframes
         // [<Emit("$0")>]
         // new() = TweenValue(Noop.noop)
