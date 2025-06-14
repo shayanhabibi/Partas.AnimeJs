@@ -9,10 +9,8 @@
         <Compile Include="Style.fs" />
         <Compile Include="Core.fs" />
         <Compile Include="Binding.fs" />
-        <Content Include="img.png" />
         <Content Include="package.json" />
         <Compile Include="Wrapper.fs" />
-        <Content Include="README.md" />
     </ItemGroup>
 
     <ItemGroup>

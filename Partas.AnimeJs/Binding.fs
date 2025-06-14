@@ -158,17 +158,19 @@ type Eases =
 
 [<Fable.Core.Erase>]
 type ChainedUtils =
-    abstract clamp: min: float * max: float -> float
-    abstract round: decimalLength: float -> float
-    abstract snap: increment: float -> float
-    abstract wrap:  min: float * max: float -> float
-    abstract interpolate: start: float * ``end``: float -> float
-    abstract mapRange: inLow: float * inHigh: float * outLow: float * outHigh: float -> float
-    abstract roundPad: decimalLength: float -> string
-    abstract padStart:  totalLength: float * padString: string -> string
-    abstract padEnd: totalLength: float * padString: string -> string
-    abstract degToRad: unit -> float
-    abstract radToDeg: unit -> float
+    abstract clamp: min: float * max: float -> ChainedUtils
+    abstract round: decimalLength: float -> ChainedUtils
+    abstract snap: increment: float -> ChainedUtils
+    abstract wrap:  min: float * max: float -> ChainedUtils
+    abstract interpolate: start: float * ``end``: float -> ChainedUtils
+    abstract mapRange: inLow: float * inHigh: float * outLow: float * outHigh: float -> ChainedUtils
+    abstract roundPad: decimalLength: float -> ChainedUtils
+    abstract padStart:  totalLength: float * padString: string -> ChainedUtils
+    abstract padEnd: totalLength: float * padString: string -> ChainedUtils
+    abstract degToRad: unit -> ChainedUtils
+    abstract radToDeg: unit -> ChainedUtils
+    [<Emit("$0(...$1)")>]
+    abstract member Invoke: float -> float
 
 [<Import("utils", "animejs")>]
 type Utils =
@@ -178,7 +180,7 @@ type Utils =
     static member get (targetSelector: Targets, propName: string, unit: bool) : float = nativeOnly
     static member sync (?callback: Timer -> unit) : Timer = nativeOnly
     static member set (targets: Targets, parameters: AnimationOptions) : Animation = nativeOnly
-    static member remove (targets: Targets, ?renderable: U2<obj, obj>, ?propertyName: string) : Target[] = nativeOnly
+    static member remove (targets: Targets, ?renderable: U2<obj, obj>, ?propertyName: string) : Targets = nativeOnly
     static member lerp (start: float, ``end``: float, amount: float, ?renderable: U2<obj, bool>) : float = nativeOnly
     static member ``$`` (targets: Targets) : Target[] = nativeOnly
     [<Import("utils.$", "animejs")>]
@@ -270,7 +272,7 @@ and TimerOptions =
     abstract onLoop: Callback<Timer> with set
     abstract onPause: Callback<Timer> with set
     abstract onComplete: Callback<Timer> with set
-    abstract member ``then``: Callback<Timer> -> JS.Promise<unit> with set
+    abstract member ``then``: (Callback<Timer> -> JS.Promise<unit>) with set
 and Timer =
     abstract member play: ChainMethod<Timer>
     abstract member reverse: ChainMethod<Timer>
@@ -481,7 +483,7 @@ and TimelineOptions =
     abstract onRender: Callback<Timeline> with set
     abstract onLoop: Callback<Timeline> with set
     abstract onPause: Callback<Timeline> with set
-    abstract ``then``: Callback<Timeline> -> JS.Promise<unit> with set
+    abstract ``then``: (Callback<Timeline> -> JS.Promise<unit>) with set
 and Timeline =
     abstract member add: U2<Targets * AnimationOptions, TimerOptions> * ?position: TimePosition -> Timeline
     abstract member set: targets: Targets * animatableProperties: CSSStyleDeclaration * ?position: TimePosition -> Timeline
@@ -735,12 +737,15 @@ type IStagger<'T> =
     abstract grid: int * int with set
     abstract axis: Axis with set
     abstract modifier: (float -> U2<float, string>) with set
-type StaggerTimeline = IStagger<U2<float, TimePosition>>
-type Stagger = IStagger<float>
+type StaggerTimeline =
+    inherit IStagger<U2<float, TimePosition>>
+type Stagger =
+    inherit IStagger<float>
 [<Import("svg", "animejs")>]
 type Svg =
     static member morphTo (path2: SVGElement, ?precision: float) : FunctionValue<string> = nativeOnly
     static member createMotionPath (path: SVGElement) : MotionPath = nativeOnly
+    /// Exposes a 'draw' property
     static member createDrawable (selector: SVGElement, ?start: float, ?``end``: float) : SVGElement[] = nativeOnly
 
 
@@ -793,7 +798,8 @@ type Export with
     static member randomPick (items: U2<string, ResizeArray<obj>>) : obj = nativeOnly
     [<Import("shuffle", "animejs")>]
     static member shuffle (items: ResizeArray<obj>) : ResizeArray<obj> = nativeOnly
-    static member stagger (target: Staggerable, ?params: Stagger) : Stagger = nativeOnly
+    [<ImportMember "animejs">]
+    static member stagger (target: Staggerable, ?params: Stagger) : FunctionValue<TweenValue> = nativeOnly
 
 [<AllowNullLiteral; Interface>]
 type MotionPath =
