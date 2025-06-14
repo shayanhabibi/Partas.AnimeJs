@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Style.fs" />
+        <Compile Include="Core.fs" />
+        <Compile Include="Binding.fs" />
+        <Content Include="package.json" />
+        <Compile Include="Wrapper.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Fable.Browser.Css" Version="2.5.0" />
+      <PackageReference Include="Fable.Browser.IntersectionObserver" Version="1.0.0" />
+      <PackageReference Include="Fable.Browser.ResizeObserver" Version="1.0.0" />
+      <PackageReference Include="Fable.Browser.Svg" Version="2.4.0" />
+      <PackageReference Include="Fable.Browser.WebGL" Version="1.3.0" />
+      <PackageReference Include="Fable.Core" Version="4.5.0" />
+      <PackageReference Include="Partas.Solid" Version="1.1.0" />
+    </ItemGroup>
+
+</Project>

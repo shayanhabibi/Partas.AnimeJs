@@ -1,0 +1,10 @@
+{
+  "name": "partas.animejs",
+  "type": "module",
+  "scripts": {
+    "test": ""
+  },
+  "dependencies": {
+    "animejs": "^4.0.2"
+  }
+}
