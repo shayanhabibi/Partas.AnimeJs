@@ -297,8 +297,10 @@ module Types =
     /// </summary>
     and Target = U6<Selector, NodeList, SVGGElement, HTMLElement, SVGElement, obj>
     and Targets<'T> = 'T[]
+    and Targets = U2<Target, Target[]>
     [<Erase>]
     type FunctionValue<'T> = delegate of target: Target * ?index: int * ?length: int -> 'T
+    type FunctionValue = FunctionValue<obj>
     type FloatModifier = float -> float
     /// <summary>
     /// Acceptable shape of type that can have stagger applied

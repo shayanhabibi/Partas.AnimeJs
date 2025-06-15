@@ -556,10 +556,10 @@ and [<Global>] AnimatableSettings private (noop: TweenValueNoop) =
 
 and AnimatableOptions =
     inherit CSSStyleDeclaration
-    abstract unit: string
-    abstract duration: U2<int<ms>, FunctionValue<int<ms>>>
-    abstract ease: Eases
-    abstract modifier: (float -> float)
+    abstract unit: string with set
+    abstract duration: U2<int<ms>, FunctionValue<int<ms>>> with set
+    abstract ease: Eases with set
+    abstract modifier: (float -> float) with set
 
 
 and Animatable =
@@ -791,7 +791,7 @@ type Export with
     [<Import("cleanInlineStyles", "animejs")>]
     static member cleanInlineStyles (renderable: 'T) : 'T = nativeOnly    
     [<Import("animate", "animejs"); Emit("animate($0, {...$1, {{...$2}}})")>]
-    static member animate (targets: U2<obj, obj[]>, parameters: AnimationOptions, others: obj) : Animation = nativeOnly
+    static member animate (targets: Targets, parameters: AnimationOptions, ?others: obj) : Animation = nativeOnly
     [<Import("random", "animejs")>]
     static member random (min: float, max: float, ?decimalLength: float) : float = nativeOnly
     [<Import("randomPick", "animejs")>]
@@ -815,7 +815,7 @@ type SvgExports =
 
 type Export with
     [<Import("createAnimatable", "animejs")>]
-    static member createAnimatable (targets: Targets, parameters: AnimationOptions) : Animation = nativeOnly
+    static member createAnimatable (targets: Targets, parameters: AnimatableOptions) : Animatable = nativeOnly
 
 [<AbstractClass>]
 [<Fable.Core.Erase>]
