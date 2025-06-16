@@ -172,6 +172,7 @@ type ChainedUtils =
     [<Emit("$0(...$1)")>]
     abstract member Invoke: float -> float
 
+[<Interface>]
 [<Import("utils", "animejs")>]
 type Utils =
     static member get (targetSelector: Node, propName: string) : string = nativeOnly
