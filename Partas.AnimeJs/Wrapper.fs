@@ -25,6 +25,12 @@ open UnsafeOperators
 [<Erase>]
 type AnimeJs = interface end
 
+(*
+Distinguish interface values from properties.
+Properties are valid in list form.
+Values are valid only as a parameter
+*)
+
 /// <summary>
 /// Allows access to the spring properties
 /// </summary>
@@ -34,88 +40,117 @@ type ISpringProp = interface end
 /// Signifies a key value pair that is accepted as an animatable prop.<br/>
 /// Use AnimatedProp.make to create generic ones
 /// </summary>
-[<Erase; Interface>]
-type IAnimatedProp<'T> =
+type [<Erase; Interface>] IAnimatedProp<'T> =
+    inherit ICssStyle<'T>
+    // static member inline op_Implicit(from: IAnimatedProp): #IAnimatedProp<'T> = !!from
     static member inline op_Implicit(from: string * 'T): #IAnimatedProp<'T> = !!from
-    static member inline op_Implicit(from: string * obj): #IAnimatedProp<obj> = !!from
+    // static member inline op_Implicit(from: string * obj): #IAnimatedProp<string> = !!from
+type [<Erase; Interface>] IAnimatedPropObj<'PropType> =
+    inherit ICssStyleObj<'PropType>
+[<Erase; Interface>]
+type IAnimatedProp =
+    inherit IAnimatedProp<string>
+    inherit ICssStyle
+
 
 [<Erase; Interface>]
-type AnimatedProp<'T> =
-    inherit CssStyle<'T, IAnimatedProp<'T>>
-    static member inline translateX(value: int): #IAnimatedProp<'T> = "translateX" ==< value
-    static member inline translateX(value: float): #IAnimatedProp<'T> = "translateX" ==< value
-    static member inline translateX(value: string): #IAnimatedProp<'T> = "translateX" ==< value
+type Style<'T> =
+    inherit CssStyle<'T>
     static member inline translateX(value: 'T): #IAnimatedProp<'T> = "translateX" ==< value
-    static member inline translateY (value: int): #IAnimatedProp<'T> = "translateY" ==< value
-    static member inline translateY (value: float): #IAnimatedProp<'T> = "translateY" ==< value
-    static member inline translateY (value: string): #IAnimatedProp<'T> = "translateY" ==< value
     static member inline translateY (value: 'T): #IAnimatedProp<'T> = "translateY" ==< value
-    static member inline translateZ (value: int): #IAnimatedProp<'T> = "translateZ" ==< value
-    static member inline translateZ (value: float): #IAnimatedProp<'T> = "translateZ" ==< value
-    static member inline translateZ (value: string): #IAnimatedProp<'T> = "translateZ" ==< value
     static member inline translateZ (value: 'T): #IAnimatedProp<'T> = "translateZ" ==< value
-    static member inline rotate (value: int): #IAnimatedProp<'T> = "rotate" ==< value
-    static member inline rotate (value: float): #IAnimatedProp<'T> = "rotate" ==< value
-    static member inline rotate (value: string): #IAnimatedProp<'T> = "rotate" ==< value
     static member inline rotate (value: 'T): #IAnimatedProp<'T> = "rotate" ==< value
-    static member inline rotateX (value: int): #IAnimatedProp<'T> = "rotateX" ==< value
-    static member inline rotateX (value: float): #IAnimatedProp<'T> = "rotateX" ==< value
-    static member inline rotateX (value: string): #IAnimatedProp<'T> = "rotateX" ==< value
     static member inline rotateX (value: 'T): #IAnimatedProp<'T> = "rotateX" ==< value
-    static member inline rotateY (value: int): #IAnimatedProp<'T> = "rotateY" ==< value
-    static member inline rotateY (value: float): #IAnimatedProp<'T> = "rotateY" ==< value
-    static member inline rotateY (value: string): #IAnimatedProp<'T> = "rotateY" ==< value
     static member inline rotateY (value: 'T): #IAnimatedProp<'T> = "rotateY" ==< value
-    static member inline rotateZ (value: int): #IAnimatedProp<'T> = "rotateZ" ==< value
-    static member inline rotateZ (value: float): #IAnimatedProp<'T> = "rotateZ" ==< value
-    static member inline rotateZ (value: string): #IAnimatedProp<'T> = "rotateZ" ==< value
     static member inline rotateZ (value: 'T): #IAnimatedProp<'T> = "rotateZ" ==< value
-    static member inline scale (value: int): #IAnimatedProp<'T> = "scale" ==< value
-    static member inline scale (value: float): #IAnimatedProp<'T> = "scale" ==< value
-    static member inline scale (value: string): #IAnimatedProp<'T> = "scale" ==< value
     static member inline scale (value: 'T): #IAnimatedProp<'T> = "scale" ==< value
-    static member inline scaleX (value: int): #IAnimatedProp<'T> = "scaleX" ==< value
-    static member inline scaleX (value: float): #IAnimatedProp<'T> = "scaleX" ==< value
-    static member inline scaleX (value: string): #IAnimatedProp<'T> = "scaleX" ==< value
     static member inline scaleX (value: 'T): #IAnimatedProp<'T> = "scaleX" ==< value
-    static member inline scaleY (value: int): #IAnimatedProp<'T> = "scaleY" ==< value
-    static member inline scaleY (value: float): #IAnimatedProp<'T> = "scaleY" ==< value
-    static member inline scaleY (value: string): #IAnimatedProp<'T> = "scaleY" ==< value
     static member inline scaleY (value: 'T): #IAnimatedProp<'T> = "scaleY" ==< value
-    static member inline scaleZ (value: int): #IAnimatedProp<'T> = "scaleZ" ==< value
-    static member inline scaleZ (value: float): #IAnimatedProp<'T> = "scaleZ" ==< value
-    static member inline scaleZ (value: string): #IAnimatedProp<'T> = "scaleZ" ==< value
     static member inline scaleZ (value: 'T): #IAnimatedProp<'T> = "scaleZ" ==< value
-    static member inline skew (value: int): #IAnimatedProp<'T> = "skew" ==< value
-    static member inline skew (value: float): #IAnimatedProp<'T> = "skew" ==< value
-    static member inline skew (value: string): #IAnimatedProp<'T> = "skew" ==< value
     static member inline skew (value: 'T): #IAnimatedProp<'T> = "skew" ==< value
-    static member inline skewX (value: int): #IAnimatedProp<'T> = "skewX" ==< value
-    static member inline skewX (value: float): #IAnimatedProp<'T> = "skewX" ==< value
-    static member inline skewX (value: string): #IAnimatedProp<'T> = "skewX" ==< value
     static member inline skewX (value: 'T): #IAnimatedProp<'T> = "skewX" ==< value
-    static member inline skewY (value: int): #IAnimatedProp<'T> = "skewY" ==< value
-    static member inline skewY (value: float): #IAnimatedProp<'T> = "skewY" ==< value
-    static member inline skewY (value: string): #IAnimatedProp<'T> = "skewY" ==< value
     static member inline skewY (value: 'T): #IAnimatedProp<'T> = "skewY" ==< value
-    static member inline perspective (value: int): #IAnimatedProp<'T> = "perspective" ==< value
-    static member inline perspective (value: float): #IAnimatedProp<'T> = "perspective" ==< value
-    static member inline perspective (value: string): #IAnimatedProp<'T> = "perspective" ==< value
     static member inline perspective (value: 'T): #IAnimatedProp<'T> = "perspective" ==< value
-    static member inline draw(value: float): #IAnimatedProp<'T> = "draw" ==< $"{value}"
-    static member inline draw(value: float * float): #IAnimatedProp<'T> = "draw" ==< $"{fst value} {snd value}"
-    static member inline draw(value: string * float): #IAnimatedProp<'T> = "draw" ==< $"{fst value} {snd value}"
-    static member inline draw(value: string * string): #IAnimatedProp<'T> = "draw" ==< $"{fst value} {snd value}"
-    static member inline draw(value: string): #IAnimatedProp<'T> = "draw" ==< value
     static member inline draw(value: 'T): #IAnimatedProp<'T> = "draw" ==< value
-[<Erase>]
-type IAnimatedProp =
-    inherit IAnimatedProp<obj>
+
+[<Interface>]
+type StyleObj<'PropType> =
+    inherit CssStyleObj<'PropType>
+    static member inline translateX(value: 'PropType list): #IAnimatedPropObj<'PropType> = "translateX" ==< createObj !!value
+    static member inline translateY (value: 'PropType list): #IAnimatedPropObj<'PropType> = "translateY" ==< createObj !!value
+    static member inline translateZ (value: 'PropType list): #IAnimatedPropObj<'PropType> = "translateZ" ==< createObj !!value
+    static member inline rotate (value: 'PropType list): #IAnimatedPropObj<'PropType> = "rotate" ==< createObj !!value
+    static member inline rotateX (value: 'PropType list): #IAnimatedPropObj<'PropType> = "rotateX" ==< createObj !!value
+    static member inline rotateY (value: 'PropType list): #IAnimatedPropObj<'PropType> = "rotateY" ==< createObj !!value
+    static member inline rotateZ (value: 'PropType list): #IAnimatedPropObj<'PropType> = "rotateZ" ==< createObj !!value
+    static member inline scale (value: 'PropType list): #IAnimatedPropObj<'PropType> = "scale" ==< createObj !!value
+    static member inline scaleX (value: 'PropType list): #IAnimatedPropObj<'PropType> = "scaleX" ==< createObj !!value
+    static member inline scaleY (value: 'PropType list): #IAnimatedPropObj<'PropType> = "scaleY" ==< createObj !!value
+    static member inline scaleZ (value: 'PropType list): #IAnimatedPropObj<'PropType> = "scaleZ" ==< createObj !!value
+    static member inline skew (value: 'PropType list): #IAnimatedPropObj<'PropType> = "skew" ==< createObj !!value
+    static member inline skewX (value: 'PropType list): #IAnimatedPropObj<'PropType> = "skewX" ==< createObj !!value
+    static member inline skewY (value: 'PropType list): #IAnimatedPropObj<'PropType> = "skewY" ==< createObj !!value
+    static member inline perspective (value: 'PropType list): #IAnimatedPropObj<'PropType> = "perspective" ==< createObj !!value
+    static member inline draw(value: 'PropType list): #IAnimatedPropObj<'PropType> = "draw" ==< createObj !!value
+
+[<Interface>]
+type Style =
+    inherit CssStyle
+    static member inline translateX(value: int): #IAnimatedProp = "translateX" ==< value
+    static member inline translateX(value: float): #IAnimatedProp = "translateX" ==< value
+    static member inline translateX(value: string): #IAnimatedProp = "translateX" ==< value
+    static member inline translateY (value: int): #IAnimatedProp = "translateY" ==< value
+    static member inline translateY (value: float): #IAnimatedProp = "translateY" ==< value
+    static member inline translateY (value: string): #IAnimatedProp = "translateY" ==< value
+    static member inline translateZ (value: int): #IAnimatedProp = "translateZ" ==< value
+    static member inline translateZ (value: float): #IAnimatedProp = "translateZ" ==< value
+    static member inline translateZ (value: string): #IAnimatedProp = "translateZ" ==< value
+    static member inline rotate (value: int): #IAnimatedProp = "rotate" ==< value
+    static member inline rotate (value: float): #IAnimatedProp = "rotate" ==< value
+    static member inline rotate (value: string): #IAnimatedProp = "rotate" ==< value
+    static member inline rotateX (value: int): #IAnimatedProp = "rotateX" ==< value
+    static member inline rotateX (value: float): #IAnimatedProp = "rotateX" ==< value
+    static member inline rotateX (value: string): #IAnimatedProp = "rotateX" ==< value
+    static member inline rotateY (value: int): #IAnimatedProp = "rotateY" ==< value
+    static member inline rotateY (value: float): #IAnimatedProp = "rotateY" ==< value
+    static member inline rotateY (value: string): #IAnimatedProp = "rotateY" ==< value
+    static member inline rotateZ (value: int): #IAnimatedProp = "rotateZ" ==< value
+    static member inline rotateZ (value: float): #IAnimatedProp = "rotateZ" ==< value
+    static member inline rotateZ (value: string): #IAnimatedProp = "rotateZ" ==< value
+    static member inline scale (value: int): #IAnimatedProp = "scale" ==< value
+    static member inline scale (value: float): #IAnimatedProp = "scale" ==< value
+    static member inline scale (value: string): #IAnimatedProp = "scale" ==< value
+    static member inline scaleX (value: int): #IAnimatedProp = "scaleX" ==< value
+    static member inline scaleX (value: float): #IAnimatedProp = "scaleX" ==< value
+    static member inline scaleX (value: string): #IAnimatedProp = "scaleX" ==< value
+    static member inline scaleY (value: int): #IAnimatedProp = "scaleY" ==< value
+    static member inline scaleY (value: float): #IAnimatedProp = "scaleY" ==< value
+    static member inline scaleY (value: string): #IAnimatedProp = "scaleY" ==< value
+    static member inline scaleZ (value: int): #IAnimatedProp = "scaleZ" ==< value
+    static member inline scaleZ (value: float): #IAnimatedProp = "scaleZ" ==< value
+    static member inline scaleZ (value: string): #IAnimatedProp = "scaleZ" ==< value
+    static member inline skew (value: int): #IAnimatedProp = "skew" ==< value
+    static member inline skew (value: float): #IAnimatedProp = "skew" ==< value
+    static member inline skew (value: string): #IAnimatedProp = "skew" ==< value
+    static member inline skewX (value: int): #IAnimatedProp = "skewX" ==< value
+    static member inline skewX (value: float): #IAnimatedProp = "skewX" ==< value
+    static member inline skewX (value: string): #IAnimatedProp = "skewX" ==< value
+    static member inline skewY (value: int): #IAnimatedProp = "skewY" ==< value
+    static member inline skewY (value: float): #IAnimatedProp = "skewY" ==< value
+    static member inline skewY (value: string): #IAnimatedProp = "skewY" ==< value
+    static member inline perspective (value: int): #IAnimatedProp = "perspective" ==< value
+    static member inline perspective (value: float): #IAnimatedProp = "perspective" ==< value
+    static member inline perspective (value: string): #IAnimatedProp = "perspective" ==< value
+    static member inline draw(value: float): #IAnimatedProp = "draw" ==< $"{value}"
+    static member inline draw(value: float * float): #IAnimatedProp = "draw" ==< $"{fst value} {snd value}"
+    static member inline draw(value: string * float): #IAnimatedProp = "draw" ==< $"{fst value} {snd value}"
+    static member inline draw(value: string * string): #IAnimatedProp = "draw" ==< $"{fst value} {snd value}"
+    static member inline draw(value: string): #IAnimatedProp = "draw" ==< value
+
 [<Interface>]
 type AnimatedProp =
-    inherit AnimatedProp<obj>
     static member inline make (key: string, value: 'T): #IAnimatedProp<'T> = !!(key ==> value)
-    static member inline make (key: string, value: obj): #IAnimatedProp<obj> = !!(key ==> value)
+    static member inline make (key: string, value: obj): #IAnimatedProp<string> = !!(key ==> value)
 
 [<Erase>]
 type Spring =
@@ -127,51 +162,69 @@ type Spring =
 type AnimeJs with
     static member inline createSpring (values: ISpringProp list): Spring = (createObj !!values) |> import "createSpring" "animejs"
 
-
-/// <summary>
-/// A building block to make an <c>Ease</c> DU which can then be compiled into an EasingFunction
-/// using <c>.ToEasing</c>
-/// </summary>
-/// <example><code>
-/// let builder = AnimationBuilder.TweenProps.init
-/// EaseDir.In
-/// |> Quad
-/// |> _.ToEasing |> builder.WithEase
-/// </code></example>
-/// <remarks>
-/// <c>Ease</c> will implicitly be accepted wherever an <c>EasingFun</c> is accepted.
-/// </remarks>
-[<RequireQualifiedAccess; StringEnum>]
-type EaseDir =
-    | In
-    | Out
-    | InOut
     
 /// <summary>
 /// To pass a custom easing function to AnimeJS, use the Ease.Function discriminated union
 /// </summary>
 [<Interface>]
 type EasingFun =
-    static member inline op_Implicit(other: Ease): EasingFun = other.ToEasing
-and Ease =
-    | DefaultLinear
-    | Linear of x1: float * x2: string * x3: float
-    | Quad of EaseDir
-    | Cubic of EaseDir
-    | Quart of EaseDir
-    | Quint of EaseDir
-    | Sine of EaseDir
-    | Circ of EaseDir
-    | Expo of EaseDir
-    | Bounce of EaseDir
-    | Power of EaseDir * power: float
-    | Back of EaseDir * overshoot: float
-    | Elastic of EaseDir * amplitude: float * period: float
-    | Irregular of length: float * randomness: float
-    | Steps of steps: float * fromStart: bool
-    | CubicBezier of mX1: float * mY1: float * mX2: float * mY2: float
-    | Spring of mass: float * stiffness: float * damping: float * velocity: float
-    | Function of easingFn: (float -> float)
+    static member inline op_Implicit(other: Ease): EasingFun = !!other
+    static member inline op_Implicit(other: FloatModifier): EasingFun = !!other
+    static member inline from(easingFn: (float -> float)): EasingFun = unbox easingFn
+    
+and [<RequireQualifiedAccess>]
+    [<StringEnum>]
+     Ease =
+    | Linear
+    | ``Linear(x1, x2 25%, x3)``
+    | In
+    | Out
+    | InOut
+    | InQuad
+    | OutQuad
+    | InOutQuad
+    | InCubic
+    | OutCubic
+    | InOutCubic
+    | InQuart
+    | OutQuart
+    | InOutQuart
+    | InQuint
+    | OutQuint
+    | InOutQuint
+    | InSine
+    | OutSine
+    | InOutSine
+    | InCirc
+    | OutCirc
+    | InOutCirc
+    | InExpo
+    | OutExpo
+    | InOutExpo
+    | InBounce
+    | OutBounce
+    | InOutBounce
+    | InBack
+    | OutBack
+    | InOutBack
+    | InElastic
+    | OutElastic
+    | InOutElastic
+    | Irregular
+    | CubicBezier
+    | Steps
+    | [<CompiledName("in(p = 1.675)")>] ``In(p = 1_675)``
+    | [<CompiledName("out(p = 1.675)")>] ``Out(p = 1_675)``
+    | [<CompiledName("inOut(p = 1.675)")>] ``InOut(p = 1_675)``
+    | [<CompiledName("inBack(overshoot = 1.70158)")>] ``InBack(overshoot = 1_70158)``
+    | [<CompiledName("outBack(overshoot = 1.70158)")>] ``OutBack(overshoot = 1_70158)``
+    | [<CompiledName("inOutBack(overshoot = 1.70158)")>] ``InOutBack(overshoot = 1_70158)``
+    | [<CompiledName("inElastic(amplitude = 1, period = .3)")>] ``InElastic(amplitude = 1, period = _3)``
+    | [<CompiledName("outElastic(amplitude = 1, period = .3)")>] ``OutElastic(amplitude = 1, period = _3)``
+    | [<CompiledName("inOutElastic(amplitude = 1, period = .3)")>] ``InOutElastic(amplitude = 1, period = _3)``
+    | ``Irregular(length = 10, randomness = 1)``
+    | ``CubicBezier(x1, y1, x2, y2)``
+    | ``Steps(steps = 10)``
     [<Import("eases.linear", "animejs")>]
     static member linear (x1: U2<float,string>) (x2: U2<float, string>) (x3: U2<float, string>): EasingFun = jsNative
     [<Import("eases.irregular", "animejs")>]
@@ -210,39 +263,6 @@ and Ease =
         ,?velocity: 'd when 'd : unmanaged
         ): EasingFun = jsNative
     static member inline createSpring (spring: ISpringProp list): EasingFun = spring |> AnimeJs.createSpring |> unbox
-    member this.ToEasing: EasingFun =
-        match this with
-        | DefaultLinear -> unbox "linear"
-        | Linear(x1,x2,x3) -> unbox $"linear({x1}, {x2}, {x3})"
-        | Quad easeDir -> unbox $"{easeDir}Quad"
-        | Cubic easeDir -> unbox $"{easeDir}Cubic"
-        | Quart easeDir -> unbox $"{easeDir}Quart"
-        | Quint easeDir -> unbox $"{easeDir}Quint"
-        | Sine easeDir -> unbox $"{easeDir}Sine"
-        | Circ easeDir -> unbox $"{easeDir}Circ"
-        | Expo easeDir -> unbox $"{easeDir}Expo"
-        | Bounce easeDir -> unbox $"{easeDir}Bounce"
-        | Power(easeDir, power) -> unbox $"{easeDir}(p = {power})"
-        | Back(easeDir, overshoot) -> unbox $"{easeDir}Back(overshoot = {overshoot})"
-        | Elastic(easeDir, amplitude, period) -> unbox $"{easeDir}Elastic(amplitude = {amplitude}, period = {period})"
-        | Irregular(length, randomness) -> unbox $"irregular(length = {length}, randomness = {randomness})"
-        | Steps(steps, fromStart) -> unbox $"steps(steps = {steps}, fromStart = {fromStart})"
-        | CubicBezier(mX1, mY1, mX2, mY2) -> unbox $"cubicBezier({mX1}, {mY1}, {mX2}, {mY2})"
-        | Function easingFn -> unbox easingFn
-        | Spring(mass, stiffness, damping, velocity) -> Ease.createSpring(mass,stiffness,damping,velocity)
-module Ease =
-    let power direction power = Power (direction, power)
-    let back direction overshoot = Back(direction, overshoot)
-    let elasticAmplitude direction amplitude = Elastic(direction, amplitude, 0.3)
-    let elasticPeriod direction period = Elastic(direction, 1., period)
-    let elastic direction amplitude period = Elastic(direction, amplitude, period)
-    let quad = Quad
-    let cubic = Cubic
-    let quart = Quart
-    let quint = Quint
-    let sine = Sine
-    let circ = Circ
-
 /// <summary>
 /// Indicates a type accepts TweenProp members
 /// </summary>
@@ -288,51 +308,77 @@ type TweenValue =
 /// Indicates that TweenProp and ToTweenValue helpers produce valid values
 /// </summary>
 [<Interface>]
-type IToTweenValue =
+type IToTweenProp =
     inherit ITweenProp
 /// <summary>
 /// Indicates that TweenProp and FromTweenValue helpers produce valid values
 /// </summary>
 [<Interface>]
-type IFromTweenValue =
+type IFromTweenProp =
     inherit ITweenProp
 
 [<Interface>]
-type ToTweenValue =
+type ToTween =
     inherit TweenProp
-    static member inline to'(value: ITweenValue): IToTweenValue = "to" ==< value
-    static member inline to'(value: ITweenValue * ITweenValue): IToTweenValue = "to" ==< value
-    static member inline to'(value: int * float): IToTweenValue = "to" ==< value
-    static member inline to'(value: float * float): IToTweenValue = "to" ==< value
-    static member inline to'(value: float * int): IToTweenValue = "to" ==< value
-    static member inline to'(value: int * int): IToTweenValue = "to" ==< value
-    static member inline to'(value: string): IToTweenValue = "to" ==< value
-    static member inline to'(value: string * string): IToTweenValue = "to" ==< value
-    static member inline to'(value: FunctionValue<float>): IToTweenValue = "to" ==< value
-    static member inline to'(value: FunctionValue<float> * FunctionValue<float>): IToTweenValue = "to" ==< value
+    static member inline to'(value: ITweenValue): #IToTweenProp = "to" ==< value
+    static member inline to'(value: ITweenValue * ITweenValue): #IToTweenProp = "to" ==< value
+    static member inline to'(value: int * float): #IToTweenProp = "to" ==< value
+    static member inline to'(value: float * float): #IToTweenProp = "to" ==< value
+    static member inline to'(value: float * int): #IToTweenProp = "to" ==< value
+    static member inline to'(value: int * int): #IToTweenProp = "to" ==< value
+    static member inline to'(value: string): #IToTweenProp = "to" ==< value
+    static member inline to'(value: string * string): #IToTweenProp = "to" ==< value
+    static member inline to'(value: FunctionValue<float>): #IToTweenProp = "to" ==< value
+    static member inline to'(value: FunctionValue<float> * FunctionValue<float>): #IToTweenProp = "to" ==< value
     
 [<Interface>]
-type FromTweenValue =
+type FromTween =
     inherit TweenProp
-    static member inline from(value: ITweenValue): IFromTweenValue = "from" ==< value
-    static member inline from(value: int): IFromTweenValue = "from" ==< value
-    static member inline from(value: float): IFromTweenValue = "from" ==< value
-    static member inline from(value: string): IFromTweenValue = "from" ==< value
+    static member inline from(value: ITweenValue): #IFromTweenProp = "from" ==< value
+    static member inline from(value: int): #IFromTweenProp = "from" ==< value
+    static member inline from(value: float): #IFromTweenProp = "from" ==< value
+    static member inline from(value: string): #IFromTweenProp = "from" ==< value
 
 [<Interface>]
 type IKeyframeProp =
+    inherit IToTweenProp
+    inherit IFromTweenProp
+[<Interface>]
+type IKeyframeValueProp =
     inherit IAnimatedProp
+    inherit IAnimatedProp<string[]>
+    inherit IAnimatedProp<int[]>
+    inherit IAnimatedProp<float[]>
     inherit ITweenProp
+
+[<Interface>]
+type Keyframe =
+    inherit ToTween
+    inherit FromTween
+
+[<Erase>]
+module Keyframe =
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type Style_ = Style
+    
+    [<Interface>]
+    type Style =
+        inherit Style<string[]>
+        inherit Style<int[]>
+        inherit Style<float[]>
+        inherit Style_
 
 [<Interface>]
 type IKeyframeValue =
     inherit ITweenValue
-
+    
 [<Interface>]
-type Keyframe =
-    inherit AnimatedProp
-    inherit TweenProp
-    static member inline create (values: IKeyframeProp list): #IKeyframeValue = !!createObj !!values
+type KeyframeValue =
+    inherit TweenValue
+    static member inline create (values: IKeyframeValueProp list): #IKeyframeValue = !!createObj !!values
+    static member inline create (value: int): #IKeyframeValue = !!value
+    static member inline create (value: float): #IKeyframeValue = !!value
+    static member inline create (value: string): #IKeyframeValue = !!value
 
 [<Interface>]
 type IPlaybackProp = interface end
@@ -369,7 +415,7 @@ type Playback =
     static member inline alternate (value: bool): #IPlaybackProp = "alternate" ==< value
     static member inline frameRate (value: int): #IPlaybackProp = "frameRate" ==< value
     static member inline ease (value: EasingFun): #IPlaybackProp = "ease" ==< value
-    static member inline ease (value: Ease): #IPlaybackProp = "ease" ==< value.ToEasing
+    static member inline ease (value: Ease): #IPlaybackProp = "ease" ==< value
     static member inline loopDelay (value: float): #IPlaybackProp = "loopDelay" ==< value
     static member inline loopDelay (value: int): #IPlaybackProp = "loopDelay" ==< value
     static member inline loopDelay (stagger: Stagger): #IPlaybackProp = "loopDelay" ==< stagger
@@ -393,7 +439,11 @@ type AnimeJs with
 [<Interface>]
 type IAnimationProp =
     inherit IAnimationCallbackProp<Animation>
-    inherit IAnimatedProp<IKeyframeValue>
+    inherit IAnimatedPropObj<IKeyframeProp>
+    inherit IAnimatedProp<string[]>
+    inherit IAnimatedProp<int[]>
+    inherit IAnimatedProp<float[]>
+    inherit IAnimatedProp
     inherit IPlaybackProp
     inherit ITweenProp
 
@@ -430,13 +480,30 @@ type TimePosition =
 [<Interface>]
 type Animation =
     inherit AnimationCallbacks<Animation>
-    inherit AnimatedProp<IKeyframeValue>
+    // inherit StyleObj<IKeyframeProp>
+    // inherit Style<string[]>
+    // inherit Style
     inherit Playback
     inherit TweenProp
     static member inline keyframes (value: IKeyframeValue list): #IAnimationProp = "keyframes" ==< List.toArray value
 
+[<Erase>]
+module Animation =
+    [<System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)>]
+    type Style_ = Style
+    [<Interface>]
+    type Style =
+        inherit StyleObj<IKeyframeProp>
+        inherit Style<string[]>
+        inherit Style<float[]>
+        inherit Style<int[]>
+        inherit Style_
+type Exports with
+    [<Import("animate", "animejs")>]
+    static member animate (targets: Targets, parameters: AnimationOptions) : Binding.Animation = nativeOnly
 type AnimeJs with
-    static member inline animate targets (options: IAnimationProp list): Binding.Animation = animate(targets,!!createObj options)
+    static member inline animate targets (options: IAnimationProp list): Binding.Animation =
+        Exports.animate(targets,!!createObj options)
 
 type TimeLabelMap =
     [<EmitIndexer>]
@@ -547,7 +614,7 @@ type AnimeJs with
 type IAnimatableValue = interface end
 [<Interface>]
 type IAnimatableProp =
-    inherit IAnimatedProp<IAnimatableValue>
+    inherit IAnimatedPropObj<IAnimatableValue>
     inherit IAnimatableValue
 
 [<Interface>]
@@ -556,7 +623,7 @@ type AnimatableValue =
     static member inline duration (value: int): #IAnimatableValue = "duration" ==< value
     static member inline duration (value: FunctionValue<_>): #IAnimatableValue = "duration" ==< value
     static member inline duration (value: string): #IAnimatableValue = "duration" ==< value
-    static member inline ease (value: Ease): #IAnimatableValue = "ease" ==< value.ToEasing
+    static member inline ease (value: Ease): #IAnimatableValue = "ease" ==< value
     static member inline ease (value: EasingFun): #IAnimatableValue = "ease" ==< value
     static member inline modifier (value: FloatModifier): #IAnimatableValue = "modifier" ==< value
 
@@ -578,7 +645,8 @@ type Binding.Animatable with
 [<Interface>]
 type Animatable =
     inherit AnimatableValue
-    inherit AnimatedProp<IAnimatableValue>
+    inherit AnimatedProp
+    inherit StyleObj<IAnimatableValue>
 
 type AnimeJs with
     static member inline createAnimatable targets (options: IAnimatableProp list): Binding.Animatable =
@@ -731,7 +799,7 @@ type ScrollObserver =
     static member inline sync (enter: string, leave: string, enterBackward: string, leaveBackward: string): #IScrollObserverProp =
         "sync" ==< $"{enter} {leave} {enterBackward} {leaveBackward}"
     static member inline sync (smooth: float): #IScrollObserverProp = "sync" ==< smooth
-    static member inline sync (ease: Ease): #IScrollObserverProp = "sync" ==< ease.ToEasing
+    static member inline sync (ease: Ease): #IScrollObserverProp = "sync" ==< ease
     static member inline sync (ease: EasingFun): #IScrollObserverProp = "sync" ==< ease
     static member inline enter (value: string): #IScrollObserverProp = "enter" ==< value
     static member inline enter (value: Enums.ObserverThreshold): #IScrollObserverProp = "enter" ==< value
@@ -753,7 +821,7 @@ type Stagger =
     static member inline from (value: float): #IStaggerProp = "from" ==< value
     static member inline from (value: StaggerFrom): #IStaggerProp = "from" ==< value
     static member inline reversed (value: bool): #IStaggerProp = "reversed" ==< value
-    static member inline ease (value: Ease): #IStaggerProp = "ease" ==< value.ToEasing
+    static member inline ease (value: Ease): #IStaggerProp = "ease" ==< value
     static member inline ease (value: EasingFun): #IStaggerProp = "ease" ==< value
     static member inline grid (value: int * int): #IStaggerProp = "grid" ==< value
     static member inline axis (value: Enums.Axis): #IStaggerProp = "axis" ==< value
@@ -761,7 +829,7 @@ type Stagger =
     
 
 type AnimeJs with
-    static member inline onScroll (options: IScrollObserverProp): Binding.ScrollObserver = Exports.onScroll(!!createObj !!options)
+    static member inline onScroll (options: IScrollObserverProp list): Binding.ScrollObserver = Exports.onScroll(!!createObj !!options)
     [<ImportMember(Spec.path)>]
     static member cleanInlineStyles(renderable: 'T): 'T = jsNative
     [<ImportMember(Spec.path)>]

@@ -791,7 +791,7 @@ type Export with
     static member createTimer (parameters: TimerOptions) : Timer = nativeOnly
     [<Import("cleanInlineStyles", "animejs")>]
     static member cleanInlineStyles (renderable: 'T) : 'T = nativeOnly    
-    [<Import("animate", "animejs"); Emit("animate($0, {...$1, {{...$2}}})")>]
+    [<Import("animate", "animejs"); Emit("$0($1,{...$2, {{...$3}}})")>]
     static member animate (targets: Targets, parameters: AnimationOptions, ?others: obj) : Animation = nativeOnly
     [<Import("random", "animejs")>]
     static member random (min: float, max: float, ?decimalLength: float) : float = nativeOnly
