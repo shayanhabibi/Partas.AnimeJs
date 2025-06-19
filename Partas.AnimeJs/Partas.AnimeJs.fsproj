@@ -11,6 +11,8 @@
         <Compile Include="Binding.fs" />
         <Content Include="package.json" />
         <Compile Include="Wrapper.fs" />
+        <Compile Include="CE.fs" />
+        <Compile Include="ComputationExpressions.fs" />
     </ItemGroup>
 
     <ItemGroup>

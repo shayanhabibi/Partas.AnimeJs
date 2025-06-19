@@ -320,6 +320,8 @@ type IFromTweenProp =
 [<Interface>]
 type ToTween =
     inherit TweenProp
+    static member inline to'(value: float): #IToTweenProp = "to" ==< value
+    static member inline to'(value: int): #IToTweenProp = "to" ==< value
     static member inline to'(value: ITweenValue): #IToTweenProp = "to" ==< value
     static member inline to'(value: ITweenValue * ITweenValue): #IToTweenProp = "to" ==< value
     static member inline to'(value: int * float): #IToTweenProp = "to" ==< value
@@ -352,9 +354,18 @@ type IKeyframeValueProp =
     inherit ITweenProp
 
 [<Interface>]
+type IKeyframeValue =
+    inherit ITweenValue
+    
+[<Interface>]
 type Keyframe =
     inherit ToTween
     inherit FromTween
+    static member inline create (options: IKeyframeProp list): #IKeyframeValue = !!createObj !!options
+
+[<AutoOpen; Erase>]
+type AutoOpenKeyframeSugar =
+    static member inline Keyframe (options: IKeyframeProp list): #IKeyframeValue = !!createObj !!options
 
 [<Erase>]
 module Keyframe =
@@ -368,9 +379,6 @@ module Keyframe =
         inherit Style<float[]>
         inherit Style_
 
-[<Interface>]
-type IKeyframeValue =
-    inherit ITweenValue
     
 [<Interface>]
 type KeyframeValue =
@@ -379,6 +387,14 @@ type KeyframeValue =
     static member inline create (value: int): #IKeyframeValue = !!value
     static member inline create (value: float): #IKeyframeValue = !!value
     static member inline create (value: string): #IKeyframeValue = !!value
+
+[<Erase; AutoOpen>]
+type AutoOpenKeyframeValueSugar =
+    static member inline KeyframeValue (values: IKeyframeValueProp list): #IKeyframeValue = !!createObj !!values
+    static member inline KeyframeValue (value: int): #IKeyframeValue = !!value
+    static member inline KeyframeValue (value: string): #IKeyframeValue = !!value
+    static member inline KeyframeValue (value: float): #IKeyframeValue = !!value
+
 
 [<Interface>]
 type IPlaybackProp = interface end
@@ -404,7 +420,12 @@ type AnimationCallbacks<'T> =
     inherit TimerCallbacks<'T>
     static member inline onBeforeUpdate (callback: Callback<'T>): #IAnimationCallbackProp<'T> = "onBeforeUpdate" ==< callback
     static member inline onRender (callback: Callback<'T>): #IAnimationCallbackProp<'T> = "onRender" ==< callback
-    
+
+[<Interface>]
+type IScrollObserverCallbackProp<'T> = interface end
+[<Interface>]
+type IScrollObserverProp =
+    inherit IScrollObserverCallbackProp<ScrollObserver>
 
 [<Interface>]
 type Playback =
@@ -420,6 +441,9 @@ type Playback =
     static member inline loopDelay (value: int): #IPlaybackProp = "loopDelay" ==< value
     static member inline loopDelay (stagger: Stagger): #IPlaybackProp = "loopDelay" ==< stagger
     static member inline loopDelay (stagger: IStaggerProp list): #IPlaybackProp = "loopDelay" ==< (createObj !!stagger)
+    static member inline autoplay (value: bool): #IPlaybackProp = "autoplay" ==< value
+    static member inline autoplay (value: ScrollObserver): #IPlaybackProp = "autoplay" ==< value
+    static member inline autoplay (options: IScrollObserverProp list): #IPlaybackProp = "autoplay" ==< Exports.onScroll(!!createObj !!options)
 
 [<Interface>]
 type ITimerProp =
@@ -440,6 +464,7 @@ type AnimeJs with
 type IAnimationProp =
     inherit IAnimationCallbackProp<Animation>
     inherit IAnimatedPropObj<IKeyframeProp>
+    inherit IAnimatedProp<IKeyframeValue[]>
     inherit IAnimatedProp<string[]>
     inherit IAnimatedProp<int[]>
     inherit IAnimatedProp<float[]>
@@ -494,9 +519,7 @@ module Animation =
     [<Interface>]
     type Style =
         inherit StyleObj<IKeyframeProp>
-        inherit Style<string[]>
-        inherit Style<float[]>
-        inherit Style<int[]>
+        inherit Style<IKeyframeValue[]>
         inherit Style_
 type Exports with
     [<Import("animate", "animejs")>]
@@ -508,12 +531,12 @@ type AnimeJs with
 type TimeLabelMap =
     [<EmitIndexer>]
     abstract member Item: TimeLabel -> ITimePosition with get,set
-
 type TimelineObj =
 
     [<EmitMethod("add")>]
     member this._add([<ParamCollection>] values): TimelineObj= jsNative
     member inline this.add(targets: Targets, animationBuilder: IAnimationProp list, ?position: ITimePosition): TimelineObj = this._add(targets, createObj !!animationBuilder, position)
+    member inline this.add(targets: Selector, animationBuilder: IAnimationProp list, ?position: ITimePosition): TimelineObj = this._add(targets, createObj !!animationBuilder, position)
     member inline this.add(timerParameters: ITimerProp list, ?position: ITimePosition) = this._add(createObj !!timerParameters, position)
     member this.sync(synced: Binding.Timer, ?position: ITimePosition): TimelineObj = jsNative
     member this.sync(synced: Binding.Animation, ?position: ITimePosition): TimelineObj = jsNative
@@ -761,11 +784,6 @@ type AnimeJs with
     static member inline createDraggable targets (options: IDraggableProp list): Binding.Draggable =
         Exports.createDraggable(targets, !!createObj !!options)
 
-[<Interface>]
-type IScrollObserverCallbackProp<'T> = interface end
-[<Interface>]
-type IScrollObserverProp =
-    inherit IScrollObserverCallbackProp<ScrollObserver>
 
 [<Interface>]
 type ScrollObserverCallbacks<'T> =
@@ -832,14 +850,14 @@ type AnimeJs with
     static member inline onScroll (options: IScrollObserverProp list): Binding.ScrollObserver = Exports.onScroll(!!createObj !!options)
     [<ImportMember(Spec.path)>]
     static member cleanInlineStyles(renderable: 'T): 'T = jsNative
+    [<Import("utils.random",Spec.path)>]
+    static member random(min: 'a when 'a: unmanaged,max: 'b when 'b:unmanaged,?decimalLength:'c): float = jsNative
     [<ImportMember(Spec.path)>]
-    static member random(min: 'a when 'a: unmanaged,max: 'b when 'b:unmanaged,?decimalLength:'c when 'c:unmanaged): float = jsNative
-    [<ImportMember(Spec.path)>]
-    [<Import("randomPick", "animejs")>]
+    [<Import("utils.randomPick", "animejs")>]
     static member randomPick (items: string): char = nativeOnly
-    [<Import("randomPick", "animejs")>]
+    [<Import("utils.randomPick", "animejs")>]
     static member randomPick (items: 'T[]): 'T = nativeOnly
-    [<Import("shuffle", "animejs")>]
+    [<Import("utils.shuffle", "animejs")>]
     static member shuffle (items: 'T[]): 'T[] = nativeOnly
     [<Import("svg.createDrawable", Spec.path)>]
     static member createDrawable(selector: SVGElement, ?start: float, ?``end``: float): SVGElementInstanceList = jsNative
