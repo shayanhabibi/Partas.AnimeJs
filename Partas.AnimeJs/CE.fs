@@ -2572,4 +2572,4 @@ type CssStyle =
     static member inline strokeOpacity: ICssStyle = unbox "strokeOpacity"
     static member inline strokeWidth: ICssStyle = unbox "strokeWidth"
     static member inline textAnchor: ICssStyle = unbox "textAnchor"
-    static member inline vectorEffect: ICssStyle = unbox "vectorEffect"
+    static member inline vectorEffect: ICssStyle = unbox "vectorEffect"    

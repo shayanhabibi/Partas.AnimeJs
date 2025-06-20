@@ -12,6 +12,31 @@ Fable bindings for the phenomenal [v4+ AnimeJs animation library](https://animej
 > Check out their v4 landing page
 
 
+## ComputationExpressions
+
+Computations that have their operations defined on the type directly should show them in auto completion.
+
+![img.png](img.png)
+
+Otherwise, you can `dot` the computation builder and filter the completions by `Op`. This should show all defined custom operations.
+
+![img_1.png](img_1.png)
+
+When viewing the operations doc in full, the remarks describe:
+
+- The operation name
+- Number of args acceptable
+- Different type signatures for each arg count
+
+![img_2.png](img_2.png)
+
+When viewing the operation docs in shorthand, the doc will list:
+
+- The operation name
+- Type signature for that particular member
+
+![img_3.png](img_3.png)
+
 ## Progress
 
 The bindings are essentially done. There are some dependencies on Partas.Solid that will have to be cleaned up though.
