@@ -6,30 +6,18 @@ open Fable.Core.JS
 open Partas.AnimeJs.Core
 open Browser.Types
 open Partas.AnimeJs.CE
-type FableObjectBuilder = interface end
-type PlaybackObjectBuilder =
-    inherit FableObjectBuilder
-
-[<Erase>]
-module RelativeOperators =
-    let inline (!<<+=) value = unbox<RelativeTimePosition> $"<<+={value}"
-    let inline (!<<-=) value = unbox<RelativeTimePosition> $"<<-={value}"
-    let inline (!<<*=) value = unbox<RelativeTimePosition> $"<<*={value}"
-    let inline (!*=) value = unbox<RelativeTweenValue> $"*={value}"
-    let inline (!-=) value = unbox<RelativeTweenValue> $"-={value}"
-    let inline (!+=) value = unbox<RelativeTweenValue> $"+={value}"
-open RelativeOperators
-[<Erase>]
-type FableObjectBuildder = FableObjectBuilder of (string * obj) list with
-    member inline this.Value: (string * obj) list = !!this
-
+/// Alias for a string * obj list
 type FableObject = (string * obj) list
+/// Implements boiler plate for builder expressions which are creating JS objects
+type FableObjectBuilder = interface end
 [<AutoOpen>]
 module FableObjectBuilderExtension =
     type FableObjectBuilder with
+        // Can initialise a sequence with an empty list
         member inline _.Yield(_: unit): FableObject = []
         member inline _.Yield(_object_value: string * obj) = _object_value
         member inline _.Yield(_object_builder: FableObject) = _object_builder
+        // hack all the possibilities away. redundancies.
         member inline _.Combine(_object_unit: unit, _object_value: string * obj) =
             _object_unit
             _object_value
@@ -42,12 +30,41 @@ module FableObjectBuilderExtension =
         member inline _.Combine(_object_builder: FableObject, _object_value: string * obj) = _object_value :: _object_builder
         member inline _.Combine(_object_builder: FableObject, _object_builder2: FableObject) = _object_builder @ _object_builder2
         member inline _.Combine(_object_builder: string * obj, _object_builder2: FableObject) = _object_builder :: _object_builder2
-        member inline _.Delay(value) = value()
+        // get rid of it
+        member inline _.Delay([<InlineIfLambda>] value) = value()
+        // If a custom operation comes after a general key,value pair then the input is string * obj
         member inline _.For(_object_builder: FableObject, _object_builder_action: string * obj -> FableObject) =
             _object_builder |> List.collect _object_builder_action
+        // If a custom operation is the first of the sequence/expression, then the input is unit
         member inline _.For(_object_builder: FableObject, _object_builder_action: unit -> FableObject) =
             _object_builder @ (_object_builder_action())
+
+// Forward declaration for Playback computation expression
+type PlaybackObjectBuilder =
+    inherit FableObjectBuilder
+
+/// <summary>
+/// Contains implementations of the Relative Time Position operators.
+/// All operators are prefixed with <c>!</c>
+/// </summary>
+/// <example><code>
+/// let pos: RelativeTimePosition = !&lt;&lt;+= 5
+/// // All operator signatures are 'a -> RelativeTimePosition via:
+/// // unbox&lt;RelativeTimePosition> $"&lt;&lt;+={value}"
+/// </code></example>
+[<Erase>]
+module RelativeOperators =
+    let inline (!<<+=) value = unbox<RelativeTimePosition> $"<<+={value}"
+    let inline (!<<-=) value = unbox<RelativeTimePosition> $"<<-={value}"
+    let inline (!<<*=) value = unbox<RelativeTimePosition> $"<<*={value}"
+    let inline (!*=) value = unbox<RelativeTweenValue> $"*={value}"
+    let inline (!-=) value = unbox<RelativeTweenValue> $"-={value}"
+    let inline (!+=) value = unbox<RelativeTweenValue> $"+={value}"
+
 open System.Runtime.CompilerServices
+
+/// Style computations implement all the accepted value types for tween/keyframes etc.
+/// Monad wrappers are used to make the `to` (too) and `from` mutually exclusive properties.
 type Style = CssStyle
 and [<Erase>] StyleValue = private StyleValue of obj
 and [<Erase>] StyleObj = private StyleObj of obj
@@ -62,9 +79,10 @@ and ICssStyle with
         _object_builder |> List.collect _object_builder_action
     member inline _.Yield(_: unit): FableObject = []
     member inline _.Yield(value: ITuple) = StyleValue value
-    member inline _.Delay([<InlineIfLambda>] value: unit -> StyleValue) = value()
     member inline _.Yield(value: float) = StyleValue value
     member inline _.Yield(value: string) = StyleValue value
+    member inline _.Yield(value: RelativeTweenValue) = StyleValue value
+    member inline _.Delay([<InlineIfLambda>] value: unit -> StyleValue) = value()
     member inline _.Delay([<InlineIfLambda>] value: unit -> FableObject) = value()
     member inline _.Delay([<InlineIfLambda>] value: unit -> StyleFromObj) = value()
     member inline _.Delay([<InlineIfLambda>] value: unit -> StyleToObj) = value()
@@ -147,82 +165,119 @@ and StyleArray with
     member inline _.Delay([<InlineIfLambda>] value: unit -> StyleValue) = value()
     member inline _.Yield(value: float) = StyleValue value
     member inline _.Yield(value: string) = StyleValue value
+    member inline _.Yield(value: RelativeTweenValue) = StyleValue value
     member inline _.Delay([<InlineIfLambda>] value: unit -> FableObject) = value()
     member inline _.Delay([<InlineIfLambda>] value: unit -> StyleFromObj) = value()
     member inline _.Delay([<InlineIfLambda>] value: unit -> StyleToObj) = value()
     member inline _.Combine(value) = fun () -> value
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/from">See the docs</a>
     [<CustomOperation "from">]
     member inline _.fromOp(_object_builder: FableObject, _property_value: float) = StyleFromObj(("from" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/from">See the docs</a>
     [<CustomOperation "from">]
     member inline _.fromOp(_object_builder: FableObject, _property_value: FunctionValue<float>) = StyleFromObj(("from" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/from">See the docs</a>
     [<CustomOperation "from">]
     member inline _.fromOp(_object_builder: FableObject, _property_value: string) = StyleFromObj(("from" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/from">See the docs</a>
     [<CustomOperation "from">]
     member inline _.fromOp(_object_builder: FableObject, _property_value: RelativeTweenValue) = StyleFromObj(("from" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: float) = StyleToObj(("to" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: FunctionValue<float>) = StyleToObj(("to" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: string) = StyleToObj(("to" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: RelativeTweenValue) = StyleToObj(("to" ==> _property_value) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: RelativeTweenValue, _property_value2: RelativeTweenValue) = StyleToObj(("to" ==> (_property_value, _property_value2)) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: float, _property_value2: float) = StyleToObj(("to" ==> (_property_value, _property_value2)) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: string, _property_value2: string) = StyleToObj(("to" ==> (_property_value, _property_value2)) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: RelativeTweenValue, _property_value2: float) = StyleToObj(("to" ==> (_property_value, _property_value2)) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: float, _property_value2: RelativeTweenValue) = StyleToObj(("to" ==> (_property_value, _property_value2)) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/to">See the docs</a>
     [<CustomOperation "too">]
     member inline _.toOp(_object_builder: FableObject, _property_value: FunctionValue<float>, _property_value2: FunctionValue<float>) = StyleToObj(("to" ==> (_property_value, _property_value2)) :: _object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/delay">See the docs</a>
     [<CustomOperation "delay">]
     member inline _.DelayOp(_object_builder: FableObject, _property_value: float) = _object_builder @ ["delay" ==> _property_value]
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/delay">See the docs</a>
     [<CustomOperation "delay">]
     member inline _.DelayOp(_object_builder: FableObject, _property_value_lambda: FunctionValue<float>) = _object_builder @ ["delay" ==> _property_value_lambda]
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/duration">See the docs</a>
     [<CustomOperation "duration">]
     member inline _.DurationOp(_object_builder: FableObject, _property_value: float) = _object_builder @ ["duration" ==> _property_value]
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/duration">See the docs</a>
     [<CustomOperation "duration">]
     member inline _.DurationOp(_object_builder: FableObject, _property_value_lambda: FunctionValue<float>) = _object_builder @ ["duration" ==> _property_value_lambda]
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/ease">See the docs</a>
     [<CustomOperation "ease">]
     member inline _.EaseOp(_object_builder: FableObject, _property_value_lambda: float -> float) = _object_builder @ ["ease" ==> _property_value_lambda]
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/composition">See the docs</a>
     [<CustomOperation "composition">]
     member inline _.CompositionOp(_object_builder: FableObject, _property_value: Composition) = _object_builder @ ["composition" ==> _property_value]
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/modifier">See the docs</a>
     [<CustomOperation "modifier">]
     member inline _.ModifierOp(_object_builder: FableObject, _property_value_lambda: FloatModifier) = _object_builder @ ["modifier" ==> _property_value_lambda]
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/delay">See the docs</a>
     [<CustomOperation "delay">]
     member inline _.DelayOp(_object_builder: StyleToObj, _property_value: float) = StyleToObj(("delay" ==> _property_value) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/delay">See the docs</a>
     [<CustomOperation "delay">]
     member inline _.DelayOp(_object_builder: StyleToObj, _property_value_lambda: FunctionValue<float>) = StyleToObj(("delay" ==> _property_value_lambda) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/duration">See the docs</a>
     [<CustomOperation "duration">]
     member inline _.DurationOp(_object_builder: StyleToObj, _property_value: float) = StyleToObj(("duration" ==> _property_value) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/duration">See the docs</a>
     [<CustomOperation "duration">]
     member inline _.DurationOp(_object_builder: StyleToObj, _property_value_lambda: FunctionValue<float>) = StyleToObj(("duration" ==> _property_value_lambda) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/ease">See the docs</a>
     [<CustomOperation "ease">]
     member inline _.EaseOp(_object_builder: StyleToObj, _property_value_lambda: float -> float) = StyleToObj(("ease" ==> _property_value_lambda) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/composition">See the docs</a>
     [<CustomOperation "composition">]
     member inline _.CompositionOp(_object_builder: StyleToObj, _property_value: Composition) = StyleToObj(("composition" ==> _property_value) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/modifier">See the docs</a>
     [<CustomOperation "modifier">]
     member inline _.ModifierOp(_object_builder: StyleToObj, _property_value_lambda: FloatModifier) = StyleToObj(("modifier" ==> _property_value_lambda) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/delay">See the docs</a>
     [<CustomOperation "delay">]
     member inline _.DelayOp(_object_builder: StyleFromObj, _property_value: float) = StyleFromObj(("delay" ==> _property_value) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/delay">See the docs</a>
     [<CustomOperation "delay">]
     member inline _.DelayOp(_object_builder: StyleFromObj, _property_value_lambda: FunctionValue<float>) = StyleFromObj(("delay" ==> _property_value_lambda) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/duration">See the docs</a>
     [<CustomOperation "duration">]
     member inline _.DurationOp(_object_builder: StyleFromObj, _property_value: float) = StyleFromObj(("duration" ==> _property_value) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/duration">See the docs</a>
     [<CustomOperation "duration">]
     member inline _.DurationOp(_object_builder: StyleFromObj, _property_value_lambda: FunctionValue<float>) = StyleFromObj(("duration" ==> _property_value_lambda) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/ease">See the docs</a>
     [<CustomOperation "ease">]
     member inline _.EaseOp(_object_builder: StyleFromObj, _property_value_lambda: float -> float) = StyleFromObj(("ease" ==> _property_value_lambda) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/composition">See the docs</a>
     [<CustomOperation "composition">]
     member inline _.CompositionOp(_object_builder: StyleFromObj, _property_value: Composition) = StyleFromObj(("composition" ==> _property_value) :: !!_object_builder)
+    /// <a href="https://animejs.com/documentation/animation/tween-parameters/modifier">See the docs</a>
     [<CustomOperation "modifier">]
     member inline _.ModifierOp(_object_builder: StyleFromObj, _property_value_lambda: FloatModifier) = StyleFromObj(("modifier" ==> _property_value_lambda) :: !!_object_builder)
 
-type Extensions =
+[<AutoOpen>]
+type AutoOpenExtensions =
     [<Extension>]
     static member inline Run(prop: ICssStyle, runner: StyleValue) =
         !!prop ==> runner
@@ -244,26 +299,15 @@ type Extensions =
     [<Extension>]
     static member inline Run(prop: StyleArray, runner: StyleFromObj): StyleFromObj = !!createObj !!runner
 
-let inline style (value: string) = unbox<ICssStyle> value
-let inline (!~) (value: string) = style value 
-
-let animatablePropertyMutualExclusion =
-    Style.accentColor {
-        too 5
-        delay 5
-    }
-let asdfas = Style.all {
-    Style.key { from 5 },
-    Style.key { 3 }
-}
-
-let asdfaasd = !~"porcheese" { 5 }
-
+// Forward interface declaration
+// Implementation below
 type TimerCallbackComputation<'T> =
     inherit FableObjectBuilder
 
 [<AutoOpen>]
 module AutoOpenTimerCallbackComputation =
+    // Generic type param because multiple options use the same callbacks but return their
+    // own type as the param
     type TimerCallbackComputation<'T> with
         [<CustomOperation "onBegin">]
         member inline _.onBeginOp(_object_builder: FableObject, _property_value: Callback<'T>) = ("onBegin" ==> _property_value) :: _object_builder
@@ -278,19 +322,22 @@ module AutoOpenTimerCallbackComputation =
         [<CustomOperation "andThen">]
         member inline _.thenOp(_object_builder: FableObject, _property_value: Callback<'T>) = ("then" ==> _property_value) :: _object_builder
 
-
+// Forward interface declaration
+// implementation below
 type AnimationCallbackComputation<'T> =
     inherit TimerCallbackComputation<'T>
 
 [<AutoOpen>]
 module AutoOpenAnimationCallbackComputation =
+    // Generic type param because multiple types may inherit these callbacks and
+    // only differ in the type that is provided as the parameter
     type AnimationCallbackComputation<'T> with
         [<CustomOperation "onBeforeUpdate">]
         member inline _.onBeforeUpdateOp(_object_builder: FableObject, _property_value: Callback<'T>) = ("onBeforeUpdate" ==> _property_value) :: _object_builder
         [<CustomOperation "onRender">]
         member inline _.onRenderOp(_object_builder: FableObject, _property_value: Callback<'T>) = ("onRender" ==> _property_value) :: _object_builder
-    
 
+/// <a href="https://animejs.com/documentation/animation/tween-parameters">Implements Tween Parameters</a>
 type TweenObjectBuilder() =
     interface FableObjectBuilder
     [<CustomOperation "from">]
@@ -370,21 +417,9 @@ type KeyframeComputation() =
     member inline _.Delay(value: unit -> FableObject) = value()
     member inline _.Combine(y) = fun () -> y
     member inline _.Run(_object_run: FableObject): KeyframesValue  = !!createObj _object_run
-let keyframe = KeyframeComputation()
-let assss = [
-    keyframe {
-        Style.all { 5 }
-        modifier (id)
-        Style.accentColor { "black" }
-        delay 5
-    }
-    keyframe {
-        Style.accentColor { "black" }
-    }
-]
 
 [<AutoOpen>]
-module PlaybackObjectBuilder =
+module AutoOpenPlaybackObjectBuilder =
     type PlaybackObjectBuilder with
         [<CustomOperation "loop">]
         member inline _.Loop(_object_builder: FableObject, _property_value: bool) = _object_builder @ [("loop" ==> _property_value)]
@@ -421,7 +456,6 @@ type BoundsComputation() =
     member inline _.RightOp(_object_builder, _property_value: float) = ("right" ==> _property_value) :: _object_builder
     member inline _.Run(_object_builder_run: FableObject): Bounds =
         unbox (_object_builder_run |> createObj)
-let bounds = BoundsComputation()
 type SpringComputation() =
     interface FableObjectBuilder
     [<CustomOperation "mass">]
@@ -435,25 +469,46 @@ type SpringComputation() =
     member inline _.Run(_object_builder_run: FableObject): float -> float =
         import "createSpring" "animejs" (_object_builder_run |> createObj)
     member inline _.Yield(x: ICssStyle) = [x.Value]
-let spring = SpringComputation()
-let tweenOptions = TweenObjectBuilder()
-
-let xxx = tweenOptions {
-    modifier
-        (spring {
-            mass 1.0
-            damping 5
-        })
-    composition Composition.Blend
-}
 
 type TimelineObj = FSharp.TimelineObj
 type TimelineOptions = interface end
-
+type TimerOptionsBaseComputation() =
+    interface FableObjectBuilder
+    interface PlaybackObjectBuilder
+    interface TimerCallbackComputation<Binding.Timer>
+type TimerOptionsComputation() =
+    inherit TimerOptionsBaseComputation()
+    member inline _.Run(_object_run: FableObject): Binding.TimerOptions = _object_run |> !!createObj
+type TimerOptionsCreateComputation() =
+    inherit TimerOptionsBaseComputation()
+    member inline _.Run (_object_run: FableObject): Binding.Timer = _object_run |> !!createObj |> Binding.Export.createTimer
 type TimelineOptionsComputation() =
     interface FableObjectBuilder
     interface PlaybackObjectBuilder
-    interface TimerCallbackComputation<FSharp.TimelineObj>
+    interface AnimationCallbackComputation<FSharp.TimelineObj>
+    member inline _.Yield (value: Binding.TimerOptions) = "defaults" ==> value
+    /// <summary>
+    /// <c>defaults</c><br/>
+    /// <c>Binding.TimerOptions -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>defaults</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>Binding.TimerOptions</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
+    [<CustomOperation "defaults">]
+    member inline _.defaultsOp(_object_builder: FableObject, value: Binding.TimerOptions): FableObject = ("defaults" ==> value) :: !!_object_builder
     member inline _.Run (_object_run: FableObject): TimelineObj = _object_run |> createObj |> import "createTimeline" Spec.path
 type FSharp.TimelineObj with
 // type TimelineComputation(?timeline: TimelineObj) =
@@ -497,42 +552,178 @@ type FSharp.TimelineObj with
     member inline _.label(_object_instance: TimelineObj, label: string, ?position: Binding.TimePosition) = _object_instance.label(!!label, ?position = !!position)
     member inline _.Run(value: TimelineObj) = value
 
-let timeline = TimelineOptionsComputation()
-let testTimelineObj: TimelineObj = !! null
-// let timeline = TimelineComputation()
-let timelineObj: TimelineObj = timeline { loop 5000 } { init }
-let yyy = timelineObj {
-    init
-    add
-        "#box"
-        (tweenOptions {
-            delay 100.0
-        })
-    restart
-    add "#box .paths" []
-    resume
-}
-
 type AnimatableOptionsComputation() =
     interface FableObjectBuilder
+    /// <summary>
+    /// <c>unit</c><br/>
+    /// <c>string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>unit</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "unit">]
     member inline _.UnitOp(_object_builder: FableObject, value: string) = ("unit", !!value) :: _object_builder
+    /// <summary>
+    /// <c>duration</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>duration</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | FunctionValue&lt;float> | FunctionValue&lt;RelativeTweenValue> | RelativeTweenValue</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "duration">]
     member inline _.DurationOp(_object_builder: FableObject, value: float) = ("duration" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>duration</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>duration</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | FunctionValue&lt;float> | FunctionValue&lt;RelativeTweenValue> | RelativeTweenValue</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "duration">]
-    member inline _.DurationOp(_object_builder: FableObject, value: FunctionValue) = ("duration" ==> value) :: _object_builder
+    member inline _.DurationOp(_object_builder: FableObject, value: FunctionValue<float>) = ("duration" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>duration</c><br/>
+    /// <c>FunctionValue&lt;RelativeTweenValue> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>duration</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | FunctionValue&lt;float> | FunctionValue&lt;RelativeTweenValue> | RelativeTweenValue</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "duration">]
-    member inline _.DurationOp(_object_builder: FableObject, value: string) = ("duration" ==> value) :: _object_builder
+    member inline _.DurationOp(_object_builder: FableObject, value: FunctionValue<RelativeTweenValue>) = ("duration" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>duration</c><br/>
+    /// <c>RelativeTweenValue -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>duration</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | FunctionValue&lt;float> | FunctionValue&lt;RelativeTweenValue> | RelativeTweenValue</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
+    [<CustomOperation "duration">]
+    member inline _.DurationOp(_object_builder: FableObject, value: RelativeTweenValue) = ("duration" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>ease</c><br/>
+    /// <c>(float -> float) -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>ease</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float -> float</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "ease">]
     member inline _.EaseOp(_object_builder: FableObject, value: float -> float) = ("ease" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>modifier</c><br/>
+    /// <c>(float -> float) -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>modifier</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float -> float</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "modifier">]
     member inline _.ModifierOp(_object_builder: FableObject, value: float -> float) = ("modifier" ==> value) :: _object_builder
     member inline _.Run(_object_run: FableObject): Binding.AnimatableOptions = !!(_object_run |> createObj)
-let animatableOptions = AnimatableOptionsComputation()
+    
+type Binding.AnimatableOptions with
+    member inline _.Yield(value: unit): unit = value
+    member inline _.Combine(value: unit -> Targets): Targets = value()
+    member inline _.Yield(value: Selector): Targets = !!value
+    member inline _.Yield(value: string): Targets = !!value
+    member inline _.Yield(value: NodeList): Targets = !!value
+    member inline _.Yield(value: #Node): Targets = !!value
+    member inline _.Delay(value) = value()
 
-let d = animatableOptions {
-    unit "asdf"
-}
+[<AutoOpen>]
+type AutoOpenAnimatableOptionsExtensions =
+    [<Extension>]
+    static member inline Run(options: Binding.AnimatableOptions, value: Targets): Binding.Animatable =
+        Binding.Export.createAnimatable(value,options)
 
 type CursorOptionsComputation() =
     member inline _.Yield(_: unit): unit = ()
@@ -543,143 +734,1297 @@ type CursorOptionsComputation() =
     member inline _.Delay(value: unit -> bool) = value()
     member inline _.Delay(value: unit -> ((string * obj) * (string * obj))) = value()
     member inline _.Combine(value: string * obj): string * obj = value
+    /// <summary>
+    /// <c>onHover</c><br/>
+    /// <c>bool -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onHover</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
     [<CustomOperation "onHover">]
     member inline _.OnHoverOp(_object_builder: unit, value: bool) = "onHover" ==> value
+    /// <summary>
+    /// <c>onHover</c><br/>
+    /// <c>bool -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onHover</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
     [<CustomOperation "onHover">]
     member inline _.OnHoverOp(_object_builder: string * obj, value: bool) = _object_builder,("onHover" ==> value)
+    /// <summary>
+    /// <c>onGrab</c><br/>
+    /// <c>bool -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onGrab</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
     [<CustomOperation "onGrab">]
     member inline _.OnGrabOp(_object_builder: unit, value: bool) = "onGrab" ==> value
+    /// <summary>
+    /// <c>onGrab</c><br/>
+    /// <c>bool -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onGrab</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
     [<CustomOperation "onGrab">]
     member inline _.OnGrabOp(_object_builder: string * obj, value: bool) = _object_builder,("onGrab" ==> value)
+    /// <summary>
+    /// <c>onHover</c><br/>
+    /// <c>string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onHover</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
+    [<CustomOperation "onHover">]
+    member inline _.OnHoverOp(_object_builder: unit, value: string) = "onHover" ==> value
+    /// <summary>
+    /// <c>onHover</c><br/>
+    /// <c>string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onHover</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
+    [<CustomOperation "onHover">]
+    member inline _.OnHoverOp(_object_builder: string * obj, value: string) = _object_builder,("onHover" ==> value)
+    /// <summary>
+    /// <c>onGrab</c><br/>
+    /// <c>string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onGrab</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
+    [<CustomOperation "onGrab">]
+    member inline _.OnGrabOp(_object_builder: unit, value: string) = "onGrab" ==> value
+    /// <summary>
+    /// <c>onGrab</c><br/>
+    /// <c>string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>onGrab</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string | bool</c></p>
+    /// </remarks>
+    /// <returns><c>string * obj</c></returns>
+    [<CustomOperation "onGrab">]
+    member inline _.OnGrabOp(_object_builder: string * obj, value: string) = _object_builder,("onGrab" ==> value)
     member inline _.Run(_object_run: (string * obj)): DraggableCursor = !!([|_object_run|] |> createObj)
     member inline _.Run(_object_run: ((string * obj) * (string * obj))): DraggableCursor = !!([|_object_run |> fst; _object_run |> snd|] |> createObj)
     member inline _.Run(_object_run: bool): DraggableCursor = DraggableCursor(_object_run)
 
 type AxisOptionsComputation() =
     interface FableObjectBuilder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: float) = ("snap" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>float -> float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: float, value2: float) = ("snap" ==> (value, value2)) :: _object_builder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>FunctionValue&lt;float></c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float>) = ("snap" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>FunctionValue&lt;float * float></c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float * float>) = ("snap" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>modifier</c><br/>
+    /// <c>(float -> float) -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>modifier</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float -> float</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "modifier">]
     member inline _.ModifierOp(_object_builder: FableObject, value: FloatModifier) = ("modifier" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>mapTo</c><br/>
+    /// <c>string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>mapTo</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "mapTo">]
     member inline _.MapToOp(_object_builder: FableObject, value: string) = ("mapTo" ==> value) :: _object_builder
     member inline _.Yield(value: bool) = value
     member inline _.Run(_object_run: FableObject): FSharp.Axis = !!createObj _object_run
     member inline _.Run(_object_run: bool): FSharp.Axis = !!_object_run
-let dragAxis = AxisOptionsComputation()
-
-let dragCursor = CursorOptionsComputation()
-
-let df = dragCursor {
-    true
-}
 
 type DraggableOptionsComputation() =
     interface FableObjectBuilder
     member _.Yield(value: DraggableCursor) = "cursor" ==> value
     member _.Yield(value: Axis * FSharp.Axis): string * obj = !!value
+    /// <summary>
+    /// <c>cursor</c><br/>
+    /// <c>bool -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>cursor</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>bool</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
+    
     [<CustomOperation "cursor">]
     member _.CursorOp(_object_builder: FableObject, value: bool) = ("cursor" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>x</c><br/>
+    /// <c>bool -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>x</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>bool | FSharp.Axis</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "x">]
     member _.XOp(_object_builder: FableObject, value: bool) = ("x" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>y</c><br/>
+    /// <c>bool -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>y</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>bool | FSharp.Axis</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "y">]
     member _.YOp(_object_builder: FableObject, value: bool) = ("y" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>x</c><br/>
+    /// <c>FSharp.Axis -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>x</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>bool | FSharp.Axis</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "x">]
     member _.XOp(_object_builder: FableObject, value: FSharp.Axis) = ("x" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>y</c><br/>
+    /// <c>FSharp.Axis -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>y</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>bool | FSharp.Axis</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "y">]
     member _.YOp(_object_builder: FableObject, value: FSharp.Axis) = ("y" ==> value) :: _object_builder
-    // member _.Run(value: string * obj): Binding.DraggableOptions = !!createObj [value]
+    /// <summary>
+    /// <c>container</c><br/>
+    /// <c>Selector -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>container</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "container">]
     member _.ContainerOp(_object_builder: FableObject, _object_value: Selector) = ("container" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>container</c><br/>
+    /// <c> string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>container</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "container">]
     member _.ContainerOp(_object_builder: FableObject, _object_value: string) = ("container" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>container</c><br/>
+    /// <c>#HTMLElement-> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>container</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "container">]
     member _.ContainerOp(_object_builder: FableObject, _object_value: #HTMLElement) = ("container" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>container</c><br/>
+    /// <c>SBounds -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>container</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "container">]
     member _.ContainerOp(_object_builder: FableObject, _object_value: Bounds) = ("container" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>container</c><br/>
+    /// <c>FunctionValue&lt;Bounds> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>container</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "container">]
     member _.ContainerOp(_object_builder: FableObject, _object_value: FunctionValue<Bounds>) = ("container" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>containerPadding</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>containerPadding</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "containerPadding">]
     member _.containerPaddingOp(_object_builder: FableObject, _object_value: float) = ("containerPadding" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>containerPadding</c><br/>
+    /// <c>Bounds -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>containerPadding</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "containerPadding">]
     member _.containerPaddingOp(_object_builder: FableObject, _object_value: Bounds) = ("containerPadding" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>containerPadding</c><br/>
+    /// <c>FunctionValue&lt;Bounds> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>containerPadding</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "containerPadding">]
     member _.containerPaddingOp(_object_builder: FableObject, _object_value: FunctionValue<Bounds>) = ("containerPadding" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>containerPadding</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>containerPadding</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "containerPadding">]
     member _.containerPaddingOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("containerPadding" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>containerFriction</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>containerFriction</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "containerFriction">]
     member _.containerFrictionOp(_object_builder: FableObject, _object_value: float) = ("containerFriction" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseMass</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseMass</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseMass">]
     member _.releaseMassOp(_object_builder: FableObject, _object_value: float) = ("releaseMass" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseMass</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseMass</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseMass">]
     member _.releaseMassOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseMass" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseStiffness</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseStiffness</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseStiffness">]
     member _.releaseStiffnessOp(_object_builder: FableObject, _object_value: float) = ("releaseStiffness" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseStiffness</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseStiffness</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseStiffness">]
     member _.releaseStiffnessOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseStiffness" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseDamping</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseDamping</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseDamping">]
     member _.releaseDampingOp(_object_builder: FableObject, _object_value: float) = ("releaseDamping" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseDamping</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseDamping</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseDamping">]
     member _.releaseDampingOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseDamping" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseEase</c><br/>
+    /// <c>(float -> float) -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseEase</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float -> float | FunctionValue&lt;float -> float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseEase">]
     member _.releaseEaseOp(_object_builder: FableObject, _object_value: float -> float) = ("releaseEase" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseEase</c><br/>
+    /// <c>FunctionValue&lt;float -> float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseEase</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float -> float | FunctionValue&lt;float -> float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseEase">]
     member _.releaseEaseOp(_object_builder: FableObject, _object_value: FunctionValue<float -> float>) = ("releaseEase" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseContainerFriction</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseContainerFriction</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseContainerFriction">]
     member _.releaseContainerFrictionOp(_object_builder: FableObject, _object_value: float) = ("releaseContainerFriction" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>releaseContainerFriction</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>releaseContainerFriction</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "releaseContainerFriction">]
     member _.releaseContainerFrictionOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseContainerFriction" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>minVelocity</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>minVelocity</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "minVelocity">]
     member _.minVelocityOp(_object_builder: FableObject, _object_value: float) = ("minVelocity" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>minVelocity</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>minVelocity</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "minVelocity">]
     member _.minVelocityOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("minVelocity" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>maxVelocity</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>maxVelocity</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "maxVelocity">]
     member _.maxVelocityOp(_object_builder: FableObject, _object_value: float) = ("maxVelocity" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>maxVelocity</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>maxVelocity</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "maxVelocity">]
     member _.maxVelocityOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("maxVelocity" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>velocityMultiplier</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>velocityMultiplier</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "velocityMultiplier">]
     member _.velocityMultiplierOp(_object_builder: FableObject, _object_value: float) = ("velocityMultiplier" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>velocityMultiplier</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>velocityMultiplier</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "velocityMultiplier">]
     member _.velocityMultiplierOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("velocityMultiplier" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>dragSpeed</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>dragSpeed</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "dragSpeed">]
     member _.dragSpeedOp(_object_builder: FableObject, _object_value: float) = ("dragSpeed" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>dragSpeed</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>dragSpeed</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "dragSpeed">]
     member _.dragSpeedOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("dragSpeed" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>scrollThreshold</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>scrollThreshold</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "scrollThreshold">]
     member _.scrollThresholdOp(_object_builder: FableObject, _object_value: float) = ("scrollThreshold" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>scrollThreshold</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>scrollThreshold</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "scrollThreshold">]
     member _.scrollThresholdOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("scrollThreshold" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>scrollSpeed</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>scrollSpeed</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "scrollSpeed">]
     member _.scrollSpeedOp(_object_builder: FableObject, _object_value: float) = ("scrollSpeed" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>scrollSpeed</c><br/>
+    /// <c>FunctionValue&lt;float> -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>scrollSpeed</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&lt;float></c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "scrollSpeed">]
     member _.scrollSpeedOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("scrollSpeed" ==> _object_value) :: _object_builder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: float) = ("snap" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>float -> float -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: float, value2: float) = ("snap" ==> (value, value2)) :: _object_builder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>FunctionValue&lt;float></c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float>) = ("snap" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>snap</c><br/>
+    /// <c>FunctionValue&lt;float * float></c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>snap</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1 | 2</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+    /// <p><c>float float</c></p>
+    /// </remarks>
+    /// <returns><c></c>(string * obj) list</returns>
     [<CustomOperation "snap">]
     member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float * float>) = ("snap" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>modifier</c><br/>
+    /// <c>(float -> float) -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>modifier</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>float -> float</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "modifier">]
     member inline _.ModifierOp(_object_builder: FableObject, value: FloatModifier) = ("modifier" ==> value) :: _object_builder
+    /// <summary>
+    /// <c>mapTo</c><br/>
+    /// <c>string -> ...</c>
+    /// </summary>
+    /// <remarks>
+    /// <list type="table">
+    /// <item> <term>
+    /// Operation:
+    /// </term> <description>
+    /// <c>mapTo</c>
+    /// </description> </item>
+    /// <item> <term>
+    /// Args Num:
+    /// </term> <description>
+    /// <c>1</c>
+    /// </description> </item>
+    /// </list>
+    /// <p><c>string</c></p>
+    /// </remarks>
+    /// <returns><c>(string * obj) list</c></returns>
     [<CustomOperation "mapTo">]
     member inline _.MapToOp(_object_builder: FableObject, value: string) = ("mapTo" ==> value) :: _object_builder
-let draggableOptions = DraggableOptionsComputation()
-
-let f = draggableOptions {
-    x (dragAxis { true })
-    dragCursor { onGrab false }
-    container (bounds { top 5 })
-    
-}
-
+    member inline _.Run(_object_builder: FableObject): Binding.DraggableOptions = !!createObj !!_object_builder
+type Binding.DraggableOptions with
+    member inline _.Yield(value: unit): unit = value
+    member inline _.Combine(value: unit -> Targets): Targets = value()
+    member inline _.Yield(value: Selector): Targets = !!value
+    member inline _.Yield(value: string): Targets = !!value
+    member inline _.Yield(value: NodeList): Targets = !!value
+    member inline _.Yield(value: #Node): Targets = !!value
+    member inline _.Delay(value) = value()
+[<AutoOpen; Erase>]
+type AutoOpenDraggableOptionsExtensions =
+    [<Extension>]
+    static member inline Run(options: Binding.DraggableOptions, value: Targets): Binding.Draggable =
+        Binding.Exports.createDraggable(value,options)
 
 type ScrollObserverOptionsComputation() =
     interface FableObjectBuilder
@@ -1416,12 +2761,6 @@ type ScrollObserverOptionsComputation() =
     member inline _.leaveOp(_object_builder: FableObject, value: ObserverThreshold, target: string) = ("leave" ==> {| container = value; target = target |}) :: _object_builder
     member inline _.Run(_object_run: FableObject): Binding.ScrollObserver = createObj _object_run |> unbox |> Binding.Exports.onScroll
     
-let onScroll = ScrollObserverOptionsComputation()
-let scr = onScroll {
-    debug
-    target ""
-}
-
 type StaggerOptionsComputation(value: float) =
     interface FableObjectBuilder
     /// <summary>
@@ -1648,6 +2987,37 @@ type StaggerOptionsComputation(value: float) =
         let stagger value options = import "stagger" Spec.path
         stagger value (createObj _object_run)
 
+let onScroll = ScrollObserverOptionsComputation()
 let stagger value = StaggerOptionsComputation(value)
-
-let asddf = stagger (100) {}
+/// <summary>
+/// Computation Expression to create a draggable in AnimeJs.<br/>
+/// Includes a run signature that implements <c>createDraggable</c> on the
+/// completed options object
+/// </summary>
+/// <example><code>
+/// let draggableOptions = draggable { x (dragAxis { true }) }
+/// let drag = draggableOptions { ".sphere" }
+/// // ...
+/// let drag = draggable { x (dragAxis { true }) } { ".sphere" }
+/// </code></example>
+let draggable = DraggableOptionsComputation()
+/// <summary>
+/// Helper computation expression for DraggableOptions.<br/>
+/// Shorthand for the "x" and "y" operations
+/// </summary>
+let dragAxis = AxisOptionsComputation()
+/// <summary>
+/// Helper computation expression for DraggableOptions.<br/>
+/// Shorthand for "cursor" operation
+/// </summary>
+let dragCursor = CursorOptionsComputation()
+let animatable = AnimatableOptionsComputation()
+let timeline = TimelineOptionsComputation()
+let spring = SpringComputation()
+let tweenParams = TweenObjectBuilder()
+let bounds = BoundsComputation()
+let keyframe = KeyframeComputation()
+let inline style (value: string) = unbox<ICssStyle> value
+let inline (!~) (value: string) = style value
+let timerOptions = TimerOptionsComputation()
+let timer = TimerOptionsCreateComputation()
