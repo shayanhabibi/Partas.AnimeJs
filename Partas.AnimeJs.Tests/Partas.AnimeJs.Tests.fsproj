@@ -12,6 +12,7 @@
         <Compile Include="UnitTest1.fs" />
         <Content Include="Tests\Tests.fsproj" />
         <Compile Include="Tests\Program.fs" />
+        <Content Include="package.json" />
     </ItemGroup>
 
     <ItemGroup>

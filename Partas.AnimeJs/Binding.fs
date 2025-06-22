@@ -71,91 +71,6 @@ module Enums =
         | ``steps(steps = 10)``
 
 
-[<AutoOpen; Fable.Core.Erase>]
-module Types =
-    type EasingFunction = float -> float
-    
-    [<AllowNullLiteral>]
-    [<Interface>]
-    type PowerEasing =
-        [<Emit("$0($1...)")>]
-        abstract member Invoke: ?power: U2<float, string> -> EasingFunction
-
-    [<AllowNullLiteral>]
-    [<Interface>]
-    type BackEasing =
-        [<Emit("$0($1...)")>]
-        abstract member Invoke: ?overshoot: U2<float, string> -> EasingFunction
-
-    [<AllowNullLiteral>]
-    [<Interface>]
-    type ElasticEasing =
-        [<Emit("$0($1...)")>]
-        abstract member Invoke: ?amplitude: U2<float, string> * ?period: U2<float, string> -> EasingFunction
-
-    /// INTERNAL USE ONLY
-    /// Used to disambiguate the primary constructor of TweenValue
-    type internal TweenValueNoop =
-        /// INTERNAL USE ONLY
-        [<Emit("")>]
-        static member inline noop: TweenValueNoop = unbox () 
-    
-    type Targets = U2<Target, Target array>
-    type TweenParamModifier = delegate of value: float -> float
-    
-    type AnimatableSetter = delegate of value: U4<int, int[], float,  float[]> * ?duration: int<ms> * ?easing: Eases -> Animatable
-
-
-[<Import("eases", "animejs")>]
-type Eases =
-    abstract irregular: ?length: float * ?randomness: float -> EasingFunction
-    abstract steps: ?steps: float * ?fromStart: bool -> EasingFunction
-    abstract cubicBezier: ?mX1: float * ?mY1: float * ?mX2: float * ?mY2: float -> EasingFunction
-    abstract ``in``: PowerEasing
-    abstract out: PowerEasing
-    abstract inOut: PowerEasing
-    abstract outIn: PowerEasing
-    abstract inQuad: EasingFunction
-    abstract outQuad: EasingFunction
-    abstract inOutQuad: EasingFunction
-    abstract outInQuad: EasingFunction
-    abstract inCubic: EasingFunction
-    abstract outCubic: EasingFunction
-    abstract inOutCubic: EasingFunction
-    abstract outInCubic: EasingFunction
-    abstract inQuart: EasingFunction
-    abstract outQuart: EasingFunction
-    abstract inOutQuart: EasingFunction
-    abstract outInQuart: EasingFunction
-    abstract inQuint: EasingFunction
-    abstract outQuint: EasingFunction
-    abstract inOutQuint: EasingFunction
-    abstract outInQuint: EasingFunction
-    abstract inSine: EasingFunction
-    abstract outSine: EasingFunction
-    abstract inOutSine: EasingFunction
-    abstract outInSine: EasingFunction
-    abstract inCirc: EasingFunction
-    abstract outCirc: EasingFunction
-    abstract inOutCirc: EasingFunction
-    abstract outInCirc: EasingFunction
-    abstract inExpo: EasingFunction
-    abstract outExpo: EasingFunction
-    abstract inOutExpo: EasingFunction
-    abstract outInExpo: EasingFunction
-    abstract inBounce: EasingFunction
-    abstract outBounce: EasingFunction
-    abstract inOutBounce: EasingFunction
-    abstract outInBounce: EasingFunction
-    abstract inBack: BackEasing
-    abstract outBack: BackEasing
-    abstract inOutBack: BackEasing
-    abstract outInBack: BackEasing
-    abstract inElastic: ElasticEasing
-    abstract outElastic: ElasticEasing
-    abstract inOutElastic: ElasticEasing
-    abstract outInElastic: ElasticEasing
-
 [<Fable.Core.Erase>]
 type ChainedUtils =
     abstract clamp: min: float * max: float -> ChainedUtils
@@ -249,18 +164,18 @@ and ScrollObserver =
     abstract member completed: bool with get
     abstract member began: bool with get
     abstract member isInView: bool with get
-    abstract member offset: float<px> with get
-    abstract member offsetStart: float<px> with get
-    abstract member offsetEnd: float<px> with get
-    abstract member distance: float<px> with get
+    abstract member offset: float with get
+    abstract member offsetStart: float with get
+    abstract member offsetEnd: float with get
+    abstract member distance: float with get
     
     
 
 and TimerOptions =
-    abstract delay: int<ms> with set
-    abstract duration: int<ms> with set
+    abstract delay: int with set
+    abstract duration: int with set
     abstract loop: int with set
-    abstract loopDelay: int<ms> with set
+    abstract loopDelay: int with set
     abstract alternate: bool with set
     abstract reversed: bool with set
     abstract autoplay: U2<bool, ScrollObserver> with set
@@ -291,7 +206,7 @@ and Timer =
     /// when you want to completely stop and destroy a timer
     /// </summary>
     abstract member revert: ChainMethod<Timer>
-    abstract member seek: time: int<ms> * ?muteCallbacks: bool -> Timer
+    abstract member seek: time: int * ?muteCallbacks: bool -> Timer
     /// <summary>
     /// Changes the total duration of a timer to fit a specific time. The total
     /// duration is equal to the duration of an iteration multiplied with the total
@@ -299,12 +214,12 @@ and Timer =
     /// (3 iterations in total) then the total duration is 3000ms.
     /// </summary>
     /// <param name="duration">Duration in ms</param>
-    abstract member stretch: duration: int<ms> -> Timer
+    abstract member stretch: duration: int -> Timer
     
     abstract member id: U2<string, int> with get,set
-    abstract member deltaTime: int<ms> with get
-    abstract member currentTime: int<ms> with get,set
-    abstract member iterationCurrentTime: int<ms> with get,set
+    abstract member deltaTime: int with get
+    abstract member currentTime: int with get,set
+    abstract member iterationCurrentTime: int with get,set
     /// <summary>
     /// Value between <c>0.</c> and <c>1.</c>
     /// </summary>
@@ -312,7 +227,7 @@ and Timer =
     abstract member iterationProgress: float with get,set
     abstract member currentIteration: int with get,set
     abstract member speed: float with get,set
-    abstract member fps: int<fps> with get,set
+    abstract member fps: int with get,set
     abstract member paused: bool with get,set
     abstract member began: bool with get,set
     abstract member completed: bool with get,set
@@ -356,45 +271,36 @@ and
     abstract member revert: unit -> unit
 
 and [<Global>] TimePosition private (noop: TweenValueNoop) =
-    [<Emit("$0")>]
-    new(_: int) = TimePosition(TweenValueNoop.noop)
-    [<Emit("$0")>]
-    new(_: float) = TimePosition(TweenValueNoop.noop)
-    [<Emit("$0")>]
-    new(label: string) = TimePosition(TweenValueNoop.noop)
-    [<Emit("$0")>]
-    new(_: RelativeTweenValue) = TimePosition(TweenValueNoop.noop)
-    [<Emit("$0")>]
-    new(_: RelativeTimePosition) = TimePosition(TweenValueNoop.noop)
+    // TODO
     [<Emit("$0")>]
     new(stagger: Stagger) = TimePosition(TweenValueNoop.noop)
 
 and AnimationOptions =
     inherit CSSStyleDeclaration
-    abstract translateX: float<px> with set
-    abstract translateY: float<px> with set
-    abstract translateZ: float<px> with set
-    abstract rotate: float<px> with set
-    abstract rotateX: float<px> with set
-    abstract rotateY: float<px> with set
-    abstract rotateZ: float<px> with set
+    abstract translateX: float with set
+    abstract translateY: float with set
+    abstract translateZ: float with set
+    abstract rotate: float with set
+    abstract rotateX: float with set
+    abstract rotateY: float with set
+    abstract rotateZ: float with set
     abstract scale: float with set
     abstract scaleX: float with set
     abstract scaleY: float with set
     abstract scaleZ: float with set
-    abstract skew: float<deg> with set
-    abstract skewX: float<deg> with set
-    abstract skewY: float<deg> with set
-    abstract perspective: float<px> with set
+    abstract skew: float with set
+    abstract skewX: float with set
+    abstract skewY: float with set
+    abstract perspective: float with set
     // global tween param values    
-    abstract delay: U2<int<ms>, FunctionValue<int<ms>>> with set
-    abstract duration: U2<int<ms>, FunctionValue<int<ms>>> with set
+    abstract delay: U2<int, FunctionValue<int>> with set
+    abstract duration: U2<int, FunctionValue<int>> with set
     abstract ease: Eases with set
     abstract composition: Composition with set
     abstract modifier: TweenParamModifier with set
     // playback settings
     abstract loop: int with set
-    abstract loopDelay: int<ms> with set
+    abstract loopDelay: int with set
     abstract alternate: bool with set
     abstract reversed: bool with set
     abstract autoplay: U2<bool, ScrollObserver> with set
@@ -410,67 +316,26 @@ and AnimationOptions =
     abstract onLoop: Callback<Animation> with set
     abstract onPause: Callback<Animation> with set
     abstract ``then``: (Callback<Animation> -> JS.Promise<unit>) with set
-and Animation =
-    abstract member play: unit -> Animation
-    abstract member reverse: unit -> Animation
-    abstract member pause: unit -> Animation
-    abstract member restart: unit -> Animation
-    abstract member alternate: unit -> Animation
-    abstract member resume: unit -> Animation
-    abstract member complete: unit -> Animation
-    /// Pauses the timer, removes it from the engine's main loop and
-    /// frees up the memory
-    abstract member cancel: unit -> Animation
-    /// <summary>
-    /// Cancels the timer, sets its <c>currentTime</c> to <c>0</c> and reverts
-    /// the linked <c>onScroll()</c> instance if necessary.<br/><br/> Use <c>.revert()</c>
-    /// when you want to completely stop and destroy a timer
-    /// </summary>
-    abstract member revert: unit -> Animation
-    abstract member seek: time: int<ms> * ?muteCallbacks: bool -> Animation
-    /// <summary>
-    /// Changes the total duration of a timer to fit a specific time. The total
-    /// duration is equal to the duration of an iteration multiplied with the total
-    /// number of iterations. So if a timer has a duration of 1000ms and loops twice
-    /// (3 iterations in total) then the total duration is 3000ms.
-    /// </summary>
-    /// <param name="duration">Duration in ms</param>
-    abstract member stretch: duration: int<ms> -> Animation
-    // Properties
-    abstract member id: string with get,set
-    abstract member targets: Targets with get
-    abstract member currentTime: int<ms> with get,set
-    abstract member iterationCurrentTime: int<ms> with get,set
-    abstract member deltaTime: int<ms> with get
-    abstract member progress: float with get,set
-    abstract member iterationProgress: float with get,set
-    abstract member currentIteration: int with get,set
-    abstract member duration: int<ms> with get
-    abstract member speed: float with get,set
-    abstract member fps: int<frames/s> with get,set
-    abstract member paused: bool with get,set
-    abstract member began: bool with get,set
-    abstract member completed: bool with get,set
-    abstract member reversed: bool with get,set
+and 
 and TimeLineOptionsDefaults =
     abstract loop: int
-    abstract loopDelay: int<ms>
+    abstract loopDelay: int
     abstract alternate: bool
     abstract reversed: bool
     abstract autoPlay: U2<bool, ScrollObserver>
     abstract frameRate: int<frames/s>
     abstract playbackRate: float
     abstract playbackEase: float
-    abstract delay: U2<int<ms>, FunctionValue<int<ms>>>
-    abstract duration: U2<int<ms>, FunctionValue<int<ms>>>
+    abstract delay: U2<int, FunctionValue<int>>
+    abstract duration: U2<int, FunctionValue<int>>
     abstract ease: Eases
     abstract composition: Composition
     abstract modifier: TweenParamModifier    
 and TimelineOptions =
     abstract defaults: TimeLineOptionsDefaults with set // & callbacks
-    abstract delay: int<ms> with set
+    abstract delay: int with set
     abstract loop: int with set
-    abstract loopDelay: int<ms> with set
+    abstract loopDelay: int with set
     abstract alternate: bool with set
     abstract reversed: bool with set
     abstract autoPlay: U2<bool, ScrollObserver> with set
@@ -514,7 +379,7 @@ and Timeline =
     /// when you want to completely stop and destroy a timer
     /// </summary>
     abstract member revert: unit -> Timeline
-    abstract member seek: time: int<ms> * ?muteCallbacks: bool -> Timeline
+    abstract member seek: time: int * ?muteCallbacks: bool -> Timeline
     /// <summary>
     /// Changes the total duration of a timer to fit a specific time. The total
     /// duration is equal to the duration of an iteration multiplied with the total
@@ -522,7 +387,7 @@ and Timeline =
     /// (3 iterations in total) then the total duration is 3000ms.
     /// </summary>
     /// <param name="duration">Duration in ms</param>
-    abstract member stretch: duration: int<ms> -> Timeline
+    abstract member stretch: duration: int -> Timeline
     /// <summary>
     /// Re-computes the timeline children animated values defined with a Function based value by updating their from values to their current target values, and their to values to their newly computed values.
     /// </summary>
@@ -532,13 +397,13 @@ and Timeline =
     /// Gets and sets the map of timeline labels
     abstract member labels: obj with get,set
     abstract member targets: Targets with get
-    abstract member currentTime: int<ms> with get,set
-    abstract member iterationCurrentTime: int<ms> with get,set
-    abstract member deltaTime: int<ms> with get
+    abstract member currentTime: int with get,set
+    abstract member iterationCurrentTime: int with get,set
+    abstract member deltaTime: int with get
     abstract member progress: float with get,set
     abstract member iterationProgress: float with get,set
     abstract member currentIteration: int with get,set
-    abstract member duration: int<ms> with get
+    abstract member duration: int with get
     abstract member speed: float with get,set
     abstract member fps: int<frames/s> with get,set
     abstract member paused: bool with get,set
@@ -546,42 +411,6 @@ and Timeline =
     abstract member completed: bool with get,set
     abstract member reversed: bool with get,set
 
-and [<Global>] AnimatableSettings private (noop: TweenValueNoop) =
-    [<Emit("$0"); ParamObject>]
-    new(
-        ?unit: string,
-        ?duration: U2<int<ms>, FunctionValue<int<ms>>>,
-        ?ease: Eases,
-        ?modifier: (float -> float)
-        ) = AnimatableSettings(TweenValueNoop.noop)
-
-and AnimatableOptions =
-    inherit CSSStyleDeclaration
-    abstract unit: string with set
-    abstract duration: U2<int<ms>, FunctionValue<int<ms>>> with set
-    abstract ease: Eases with set
-    abstract modifier: (float -> float) with set
-
-
-and Animatable =
-    inherit CSSStyleDeclaration
-    [<EmitIndexer>]
-    abstract member Item: string -> AnimatableSetter
-    abstract targets: Targets
-    /// property ==> Animation
-    abstract animations: obj
-
-[<Global; AllowNullLiteral>]
-type AxisParameter
-    [<ParamObject; Emit("$0")>]
-        (?snap:
-        U8<float, float[], FunctionValue<float>, FunctionValue<int>,
-        int, int[], FunctionValue<float[]>, FunctionValue<int[]>>,
-        ?modifier: float -> float,
-        ?mapTo: float) =
-        
-        [<Emit("$0")>]
-        new(value: bool) = AxisParameter()
 
 type DraggableOptions =
     abstract x: AxisParameter with set
@@ -595,7 +424,7 @@ type DraggableOptions =
     /// </summary>
     abstract trigger: Target with set
     abstract container: U4<string, HTMLElement, DraggableBounds, unit -> DraggableBounds> with set
-    abstract containerPadding: U3<float<px>, DraggableBounds, unit -> DraggableBounds> with set
+    abstract containerPadding: U3<float, DraggableBounds, unit -> DraggableBounds> with set
     abstract containerFriction: float with set
     abstract releaseContainerFriction: U2<float, unit -> float> with set
     abstract releaseMass: float with set
@@ -620,19 +449,19 @@ type DraggableOptions =
 and Draggable =
     abstract member disable: unit -> Draggable
     abstract member enable: unit -> Draggable
-    abstract member setX: float<px> * ?muteCallback: bool -> Draggable
-    abstract member setY: float<px> * ?muteCallback: bool -> Draggable
-    abstract member animateInView: ?duration: int<ms> * ?gap: bool * ?ease: Eases -> Draggable
-    abstract member scrollInView: ?duration: int<ms> * ?gap: bool * ?ease: Eases -> Draggable
+    abstract member setX: float * ?muteCallback: bool -> Draggable
+    abstract member setY: float * ?muteCallback: bool -> Draggable
+    abstract member animateInView: ?duration: int * ?gap: bool * ?ease: Eases -> Draggable
+    abstract member scrollInView: ?duration: int * ?gap: bool * ?ease: Eases -> Draggable
     abstract member stop: unit -> Draggable
     abstract member reset: unit -> Draggable
     abstract member revert: unit -> Draggable
     abstract member refresh: unit -> Draggable
     //properties
-    abstract member snapX: U2<int<px>, int<px>[]> with get,set
-    abstract member snapY: U2<int<px>, int<px>[]> with get,set
+    abstract member snapX: U2<int, int[]> with get,set
+    abstract member snapY: U2<int, int[]> with get,set
     abstract member scrollSpeed: float with get,set
-    abstract member scrollThreshold: float<px> with get,set
+    abstract member scrollThreshold: float with get,set
     abstract member dragSpeed: float with get,set
     abstract member maxVelocity: float with get,set
     abstract member minVelocity: float with get,set
@@ -646,23 +475,23 @@ and Draggable =
     abstract member ``$container``: HTMLElement with get,set
     abstract member ``$target``: HTMLElement with get
     abstract member ``$scrollContainer``: U2<Window, HTMLElement> with get
-    abstract member x: float<px> with get,set
-    abstract member y: float<px> with get,set
+    abstract member x: float with get,set
+    abstract member y: float with get,set
     abstract member progressX: float with get,set
     abstract member progressY: float with get,set
     abstract member velocity: float with get
     abstract member angle: float<rad> with get
     abstract member xProp: string with get
     abstract member yProp: string with get
-    abstract member destX: float<px> with get
-    abstract member destY: float<px> with get
-    abstract member deltaX: float<px> with get
-    abstract member deltaY: float<px> with get
+    abstract member destX: float with get
+    abstract member destY: float with get
+    abstract member deltaX: float with get
+    abstract member deltaY: float with get
     abstract member enabled: bool with get
     abstract member grabbed: bool with get
     abstract member dragged: bool with get
     abstract member cursor: DraggableCursor with get,set
-    abstract member disabled: x: float<px> * y: float<px> with get
+    abstract member disabled: x: float * y: float with get
     abstract member ``fixed``: bool with get
     abstract member useWin: bool with get
     abstract member isFinePointer: bool with get,set
@@ -673,14 +502,14 @@ and Draggable =
     abstract member released: bool with get
     abstract member updated: bool with get
     abstract member scroll: JSCoordinatePojo with get
-    abstract member coords: x: float<px> * y: float<px> * prevX: float<px> * prevY: float<px> with get
-    abstract member snapped: x: float<px> * y: float<px> with get
-    abstract member pointer: x: float<px> * y: float<px> * prevX: float<px> * prevY: float<px> with get
-    abstract member scrollView: width: float<px> * height: float<px> with get
-    abstract member dragArea: x: float<px> * y: float<px> * width: float<px> * height: float<px> with get
-    abstract member scrollBounds: top: float<px> * right: float<px> * bottom: float<px> * left: float<px> with get
-    abstract member targetBounds: top: float<px> * right: float<px> * bottom: float<px> * left: float<px> with get
-    abstract member window: width: float<px> * height: float<px> with get
+    abstract member coords: x: float * y: float * prevX: float * prevY: float with get
+    abstract member snapped: x: float * y: float with get
+    abstract member pointer: x: float * y: float * prevX: float * prevY: float with get
+    abstract member scrollView: width: float * height: float with get
+    abstract member dragArea: x: float * y: float * width: float * height: float with get
+    abstract member scrollBounds: top: float * right: float * bottom: float * left: float with get
+    abstract member targetBounds: top: float * right: float * bottom: float * left: float with get
+    abstract member window: width: float * height: float with get
     abstract member pointerVelocity: float with get
     abstract member pointerAngle: float<rad> with get
     abstract member activeProp: string with get
@@ -695,15 +524,15 @@ and Draggable =
 
 type ScopeOptionsDefaults =
     abstract loop: int with set
-    abstract loopDelay: int<ms> with set
+    abstract loopDelay: int with set
     abstract alternate: bool with set
     abstract reversed: bool with set
     abstract autoPlay: U2<bool, ScrollObserver> with set
     abstract frameRate: int<frames/s> with set
     abstract playbackRate: float with set
     abstract playbackEase: float with set
-    abstract delay: U2<int<ms>, FunctionValue<int<ms>>> with set
-    abstract duration: U2<int<ms>, FunctionValue<int<ms>>> with set
+    abstract delay: U2<int, FunctionValue<int>> with set
+    abstract duration: U2<int, FunctionValue<int>> with set
     abstract ease: Eases with set
     abstract composition: Composition with set
     abstract modifier: TweenParamModifier with set  
@@ -730,18 +559,6 @@ and Scope =
     abstract member matches: obj with get
     abstract member mediaQueryLists: obj with get
 
-type IStagger<'T> =
-    abstract start: 'T with set
-    abstract ``from``: U2<int, StaggerFrom> with set
-    abstract reversed: bool with set
-    abstract ease: Eases with set
-    abstract grid: int * int with set
-    abstract axis: Axis with set
-    abstract modifier: (float -> U2<float, string>) with set
-type StaggerTimeline =
-    inherit IStagger<U2<float, TimePosition>>
-type Stagger =
-    inherit IStagger<float>
 [<Import("svg", "animejs")>]
 type Svg =
     static member morphTo (path2: SVGElement, ?precision: float) : FunctionValue<string> = nativeOnly
@@ -772,7 +589,7 @@ type Engine =
     abstract member reversed: bool with get, set
     abstract member alternate: bool with get, set
     abstract member autoplay: bool with get, set
-    abstract member duration: U2<float<ms>, FunctionValue<float>> with get, set
+    abstract member duration: U2<float, FunctionValue<float>> with get, set
     abstract member delay: U2<float, FunctionValue<float>> with get, set
     abstract member loopDelay: float with get, set
     abstract member ease: Eases with get, set
@@ -800,13 +617,13 @@ type Export with
     [<Import("shuffle", "animejs")>]
     static member shuffle (items: ResizeArray<obj>) : ResizeArray<obj> = nativeOnly
     [<ImportMember "animejs">]
-    static member stagger (target: Staggerable, ?params: Stagger) : FunctionValue<TweenValue> = nativeOnly
+    static member stagger (target: Staggerable, ?parameters: Stagger) : FunctionValue<TweenValue> = nativeOnly
 
 [<AllowNullLiteral; Interface>]
 type MotionPath =
-    abstract member translateX : FunctionValue<float<px>> with get, set
-    abstract member translateY : FunctionValue<float<px>> with get, set
-    abstract member rotate : FunctionValue<float<deg>> with get, set
+    abstract member translateX : FunctionValue<float> with get, set
+    abstract member translateY : FunctionValue<float> with get, set
+    abstract member rotate : FunctionValue<float> with get, set
 
 [<Import("svg", "animejs")>]
 type SvgExports =

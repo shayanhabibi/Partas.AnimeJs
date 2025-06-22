@@ -1,286 +1,167 @@
 ﻿module Partas.AnimeJs.Core
 
+open System
+open System.Runtime.CompilerServices
 open Fable.Core
 open Fable.Core.JsInterop
 open Browser.Types
 open Partas.Solid
 open Partas.Solid.Experimental.U
 open Partas.Solid.Style.Types.DataType
-
+    
 [<Erase>]
 module Spec =
     let [<Literal; Erase>] path = "animejs"
     let [<Literal; Erase>] version = "4.0.2"
 
-type internal Noop =
-    static member noop: Noop = JS.undefined
-
-[<AutoOpen; Erase>]
-module Measurements =
-    /// <summary>
-    /// Converters:<br/>
-    /// - convertSecondsToMs
-    /// </summary>
-    [<Measure>] type seconds
-    /// <summary>
-    /// Converters:<br/>
-    /// - convertSecondsToMs
-    /// </summary>
-    [<Measure>] type s = seconds
-    
-    /// <summary>
-    /// No helpers available for this measurement
-    /// </summary>
-    [<Measure>] type frames
-    /// <summary>
-    /// No helpers available for this measurement
-    /// </summary>
-    [<Measure>] type f = frames
-    
-    /// <summary>
-    /// No helpers available for this measurement
-    /// </summary>
-    [<Measure>] type fps = frames/s
-    
-    /// <summary>
-    /// Converters:<br/>
-    /// - convertMsToSeconds
-    /// </summary>
-    [<Measure>] type milliseconds
-    /// <summary>
-    /// Converters:<br/>
-    /// - convertMsToSeconds
-    /// </summary>
-    [<Measure>] type ms = milliseconds
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderPx
-    /// </summary>    
-    [<Measure>] type pixels
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderPx
-    /// </summary>    
-    [<Measure>] type px = pixels
-    
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderPerc
-    /// </summary>    
-    [<Measure>] type percentage
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderPerc
-    /// </summary>    
-    [<Measure>] type perc = percentage
-    
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderRem
-    /// </summary>    
-    [<Measure>] type rem
-    
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderDeg<br/>
-    /// Converters:<br/>
-    /// - convertDegToRad
-    /// </summary>    
-    [<Measure>] type degrees
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderDeg<br/>
-    /// Converters:<br/>
-    /// - convertDegToRad
-    /// </summary>    
-    [<Measure>] type deg = degrees
-    
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderRad<br/>
-    /// Converters:<br/>
-    /// - convertRadToDeg
-    /// </summary>    
-    [<Measure>] type radians
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderRad<br/>
-    /// Converters:<br/>
-    /// - convertRadToDeg
-    /// </summary>    
-    [<Measure>] type rad = radians
-    
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderHex<br/>
-    /// </summary>    
-    [<Measure>] type colorhex
-    /// <summary>
-    /// Render to string with Unit:<br/>
-    /// - renderHex<br/>
-    /// </summary>    
-    [<Measure>] type hex = colorhex
-    
-    [<AutoOpen; Erase>]
-    type MeasurementConverters =
-        static member msPerSecond: int<ms/s> = 1000<ms/s>
-        static member convertSecondsToMs (s: int<s>): int<ms> = s * msPerSecond
-        static member convertSecondsToMs (s: float<s>): float<ms> = s * unbox msPerSecond
-        static member convertMsToSeconds (ms: int<ms>): int<ms> = (ms / unbox msPerSecond)
-        static member convertMsToSeconds (ms: float<ms>): float<ms> = (ms / unbox msPerSecond)
-        /// <summary>
-        /// Utilises the <c>animejs</c> <c>utils.radToDeg</c> helper
-        /// </summary>
-        [<Import("utils.radToDeg", Spec.path)>]
-        static member convertRadToDeg (rad: float<rad>): float<deg> = jsNative
-        /// <summary>
-        /// Utilises the <c>animejs</c> <c>utils.radToDeg</c> helper
-        /// </summary>
-        [<Import("utils.radToDeg", Spec.path)>]
-        static member convertRadToDeg (rad: int<rad>): int<deg> = jsNative
-        /// <summary>
-        /// Utilises the <c>animejs</c> <c>utils.degToRad</c> helper
-        /// </summary>
-        [<Import("utils.degToRad", Spec.path)>]
-        static member convertDegToRad (deg: float<deg>): float<rad> = jsNative
-        /// <summary>
-        /// Utilises the <c>animejs</c> <c>utils.degToRad</c> helper
-        /// </summary>
-        [<Import("utils.degToRad", Spec.path)>]
-        static member convertDegToRad (deg: int<deg>): int<rad> = jsNative
-    
-    [<AutoOpen; Erase>]
-    type RenderMeasurement =
-        /// <summary>
-        /// Renders a numerical with the <c>deg</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]deg"</returns>
-        static member inline renderDeg (deg: float<deg>) = $"{deg}deg"
-        /// <summary>
-        /// Renders a numerical with the <c>deg</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]deg"</returns>
-        static member inline renderDeg (deg: int<deg>) = $"{deg}deg"
-        /// <summary>
-        /// Renders a numerical with the <c>perc</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]%"</returns>
-        static member inline renderPerc (perc: float<perc>) = $"{perc}%%"
-        /// <summary>
-        /// Renders a numerical with the <c>perc</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]%"</returns>
-        static member inline renderPerc (perc: int<perc>) = $"{perc}%%"
-        /// <summary>
-        /// Renders a numerical with the <c>px</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]px"</returns>
-        static member inline renderPx (px: float<px>) = $"{px}px"
-        /// <summary>
-        /// Renders a numerical with the <c>px</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]px"</returns>
-        static member inline renderPx (px: int<px>) = $"{px}px"
-        /// <summary>
-        /// Renders a numerical with the <c>rem</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]rem"</returns>
-        static member inline renderRem (rem: int<rem>) = $"{rem}rem"
-        /// <summary>
-        /// Renders a numerical with the <c>rem</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]rem"</returns>
-        static member inline renderRem (rem: float<rem>) = $"{rem}rem"
-        /// <summary>
-        /// Renders a numerical with the <c>rad</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]rad"</returns>
-        static member inline renderRad (rad: float<rad>) = $"{rad}rad"
-        /// <summary>
-        /// Renders a numerical with the <c>rad</c> measurement to a JS string with the
-        /// unit suffix.
-        /// </summary>
-        /// <returns>"[value]rad"</returns>
-        static member inline renderRad (rad: int<rad>) = $"{rad}rad"
-        /// <summary>
-        /// Renders a numerical with the <c>hex</c> measurement to a JS color string with the
-        /// <c>#</c> prefix.
-        /// </summary>
-        /// <returns>"#[value]"</returns>
-        static member inline renderHex (hex: int<hex>) = $"#{hex}"
-
 [<Erase; AutoOpen>]
 module Enums =
     [<StringEnum; RequireQualifiedAccess>]
-    type TimeUnit =
-        | S
-        | Ms
+    type timeUnit =
+        | s
+        | ms
 
-    [<StringEnum>]
-    type StaggerFrom =
-        | First
-        | Center
-        | Last
+    [<StringEnum; RequireQualifiedAccess>]
+    type staggerFrom =
+        | first
+        | center
+        | last
 
 
     [<RequireQualifiedAccess>]
     [<StringEnum>]
-    type Axis =
-        | X
-        | Y
+    type axis =
+        | x
+        | y
         
     [<StringEnum; RequireQualifiedAccess>]
-    type Composition =
+    type composition =
         /// <summary>
         /// Replace and cancel the current running animation on the property.
         /// </summary>
-        | Replace
+        | replace
         /// <summary>
         /// Do not replace the running animation. This means the previous animation will
         /// continue running if its duration is longer than the new animation. This mode can
         /// also offer better performance
         /// </summary>
-        | None
+        | none
         /// <summary>
         /// Creates an additive animation and blends its values with the running animation
         /// </summary>
-        | Blend
+        | blend
 
-    [<StringEnum>]
-    type ObserverThreshold =
+    [<StringEnum; RequireQualifiedAccess>]
+    type observerThreshold =
         /// Top Y value
-        | Top
+        | top
         /// Bottom Y value
-        | Bottom
+        | bottom
         /// Left X value
-        | Left
+        | left
         /// Right X value
-        | Right
+        | right
         /// Center X or Y value
-        | Center
+        | center
         /// Equivalent to Y-Top X-Left
-        | Start
+        | start
         /// Equivalent to Y-Bottom X-Right
-        | End
-        /// Minimum value possible to meet the etner or leave condition
-        | Min
+        | [<CompiledName "end">] end'
+        /// Minimum value possible to meet the enter or leave condition
+        | min
         /// Maximum value possible to meet the enter or leave condition
-        | Max
+        | max
         /// Alias for the 'shorthand' position scheme in animejs
-        static member inline (+) (x: ObserverThreshold, y: ObserverThreshold) = $"{x} {y}"
-
+        | [<CompiledName "top bottom">] top_bottom
+        | [<CompiledName "bottom top">] bottom_top
+        | [<CompiledName "top left">] top_left
+        | [<CompiledName "left top">] left_top
+        | [<CompiledName "top right">] top_right
+        | [<CompiledName "right top">] right_top
+        | [<CompiledName "top center">] top_center
+        | [<CompiledName "center top">] center_top
+        | [<CompiledName "top start">] top_start
+        | [<CompiledName "start top">] start_top
+        | [<CompiledName "top end">] top_end
+        | [<CompiledName "end top">] end_top
+        | [<CompiledName "top min">] top_min
+        | [<CompiledName "min top">] min_top
+        | [<CompiledName "top max">] top_max
+        | [<CompiledName "max top">] max_top
+        | [<CompiledName "bottom left">] bottom_left
+        | [<CompiledName "left bottom">] left_bottom
+        | [<CompiledName "bottom right">] bottom_right
+        | [<CompiledName "right bottom">] right_bottom
+        | [<CompiledName "bottom center">] bottom_center
+        | [<CompiledName "center bottom">] center_bottom
+        | [<CompiledName "bottom start">] bottom_start
+        | [<CompiledName "start bottom">] start_bottom
+        | [<CompiledName "bottom end">] bottom_end
+        | [<CompiledName "end bottom">] end_bottom
+        | [<CompiledName "bottom min">] bottom_min
+        | [<CompiledName "min bottom">] min_bottom
+        | [<CompiledName "bottom max">] bottom_max
+        | [<CompiledName "max bottom">] max_bottom
+        | [<CompiledName "left right">] left_right
+        | [<CompiledName "right left">] right_left
+        | [<CompiledName "left center">] left_center
+        | [<CompiledName "center left">] center_left
+        | [<CompiledName "left start">] left_start
+        | [<CompiledName "start left">] start_left
+        | [<CompiledName "left end">] left_end
+        | [<CompiledName "end left">] end_left
+        | [<CompiledName "left min">] left_min
+        | [<CompiledName "min left">] min_left
+        | [<CompiledName "left max">] left_max
+        | [<CompiledName "max left">] max_left
+        | [<CompiledName "right center">] right_center
+        | [<CompiledName "center right">] center_right
+        | [<CompiledName "right start">] right_start
+        | [<CompiledName "start right">] start_right
+        | [<CompiledName "right end">] right_end
+        | [<CompiledName "end right">] end_right
+        | [<CompiledName "right min">] right_min
+        | [<CompiledName "min right">] min_right
+        | [<CompiledName "right max">] right_max
+        | [<CompiledName "max right">] max_right
+        | [<CompiledName "center start">] center_start
+        | [<CompiledName "start center">] start_center
+        | [<CompiledName "center end">] center_end
+        | [<CompiledName "end center">] end_center
+        | [<CompiledName "center min">] center_min
+        | [<CompiledName "min center">] min_center
+        | [<CompiledName "center max">] center_max
+        | [<CompiledName "max center">] max_center
+        | [<CompiledName "start end">] start_end
+        | [<CompiledName "end start">] end_start
+        | [<CompiledName "start min">] start_min
+        | [<CompiledName "min start">] min_start
+        | [<CompiledName "start max">] start_max
+        | [<CompiledName "max start">] max_start
+        | [<CompiledName "end min">] end_min
+        | [<CompiledName "min end">] min_end
+        | [<CompiledName "end max">] end_max
+        | [<CompiledName "max end">] max_end
+        | [<CompiledName "min max">] min_max
+        | [<CompiledName "max min">] max_min
+        static member inline (+) (x: observerThreshold, y: string) =
+            $"{x} {y}"
+        static member inline (+) (x: string, y: observerThreshold) =
+            $"{x} {y}"
+        static member inline (+) (x: observerThreshold, y: float) =
+            $"{x} {y}"
+        static member inline (+) (x: float, y: observerThreshold) =
+            $"{x} {y}"
 [<AutoOpen; Erase>]
 module Types =
+    type AnimeJs = interface end
+    /// <summary>
+    /// Alias for <c>'T -> unit</c>.
+    /// </summary>
     type Callback<'T> = 'T -> unit
+    /// <summary>
+    /// Alias for <c>unit -> 'T</c>
+    /// </summary>
     type ChainMethod<'T> = unit -> 'T
     /// <summary>
     /// CSS Selector.<br/> Provides the animejs utility <c>utils.$</c> to find all nodes by the selector
@@ -292,66 +173,44 @@ module Types =
     [<Erase>]
     type Selector = Selector of string with
         member inline this.find with get(): NodeList = this |> JsInterop.import "utils.$" Spec.path
-    /// <summary>
-    /// Target can either be a selector, an element, a list of elements, or a record/pojo
-    /// </summary>
-    and Target = U6<Selector, NodeList, SVGGElement, HTMLElement, SVGElement, obj>
-    and Targets<'T> = 'T[]
-    and Targets = U2<Target, Target[]>
     [<Erase>]
-    type FunctionValue<'T> = delegate of target: Target * ?index: int * ?length: int -> 'T
-    type FunctionValue = FunctionValue<obj>
+    type Target<'Type> = Target of 'Type
+    [<Erase>]
+    type Targets = Targets of ResizeArray<obj>
+    type FunctionValue<'Type> = delegate of target: obj * ?index: int * ?length: int -> 'Type
+    type FunctionValue = FunctionValue<string>
     type FloatModifier = float -> float
-    /// <summary>
-    /// Acceptable shape of type that can have stagger applied
-    /// </summary>
-    type Staggerable = U6<string, float, int, int * int, float * float, string * string>
-    /// <summary>
-    /// Is an acceptable parameter for some Draggable options to modify the bounds of the draggable.<br/>
-    /// Can use the <c>Bounds</c> record with the <c>.toTuple</c> member. Can also create a record using
-    /// <c>Bounds.fromTuple</c>.
-    /// </summary>
-    [<Erase>]
-    type DraggableBounds = DraggableBounds of top: float<px> * right: float<px> * bottom: float<px> * left: float<px> 
-    /// <summary>
-    /// Used when modifying the cursor appearance/style in draggables
-    /// </summary>
-    [<Global>]
-    type DraggableCursor private (noop: unit -> unit) =
-        [<Emit("$0")>]
-        new(_: bool) = DraggableCursor(fun () -> ())
-        [<ParamObject; Emit("$0")>]
-        new(?onHover: string, ?onGrab: string) = DraggableCursor(fun () -> ())
-        [<Emit("$0")>]
-        new(_:unit -> DraggableCursor) = DraggableCursor(fun () -> ())
+    type EasingFun = delegate of float -> float
+    type KeyframePercentValue = interface end
+
     /// <summary>
     /// Returned and set in some properties. Can use the <c>Coordinate</c> record with
     /// <c>.toPojo</c>. Can also create a record using <c>Coordinate.fromPojo</c> 
     /// </summary>
     [<Erase; AllowNullLiteral>]
     type JSCoordinatePojo =
-        abstract member x: float<px> with get,set
-        abstract member y: float<px> with get,set
+        abstract member x: float with get,set
+        abstract member y: float with get,set
     /// <summary>
     /// Returned and set in some properties. Can use the <c>Coordinate</c> record with
     /// <c>.toTuple</c>. Can also create a record using <c>Coordinate.fromTuple</c>
     /// </summary>
     [<Erase>]
-    type JSCoordinate = JSCoordinate of x: float<px> * y: float<px>
+    type JSCoordinate = JSCoordinate of x: float * y: float
     /// <summary>
     /// Returned and set in some properties. Can use the <c>CoordinateHistory</c> record with
     /// <c>.toTuple</c>. Can also create a record using <c>CoordinateHistory.fromTuple</c>
     /// </summary>
     [<Erase>]
-    type JSCoordinateHistory = JSCoordinateHistory of x: float<px> * y: float<px> * prevX: float<px> * prevY: float<px> 
+    type JSCoordinateHistory = JSCoordinateHistory of x: float * y: float * prevX: float * prevY: float 
     
     /// FSharp wrapping type for use with the Draggable and others. Can compile to/from tuples and pojos using
     /// the static methods.
     type CoordinateHistory = {
-        x: float<px>
-        y: float<px>
-        prevX: float<px>
-        prevY: float<px>
+        x: float
+        y: float
+        prevX: float
+        prevY: float
     } with
         member inline this.toPojo = this |> toPlainJsObj
         member inline this.toTuple = JSCoordinateHistory (this.x,this.y,this.prevX,this.prevY)
@@ -362,8 +221,8 @@ module Types =
     /// FSharp wrapping type for use with the Draggable and others. Can compile to/from tuples and pojos using
     /// the static methods.
     type Coordinate = {
-        x: float<px>
-        y: float<px>
+        x: float
+        y: float
     } with
         member inline this.toPojo: JSCoordinatePojo = this |> JsInterop.toPlainJsObj |> unbox
         member inline this.toTuple = JSCoordinate (this.x, this.y)
@@ -377,141 +236,3466 @@ module Types =
             x = LanguagePrimitives.FloatWithMeasure (fst value)
             y = LanguagePrimitives.FloatWithMeasure (snd value)
         }
-        static member inline fromTuple (JSCoordinate (x: float<px> , y: float<px>)) = { x = x; y = y }
+        static member inline fromTuple (JSCoordinate (x: float , y: float)) = { x = x; y = y }
         static member inline unsafeFromTuple (value: obj): Coordinate = {
             x = fst !!value
             y = snd !!value
         }
     
-    /// FSharp wrapping type for use with the Draggable. Can compile to/from JSDraggableBounds
-    type Bounds = {
-        top: float<px>
-        right: float<px>
-        bottom: float<px>
-        left: float<px>
-    } with
-        member inline this.toTuple: DraggableBounds = DraggableBounds(this.top,this.right,this.bottom,this.left)
-        static member inline fromTuple (DraggableBounds (top,right,bottom,left)) = { top = top; right = right; bottom = bottom; left = left }
-        static member inline unsafeFromTuple value = !!value |> Bounds.fromTuple
 
-    /// <summary>
-    /// Tween Value operators for type based composition.<br/> Available operators: <code>
-    /// !+= [ float | int | string ] // "+={value}"
-    /// !-= [ float | int | string ] // "-={value}"
-    /// !*= [ float | int | string ] // "*={value}"
-    /// </code>
-    /// </summary>
-    [<AutoOpen; Erase>]
-    type RelativeTweenValue =
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!+=) (value: int): RelativeTweenValue = unbox $"+={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!+=) (value: float): RelativeTweenValue = unbox $"+={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!+=) (value: string): RelativeTweenValue = unbox $"+={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!-=) (value: int): RelativeTweenValue = unbox $"-={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!-=) (value: float): RelativeTweenValue = unbox $"-={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!-=) (value: string): RelativeTweenValue = unbox $"-={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!*=) (value: int): RelativeTweenValue = unbox $"*={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!*=) (value: float): RelativeTweenValue = unbox $"*={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!*=) (value: string): RelativeTweenValue = unbox $"*={value}"
-
-    [<AutoOpen; Erase>]
     type RelativeTimePosition =
-        /// <summary>
-        /// Compiles the <c>"&lt;"</c> enum in JS.
-        /// </summary>
-        static member inline (!<): RelativeTimePosition = unbox "<"
-        /// <summary>
-        /// Compiles the <c>"&lt;&lt;"</c> enum in JS.
-        /// </summary>
-        static member inline (!<<): RelativeTimePosition = unbox "<<"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!<<+=) value: RelativeTimePosition = unbox $"<<+={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!<<-=) value: RelativeTimePosition = unbox $"<<-={value}"
-        /// <summary>
-        /// Helper to render a numeric with the prefix operator (anything following the <c>!</c>)
-        /// </summary>
-        static member inline (!<<*=) value: RelativeTimePosition = unbox $"<<*={value}"
+        [<Emit("$0")>]
+        abstract member Value: string with get
+    type RelativeTweenValue = inherit RelativeTimePosition
+    type TimeLabel = inherit RelativeTimePosition
+    [<Interface; AllowNullLiteral>]
+    type DraggableCursor =
+        abstract member onGrab: string with get,set
+        abstract member onDrag: string with get,set
+    
+module Operators =
+    let inline (!<<+=) value: RelativeTimePosition = unbox $"<<+={value}"
+    let inline (!<<-=) value: RelativeTimePosition = unbox $"<<-={value}"
+    let inline (!<<*=) value: RelativeTimePosition = unbox $"<<*={value}"
+    let inline (!<) _: RelativeTimePosition = unbox "<"
+    let inline (!<<) _: RelativeTimePosition = unbox "<<"
+    let inline (!+=) value: RelativeTweenValue = unbox $"+={value}"
+    let inline (!-=) value: RelativeTweenValue = unbox $"-={value}"
+    let inline (!*=) value: RelativeTweenValue = unbox $"*={value}"
+    let inline timeLabel (value: string): TimeLabel = !!value
+    let inline (==<) x y: 'Type = unbox (x,y)
+    let inline (!%) value: KeyframePercentValue = !! $"{value}%%"
 
-    /// <summary>
-    /// Used in the ScrollObserver to set the threshold for animations to active/stop.
-    /// </summary>
-    type ScrollObserverThreshold private (noop: char) =
-        [<Emit("$0")>]
-        new(_:int<px>) = ScrollObserverThreshold(' ')
-        [<Emit("$0")>]
-        new(_:float<px>) = ScrollObserverThreshold(' ')
-        [<Emit("$0")>]
-        new(_: ObserverThreshold) = ScrollObserverThreshold(' ')
-        [<Emit("$0")>]
-        new(_: string) = ScrollObserverThreshold(' ')
-        [<Emit("$0")>]
-        new(_: RelativeTweenValue) = ScrollObserverThreshold(' ')
-        [<Emit("$0"); ParamObject>]
-        new(target: U5<string, int, float, ObserverThreshold, RelativeTweenValue>, container: U5<string, int, float, ObserverThreshold, RelativeTweenValue>) = ScrollObserverThreshold(' ')
+open Operators
 
-    /// <summary>
-    /// Provides stronger typing
-    /// </summary>
-    [<Global>]
-    type TweenValue private (v: Noop) =
-        [<Emit("$0")>]
-        new(_: int) = TweenValue(Noop.noop)
-        [<Emit("$0")>]
-        new(_: float) = TweenValue(Noop.noop)
-        [<Emit("$0")>]
-        new(_: RelativeTweenValue) = TweenValue(Noop.noop)
-        [<Emit("$0")>]
-        new(_: FunctionValue<int>) = TweenValue(Noop.noop)
-        [<Emit("$0")>]
-        new(_: FunctionValue<float>) = TweenValue(Noop.noop)
-        [<Emit("$0")>]
-        new(_: FunctionValue<string>) = TweenValue(Noop.noop)
-        [<ParamObject; Emit("$0")>]
-        new(
-            ?``to``: TweenValue,
-            ?``from``: TweenValue,
-            ?delay: U2<int<ms>, FunctionValue<int<ms>>>,
-            ?duration: U2<int<ms>, FunctionValue<int<ms>>>,
-            ?ease: EasingFunction,
-            ?composition: Composition,
-            ?modifier: FloatModifier
-            ) = TweenValue(Noop.noop)
-        [<Emit("$0")>]
-        new(_: TweenValue * TweenValue) = TweenValue(Noop.noop)
-        // TODO - Duration based keyframes
-        // [<Emit("$0")>]
-        // new() = TweenValue(Noop.noop)
-        // TODO - Percentage based keyframes
-        // [<Emit("$0")>]
-        // new(_: string * TweenValue) = TweenValue(Noop.noop)
+[<Erase>]
+type Eases =
+    [<Import("eases.irregular", Spec.path)>] static member irregular(?length:float,?randomness:float): EasingFun = jsNative
+    [<Import("eases.steps", Spec.path)>] static member steps(?steps: float , ?fromStart: bool ): EasingFunction = jsNative
+    [<Import("eases.cubicBezier", Spec.path)>] static member cubicBezier( ?mX1: float , ?mY1: float , ?mX2: float , ?mY2: float ): EasingFunction = jsNative
+    [<Import("eases.in", Spec.path)>] static member ``in``(?power: float ): EasingFun = jsNative
+    [<Import("eases.out", Spec.path)>] static member out( ?power: float ): EasingFun = jsNative
+    [<Import("eases.inOut", Spec.path)>] static member inOut( ?power: float ): EasingFun = jsNative
+    [<Import("eases.inQuad", Spec.path)>] static member inQuad: EasingFun = jsNative
+    [<Import("eases.outQuad", Spec.path)>] static member outQuad: EasingFun = jsNative
+    [<Import("eases.inOutQuad", Spec.path)>] static member inOutQuad: EasingFun = jsNative
+    [<Import("eases.inCubic", Spec.path)>] static member inCubic: EasingFun = jsNative
+    [<Import("eases.outCubic", Spec.path)>] static member outCubic: EasingFun = jsNative
+    [<Import("eases.inOutCubic", Spec.path)>] static member inOutCubic: EasingFun = jsNative
+    [<Import("eases.inQuart", Spec.path)>] static member inQuart: EasingFun = jsNative
+    [<Import("eases.outQuart", Spec.path)>] static member outQuart: EasingFun = jsNative
+    [<Import("eases.inOutQuart", Spec.path)>] static member inOutQuart: EasingFun = jsNative
+    [<Import("eases.inQuint", Spec.path)>] static member inQuint: EasingFun = jsNative
+    [<Import("eases.outQuint", Spec.path)>] static member outQuint: EasingFun = jsNative
+    [<Import("eases.inOutQuint", Spec.path)>] static member inOutQuint: EasingFun = jsNative
+    [<Import("eases.inSine", Spec.path)>] static member inSine: EasingFun = jsNative
+    [<Import("eases.outSine", Spec.path)>] static member outSine: EasingFun = jsNative
+    [<Import("eases.inOutSine", Spec.path)>] static member inOutSine: EasingFun = jsNative
+    [<Import("eases.inCirc", Spec.path)>] static member inCirc: EasingFun = jsNative
+    [<Import("eases.outCirc", Spec.path)>] static member outCirc: EasingFun = jsNative
+    [<Import("eases.inOutCirc", Spec.path)>] static member inOutCirc: EasingFun = jsNative
+    [<Import("eases.inExpo", Spec.path)>] static member inExpo: EasingFun = jsNative
+    [<Import("eases.outExpo", Spec.path)>] static member outExpo: EasingFun = jsNative
+    [<Import("eases.inOutExpo", Spec.path)>] static member inOutExpo: EasingFun = jsNative
+    [<Import("eases.inBounce", Spec.path)>] static member inBounce: EasingFun = jsNative
+    [<Import("eases.outBounce", Spec.path)>] static member outBounce: EasingFun = jsNative
+    [<Import("eases.inOutBounce", Spec.path)>] static member inOutBounce: EasingFun = jsNative
+    [<Import("eases.inBack", Spec.path)>] static member inBack( ?overshoot: float ): EasingFun = jsNative
+    [<Import("eases.outBack", Spec.path)>] static member outBack( ?overshoot: float ): EasingFun = jsNative
+    [<Import("eases.inOutBack", Spec.path)>] static member inOutBack( ?overshoot: float ): EasingFun = jsNative
+    [<Import("eases.inElastic", Spec.path)>] static member inElastic( ?amplitude: float , ?period: float ): EasingFun = jsNative
+    [<Import("eases.outElastic", Spec.path)>] static member outElastic( ?amplitude: float , ?period: float ): EasingFun = jsNative
+    [<Import("eases.inOutElastic", Spec.path)>] static member inOutElastic( ?amplitude: float , ?period: float ): EasingFun = jsNative
+    [<Import("createSpring", Spec.path)>] static member
+        createSpring(?mass:float,?stiffness:float,?damping:float,?velocity:float): EasingFun = jsNative
+    [<Import("createSpring", Spec.path)>] static member
+        createSpring(options: obj): EasingFun = jsNative
+
+[<AutoOpen>]
+type Utils =
+    [<ImportMember(Spec.path)>]
+    static member cleanInlineStyles(renderable: 'Type): 'Type = jsNative
+    [<Import("utils.random",Spec.path)>]
+    static member random(min: 'a when 'a: unmanaged,max: 'b when 'b:unmanaged,?decimalLength:'c): float = jsNative
+    [<ImportMember(Spec.path)>]
+    [<Import("utils.randomPick", "animejs")>]
+    static member randomPick (items: string): char = nativeOnly
+    [<Import("utils.randomPick", "animejs")>]
+    static member randomPick (items: 'Type[]): 'Type = nativeOnly
+    [<Import("utils.shuffle", "animejs")>]
+    static member shuffle (items: 'Type[]): 'Type[] = nativeOnly
+
+
+[<AutoOpen; Erase>]
+module rec AutoOpenInstanceDefinitions =
+    [<AllowNullLiteral; Interface>]
+    type Bounds =
+        abstract member top: float with get,set
+        abstract member left: float with get,set
+        abstract member right: float with get,set
+        abstract member bottom: float with get,set
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type ScrollContainer =
+        abstract member element: HTMLElement with get, set
+        abstract member useWin: bool with get, set
+        abstract member winWidth: float with get, set
+        abstract member winHeight: float with get, set
+        abstract member width: float with get, set
+        abstract member height: float with get, set
+        abstract member left: float with get, set
+        abstract member top: float with get, set
+        abstract member zIndex: float with get, set
+        abstract member scrollX: float with get, set
+        abstract member scrollY: float with get, set
+        abstract member prevScrollX: float with get, set
+        abstract member prevScrollY: float with get, set
+        abstract member scrollWidth: float with get, set
+        abstract member scrollHeight: float with get, set
+        abstract member velocity: float with get, set
+        abstract member backwardX: bool with get, set
+        abstract member backwardY: bool with get, set
+        abstract member scrollTicker: Timer with get, set
+        abstract member dataTimer: Timer with get, set
+        abstract member resizeTicker: Timer with get, set
+        abstract member wakeTicker: Timer with get, set
+        abstract member _head: ScrollObserver with get, set
+        abstract member _tail: ScrollObserver with get, set
+        abstract member resizeObserver: ResizeObserverType with get, set
+        abstract member updateScrollCoords: unit -> unit
+        abstract member updateWindowBounds: unit -> unit
+        abstract member updateBounds: unit -> unit
+        abstract member refreshScrollObservers: unit -> unit
+        abstract member refresh: unit -> unit
+        abstract member handleScroll: unit -> unit
+        abstract member handleEvent: e: Event -> unit
+        abstract member revert: unit -> unit
+    type ScrollObserver =
+        abstract member link: obj -> ScrollObserver
+        abstract member refresh: unit -> ScrollObserver
+        abstract member revert: unit -> ScrollObserver
+        abstract member id: float with get,set
+        abstract member container: ScrollContainer with get
+        abstract member target: HTMLElement with get
+        abstract member linked: obj with get
+        abstract member repeat: bool with get
+        abstract member horizontal: bool with get
+        abstract member enter: U2<string, float> with get
+        abstract member leave:  U2<string, float> with get
+        abstract member sync: bool with get
+        abstract member velocity: float with get
+        abstract member backward: bool with get
+        abstract member scroll: float with get
+        abstract member progress: float with get
+        abstract member completed: bool with get
+        abstract member began: bool with get
+        abstract member isInView: bool with get
+        abstract member offset: float with get
+        abstract member offsetStart: float with get
+        abstract member offsetEnd: float with get
+        abstract member distance: float with get
+    type ScrollObserverOptions = interface end
+    type Timer =
+        abstract member play: ChainMethod<Timer>
+        abstract member reverse: ChainMethod<Timer>
+        abstract member pause: ChainMethod<Timer>
+        abstract member restart: ChainMethod<Timer>
+        abstract member alternate: ChainMethod<Timer>
+        abstract member resume: ChainMethod<Timer>
+        abstract member complete: ChainMethod<Timer>
+        /// Pauses the timer, removes it from the engine's main loop and
+        /// frees up the memory
+        abstract member cancel: ChainMethod<Timer>
+        /// <summary>
+        /// Cancels the timer, sets its <c>currentTime</c> to <c>0</c> and reverts
+        /// the linked <c>onScroll()</c> instance if necessary.<br/><br/> Use <c>.revert()</c>
+        /// when you want to completely stop and destroy a timer
+        /// </summary>
+        abstract member revert: ChainMethod<Timer>
+        abstract member seek: time: int * ?muteCallbacks: bool -> Timer
+        /// <summary>
+        /// Changes the total duration of a timer to fit a specific time. The total
+        /// duration is equal to the duration of an iteration multiplied with the total
+        /// number of iterations. So if a timer has a duration of 1000ms and loops twice
+        /// (3 iterations in total) then the total duration is 3000ms.
+        /// </summary>
+        /// <param name="duration">Duration in ms</param>
+        abstract member stretch: duration: int -> Timer
+        
+        abstract member id: U2<string, int> with get,set
+        abstract member deltaTime: int with get
+        abstract member currentTime: int with get,set
+        abstract member iterationCurrentTime: int with get,set
+        /// <summary>
+        /// Value between <c>0.</c> and <c>1.</c>
+        /// </summary>
+        abstract member progress: float with get,set
+        abstract member iterationProgress: float with get,set
+        abstract member currentIteration: int with get,set
+        abstract member speed: float with get,set
+        abstract member fps: int with get,set
+        abstract member paused: bool with get,set
+        abstract member began: bool with get,set
+        abstract member completed: bool with get,set
+        abstract member reversed: bool with get,set
+    type Animation =
+        inherit TimerObjectInjection<Animation>
+        abstract member targets: Targets with get
+    type AnimationOptions = interface end
+    type Timeline =
+        inherit TimerObjectInjection<Timeline>
+        [<EmitMethod "add">]
+        abstract member add2: obj * ?position: RelativeTimePosition -> Timeline
+        [<EmitMethod "add">]
+        abstract member add3: obj * obj * ?position: RelativeTimePosition -> Timeline
+        abstract member set: targets: Targets * animatableProperties: obj * ?position: RelativeTimePosition -> Timeline
+        abstract member sync: obj * ?position: RelativeTimePosition -> Timeline
+        abstract member label: labelName: string * ?position: RelativeTimePosition -> Timeline
+        abstract member remove: obj * label: string -> Timeline
+        abstract member call: Callback<unit> * ?position: RelativeTimePosition -> Timeline
+        abstract member init: ChainMethod<Timeline>
+        abstract member refresh: ChainMethod<Timeline>
+        /// Gets and sets the map of timeline labels
+        abstract member labels: obj with get,set
+        abstract member targets: Targets with get
+        abstract member duration: int with get
+    type TimelineOptions = interface end
+    type Draggable =
+        abstract member disable: ChainMethod<Draggable>
+        abstract member enable: ChainMethod<Draggable>
+        abstract member setX: float * ?muteCallback: bool -> Draggable
+        abstract member setY: float * ?muteCallback: bool -> Draggable
+        abstract member animateInView: ?duration: int * ?gap: bool * ?ease: Eases -> Draggable
+        abstract member scrollInView: ?duration: int * ?gap: bool * ?ease: Eases -> Draggable
+        abstract member stop: ChainMethod<Draggable>
+        abstract member reset: ChainMethod<Draggable>
+        abstract member revert: ChainMethod<Draggable>
+        abstract member refresh: ChainMethod<Draggable>
+        //properties
+        abstract member snapX: U2<int, int[]> with get,set
+        abstract member snapY: U2<int, int[]> with get,set
+        abstract member scrollSpeed: float with get,set
+        abstract member scrollThreshold: float with get,set
+        abstract member dragSpeed: float with get,set
+        abstract member maxVelocity: float with get,set
+        abstract member minVelocity: float with get,set
+        abstract member velocityMultiplier: float with get,set
+        abstract member releaseEase: (unit -> Eases) with get,set
+        abstract member releaseSpring: EasingFun with get
+        abstract member containerPadding: Bounds with get,set
+        abstract member containerFriction: float with get,set
+        abstract member containerBounds: Bounds with get
+        abstract member containerArray: Option<HTMLElement array> with get
+        abstract member ``$container``: HTMLElement with get,set
+        abstract member ``$target``: HTMLElement with get
+        abstract member ``$scrollContainer``: U2<Window, HTMLElement> with get
+        abstract member x: float with get,set
+        abstract member y: float with get,set
+        abstract member progressX: float with get,set
+        abstract member progressY: float with get,set
+        abstract member velocity: float with get
+        abstract member angle: float with get
+        abstract member xProp: string with get
+        abstract member yProp: string with get
+        abstract member destX: float with get
+        abstract member destY: float with get
+        abstract member deltaX: float with get
+        abstract member deltaY: float with get
+        abstract member enabled: bool with get
+        abstract member grabbed: bool with get
+        abstract member dragged: bool with get
+        abstract member cursor: DraggableCursor with get,set
+        abstract member disabled: x: float * y: float with get
+        abstract member ``fixed``: bool with get
+        abstract member useWin: bool with get
+        abstract member isFinePointer: bool with get,set
+        abstract member initialized: bool with get
+        abstract member canScroll: bool with get
+        abstract member contained: bool with get
+        abstract member manual: bool with get
+        abstract member released: bool with get
+        abstract member updated: bool with get
+        abstract member scroll: JSCoordinatePojo with get
+        abstract member coords: x: float * y: float * prevX: float * prevY: float with get
+        abstract member snapped: x: float * y: float with get
+        abstract member pointer: x: float * y: float * prevX: float * prevY: float with get
+        abstract member scrollView: width: float * height: float with get
+        abstract member dragArea: x: float * y: float * width: float * height: float with get
+        abstract member scrollBounds: top: float * right: float * bottom: float * left: float with get
+        abstract member targetBounds: top: float * right: float * bottom: float * left: float with get
+        abstract member window: width: float * height: float with get
+        abstract member pointerVelocity: float with get
+        abstract member pointerAngle: float with get
+        abstract member activeProp: string with get
+        abstract member onGrab: Callback<Draggable> with get,set
+        abstract member onDrag: Callback<Draggable> with get,set
+        abstract member onRelease: Callback<Draggable> with get,set
+        abstract member onUpdate: Callback<Draggable> with get,set
+        abstract member onSettle: Callback<Draggable> with get,set
+        abstract member onSnap: Callback<Draggable> with get,set
+        abstract member onResize: Callback<Draggable> with get,set
+        abstract member onAfterResize: Callback<Draggable> with get,set
+    type DraggableOptions = interface end
+    type AxisOptions = interface end
+    type Scope =
+        abstract member add: Scope -> (unit -> unit)
+        abstract member refresh: unit -> Scope
+        abstract member revert: unit -> Scope
+        abstract member data: obj with get,set
+        abstract member defaults: ScopeOptionsDefaults  with get
+        abstract member root: U2<Document, HTMLElement> with get
+        abstract member constructors: (unit -> unit)[] with get
+        abstract member revertConstructors: (unit -> unit)[] with get
+        abstract member revertibles: obj[] with get
+        abstract member methods: obj with get
+        abstract member matches: obj with get
+        abstract member mediaQueryLists: obj with get
+    type ScopeOptions = interface end
+    type EngineDefaults =        
+        abstract member playbackEase: Eases with get, set
+        abstract member playbackRate: float with get, set
+        abstract member frameRate: int with get, set
+        abstract member loop: U2<float, bool> with get, set
+        abstract member reversed: bool with get, set
+        abstract member alternate: bool with get, set
+        abstract member autoplay: bool with get, set
+        abstract member duration: U2<float, FunctionValue<float>> with get, set
+        abstract member delay: U2<float, FunctionValue<float>> with get, set
+        abstract member loopDelay: float with get, set
+        abstract member ease: Eases with get, set
+        abstract member composition: composition with get, set
+        abstract member modifier: (float -> float) with get, set
+        abstract member onBegin: Callback<obj> with get, set
+        abstract member onBeforeUpdate: Callback<obj> with get, set
+        abstract member onUpdate: Callback<obj> with get, set
+        abstract member onLoop: Callback<obj> with get, set
+        abstract member onPause: Callback<obj> with get, set
+        abstract member onComplete: Callback<obj> with get, set
+        abstract member onRender: Callback<obj> with get, set
+    type Engine =
+        abstract member timeUnit: Enums.timeUnit with get,set
+        abstract member speed: float with get,set
+        abstract member fps: int with get,set
+        /// Value of 0 will skip the rounding process.
+        /// Only rounds properties that are string values internally
+        abstract member precision: int with get,set
+        abstract member pauseOnDocumentHidden: bool with get,set
+        abstract member update: unit -> Engine
+        abstract member pause: unit -> Engine
+        abstract member resume: unit -> Engine
+        abstract member currentTime: float with get,set
+        abstract member deltaTime: float with get,set
+        abstract member useDefaultMainLoop: bool with get,set
+        abstract member defaults: EngineDefaults with get,set
+        
+    type ScopeOptionsDefaults =
+        abstract loop: int with set
+        abstract loopDelay: int with set
+        abstract alternate: bool with set
+        abstract reversed: bool with set
+        abstract autoPlay: U2<bool, ScrollObserver> with set
+        abstract frameRate: int with set
+        abstract playbackRate: float with set
+        abstract playbackEase: float with set
+        abstract delay: U2<int, FunctionValue<int>> with set
+        abstract duration: U2<int, FunctionValue<int>> with set
+        abstract ease: Eases with set
+        abstract composition: composition with set
+        abstract modifier: FloatModifier with set  
+        abstract onBegin: Callback<unit> with set
+        abstract onUpdate: Callback<unit> with set
+        abstract onRender: Callback<unit> with set
+        abstract onLoop: Callback<unit> with set
+        abstract onComplete: Callback<unit> with set
+
+    [<AllowNullLiteral; Interface>]
+    type MotionPath =
+        abstract member translateX : FunctionValue<float> with get, set
+        abstract member translateY : FunctionValue<float> with get, set
+        abstract member rotate : FunctionValue<float> with get, set
+
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type AnimatablePropertySetter =
+        [<Emit("$0($1...)")>]
+        abstract member Invoke: ``to``: U2<float, ResizeArray<float>> * ?duration: float * ?ease: EasingFunction -> Animation
+
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type AnimatablePropertyGetter =
+        [<Emit("$0($1...)")>]
+        abstract member Invoke: unit -> U2<float, ResizeArray<float>>
+
+    [<AllowNullLiteral>]
+    [<Interface>]
+    type Animatable =
+        abstract member targets: obj array with get
+        abstract member animations: obj with get
+        abstract member revert: ChainMethod<Animatable>
+    type AnimatableOptions = interface end
+    type TimerObjectInjection<'Type> =
+        abstract member play: ChainMethod<'Type>
+        abstract member reverse: ChainMethod<'Type>
+        abstract member pause: ChainMethod<'Type>
+        abstract member restart: ChainMethod<'Type>
+        abstract member alternate: ChainMethod<'Type>
+        abstract member resume: ChainMethod<'Type>
+        abstract member complete: ChainMethod<'Type>
+        abstract member cancel: ChainMethod<'Type>
+        abstract member revert: ChainMethod<'Type>
+        abstract member seek: time: int * ?muteCallbacks: bool -> 'Type
+        abstract member stretch: duration: int -> 'Type
+        
+        abstract member id: string with get,set
+        abstract member deltaTime: float with get
+        abstract member currentTime: float with get,set
+        abstract member iterationCurrentTime: float with get,set
+        abstract member progress: float with get,set
+        abstract member iterationProgress: float with get,set
+        abstract member currentIteration: float with get,set
+        abstract member speed: float with get,set
+        abstract member fps: int with get,set
+        abstract member paused: bool with get,set
+        abstract member began: bool with get,set
+        abstract member completed: bool with get,set
+        abstract member reversed: bool with get,set
+
+type AnimeJs with
+    [<Import("createTimer", "animejs")>]
+    static member createTimer (parameters: obj) : Timer = nativeOnly
+    [<ImportMember(Spec.path)>]
+    static member createTimeline (parameters: obj): Timeline = nativeOnly
+    [<Import("utils.cleanInlineStyles", "animejs")>]
+    static member cleanInlineStyles (renderable: 'Type) : 'Type = nativeOnly    
+    [<Import("animate", "animejs")>]
+    static member animate (targets: Targets, parameters: obj) : Animation = nativeOnly
+    [<Import("utils.random", "animejs")>]
+    static member random (min: float, max: float, ?decimalLength: float) : float = nativeOnly
+    [<Import("utils.randomPick", "animejs")>]
+    static member randomPick (items: U2<string, ResizeArray<obj>>) : obj = nativeOnly
+    [<Import("utils.shuffle", "animejs")>]
+    static member shuffle (items: ResizeArray<obj>) : ResizeArray<obj> = nativeOnly
+    [<ImportMember "animejs">]
+    static member stagger (target: obj, ?parameters: obj) : FunctionValue<float> = nativeOnly
+    [<Import("createAnimatable", "animejs")>]
+    static member createAnimatable (targets: Targets, parameters: obj) : Animatable = nativeOnly
+    [<Import("createDraggable", "animejs")>]
+    static member createDraggable (target: Targets, ?parameters: obj) : Draggable = nativeOnly
+    [<Import("createSpring", "animejs"); ParamObject>]
+    static member createSpring (?mass: float, ?stiffness: float, ?damping: float, ?velocity: float) : EasingFun = nativeOnly
+    [<Import("createScope", "animejs")>]
+    static member createScope (?``params``: obj) : Scope = nativeOnly
+    
+    [<Import("onScroll", "animejs")>]
+    static member inline onScroll (options: obj): ScrollObserver = jsNative 
+    [<Import("svg.createDrawable", Spec.path)>]
+    static member createDrawable(selector: SVGElement, ?start: float, ?``end``: float): SVGElementInstanceList = jsNative
+    [<Import("svg.createDrawable", Spec.path)>]
+    static member createDrawable(selector: Selector, ?start: float, ?``end``: float): SVGElementInstanceList = jsNative
+    [<Import("svg.morphTo", Spec.path)>]
+    static member morphTo (path2: SVGElement, ?precision: float) : FunctionValue<_> = nativeOnly
+    [<Import("svg.morphTo", Spec.path)>]
+    static member morphTo (path2: Selector, ?precision: float) : FunctionValue<_> = nativeOnly
+    [<Import("svg.createMotionPath", Spec.path)>]
+    static member createMotionPath (path: SVGElement) : MotionPath = nativeOnly
+    [<Import("svg.morphTo", Spec.path)>]
+    static member createMotionPath (path: Selector) : MotionPath = nativeOnly
+
+type Targets  with
+    [<Emit "$0">]
+    member inline this.Value = let (Targets value) = this in value  
+    member inline this.Yield(value: string) = value :> obj |> this.Value.Add
+    member inline this.Yield(value: #Element) = value :> obj |> this.Value.Add
+    member inline this.Yield(value: NodeList) = value :> obj |> this.Value.Add
+    member inline this.Yield(value: #Element seq) = value |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Yield(value: string seq) = value |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Yield(value: Target<_>) = value :> obj |> this.Value.Add
+    member inline this.Yield(value: Target<_> seq) = value |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Yield(value: unit -> #Element) =
+        value() :> obj |> this.Value.Add
+    member inline this.Yield(value: unit -> string) =
+        value() :> obj |> this.Value.Add
+    member inline this.Yield(value: unit -> NodeList) =
+        value() :> obj |> this.Value.Add
+    member inline this.Yield(value: unit -> Target<_>) =
+        value() :> obj |> this.Value.Add
+    member inline this.Yield(value: unit -> #Element seq) =
+        value() |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Yield(value: unit -> string seq) =
+        value() |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Yield(value: unit -> Target<_> seq) =
+        value() |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Run _ = this
+let targets (value: obj list) = value |> id |> ResizeArray |> Targets
+
+type FableObject = (string * obj) list
+type FableObjectBuilder = interface end
+type EasePropertyInjection = interface end
+type PlaybackPropertyInjection =
+    inherit FableObjectBuilder
+    inherit EasePropertyInjection
+type PercentKeyframe = PercentKeyframe of string with
+    interface FableObjectBuilder
+    interface EasePropertyInjection
+    static member inline (<--) (x: PercentKeyframe, keyframeOptions: (string * obj) list): KeyframePercentValue =
+        !!(!!x ==> createObj keyframeOptions)
+type StyleValue = StyleValue of string * obj
+type StyleValueList = StyleValueList of string * obj list
+type StyleValueFunction = StyleValueFunction of string * FunctionValue<obj>
+
+type TweenPropertyInjection =
+    inherit FableObjectBuilder
+    inherit EasePropertyInjection
+type CssStyle =
+    inherit TweenPropertyInjection
+
+type stagger [<Emit("$0")>] (value: obj) =
+    interface FableObjectBuilder
+    interface EasePropertyInjection
+    [<Emit("$0")>] new (value: string * string) = stagger(value)
+    [<Emit("$0")>] new (value: float * string) = stagger(value)
+    [<Emit("$0")>] new (value: float * float) = stagger(value)
+    [<Emit("$0")>] new (value: string * float) = stagger(value)
+    [<Emit("$0")>] new (value: string) = stagger(value)
+    [<Emit("$0")>] new (value: float) = stagger(value)
+    member inline this.asFunctionValue = AnimeJs.stagger(this)
+
+[<Interface>]
+type ICssStyle =
+    inherit CssStyle
+    static member inline (<--) (x: ICssStyle, stagger: stagger) = unbox<StyleValue>(x, AnimeJs.stagger(stagger))
+    static member inline (<--) (x: ICssStyle,y: int) = StyleValue(!!x, y)
+    static member inline (<--) (x: ICssStyle,y: float) = StyleValue(!!x, y)
+    static member inline (<--) (x: ICssStyle, y: string) = StyleValue(!!x,y)
+    static member inline (<--) (x: ICssStyle, y: obj list) = StyleValueList(!!x,!!y)
+    static member inline (<--) (x: ICssStyle, y: FunctionValue<obj>) = StyleValueFunction(!!x,y)
+
+type StyleObj = interface end
+type StyleAnimationObj =
+    inherit StyleObj
+type StyleToObj =
+    inherit StyleAnimationObj
+type StyleFromObj =
+    inherit StyleAnimationObj
+type StyleAnimatableObj =
+    inherit StyleObj
+
+type StyleArray() =
+    interface CssStyle
+    member inline _.Run(state: FableObject): StyleObj = !!createObj state
+    member inline _.Run(state: StyleFromObj): StyleFromObj = !!createObj state
+    member inline _.Run(state: StyleToObj): StyleFromObj = !!createObj state
+    
+type KeyframeValue = interface end
+type KeyframeBuilder() =
+    interface FableObjectBuilder
+    interface TweenPropertyInjection
+let keyframe = KeyframeBuilder()
+let tween: StyleArray = StyleArray()
+[<Erase>]
+type StyleArrayBuilder = StyleArrayBuilder of string with
+    static member inline (<--) (x: StyleArrayBuilder, keyframes: KeyframeValue list): StyleArray =
+        !!(!!x ==> (keyframes |> List.toArray))
+    static member inline (<--) (x: StyleArrayBuilder, keyframes: PercentKeyframe list): StyleArray =
+        !!(!!x ==> (createObj !!keyframes))
+let keyframes = StyleArrayBuilder "keyframes"
+type TimerCallbackInjection<'Type> = interface end
+type AnimationCallbackInjection<'Type> = inherit TimerCallbackInjection<'Type>
+type ScrollObserverCallbackInjection<'Type> = interface end
+type DraggableCallbackInjection<'Type> = interface end
+type TweenObjectBuilder =
+    inherit FableObjectBuilder
+    inherit EasePropertyInjection
+type BoundsBuilder = inherit FableObjectBuilder
+type SpringBuilder = inherit FableObjectBuilder
+type TimerPropertyInjection =
+    inherit PlaybackPropertyInjection
+    inherit TimerCallbackInjection<Timer>
+type TimelineBuilder =
+    inherit FableObjectBuilder
+    inherit PlaybackPropertyInjection
+    inherit AnimationCallbackInjection<Timeline>
+type AnimatableBuilder =
+    inherit FableObjectBuilder
+    inherit EasePropertyInjection
+[<Erase>]
+type StyleNoValue = StyleNoValue of string
+[<Erase>]
+type StyleWithValue = StyleWithValue of string * obj
+[<Erase>]
+type StyleWithDuration = StyleWithDuration of prop: string * duration: float
+[<Erase>]
+type StyleWithEase = StyleWithEase of prop: string * ease: EasingFun
+[<Erase>]
+type StyleWithDurationEase = StyleWithDurationEase of prop: string * duration: float * ease: EasingFun
+[<Erase>]
+type StyleWithValueDuration = StyleWithValueDuration of prop: string * value: obj * duration: float
+[<Erase>]
+type StyleWithValueEase = StyleWithValueEase of prop: string * value: obj * ease: EasingFun
+[<Erase>]
+type StyleWithValueDurationEase = StyleWithValueDurationEase of prop: string * value: obj * duration: float * ease: EasingFun
+type CursorBuilder = interface end
+type AxisBuilder =
+    inherit FableObjectBuilder
+type AxisX() =
+    interface AxisBuilder
+    member inline _.Run(state: bool): string * obj = "x" ==> state
+    member inline _.Run(state: FableObject): string * obj = "x" ==> createObj state
+let axisX = AxisX()
+type AxisY() =
+    interface AxisBuilder
+    member inline _.Run(state: bool): string * obj = "y" ==> state
+    member inline _.Run(state: FableObject): string * obj = "y" ==> createObj state
+let axisY = AxisY()
+let axisOptions = unbox<AxisBuilder> ()
+type DraggableBuilder =
+    inherit AxisBuilder
+    inherit DraggableCallbackInjection<Draggable>
+type ScrollObserverBuilder =
+    inherit FableObjectBuilder
+    inherit ScrollObserverCallbackInjection<ScrollObserver>
+type AnimationBuilder =
+    inherit TweenPropertyInjection
+    inherit FableObjectBuilder
+    inherit AnimationCallbackInjection<Animation>
+    inherit PlaybackPropertyInjection
+    inherit EasePropertyInjection
+
+type DrawableBuilder = interface end
+
+type UtilsBuilder = interface end
+
+[<AutoOpen; Erase>]
+module AutoOpenComputationImplementations =
+    [<Erase>]
+    module Helpers =
+        let inline add state value = value :: state
+        let inline addTail state value = state @ [ value ]
+    open Helpers
+    type FableObjectBuilder with
+        member inline _.Yield(_: unit): FableObject = []
+        member inline _.Yield(value: string * obj) = [ value ]
+        member inline _.Yield(object: FableObject) = object
+        member inline _.Combine(_: unit, value: string * obj) =
+            [ value ]
+        member inline _.Combine(value: string * obj, _: unit) =
+            [ value ]
+        member inline _.Combine(_: unit, value: FableObject) = value
+        member inline _.Combine(value: FableObject, _: unit) = value
+        member inline _.Combine(left: string * obj, right: string * obj) =
+            [ left; right ]
+        member inline _.Combine(left: FableObject, right: string * obj) =
+            right :: left
+        member inline _.Combine(left: string * obj, right: FableObject) =
+            left :: right
+        member inline _.Combine(left: FableObject, right: FableObject) =
+            left @ right
+        member inline _.Combine(y) = fun () -> y
+        member inline _.Delay([<InlineIfLambda>] value) = value()
+        member inline _.For(state: FableObject, [<InlineIfLambda>] value: string * obj -> FableObject) =
+            state |> List.collect value
+        member inline _.For(state: FableObject, [<InlineIfLambda>] value: unit -> FableObject) =
+            state @ value()
+        member inline _.For(state: FableObject, [<InlineIfLambda>] value: unit -> string * obj) =
+            value() :: state
+        member inline _.For(state, [<InlineIfLambda>] value) =
+            state |> value
+        member inline _.For(_:unit, [<InlineIfLambda>] value) = value()
+        
+    
+    type DraggableCallbackInjection<'Type> with
+        [<CustomOperation "onGrab">]
+        member inline _.onGrabOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onGrab" ==> value |> add state
+        [<CustomOperation "onDrag">]
+        member inline _.onDragOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onDrag" ==> value |> add state
+        [<CustomOperation "onRelease">]
+        member inline _.onReleaseOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            ("onRelease" ==> value)
+            :: state
+        [<CustomOperation "onSnap">]
+        member inline _.onSnapOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            ("onSnap" ==> value)
+            :: state
+        [<CustomOperation "onResize">]
+        member inline _.onResizeOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            ("onResize" ==> value)
+            :: state
+        [<CustomOperation "onAfterResize">]
+        member inline _.onAfterResizeOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            ("onAfterResize" ==> value)
+            :: state
+        [<CustomOperation "onSettle">]
+        member inline _.onSettleOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            ("onSettle" ==> value)
+            :: state
+        [<CustomOperation "onUpdate">]
+        member inline _.onUpdateOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            ("onUpdate" ==> value)
+            :: state
+        
+    type TimerCallbackInjection<'Type> with
+        [<CustomOperation "onBegin">]
+        member inline _.onBeginOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onBegin" ==> value |> add state
+        [<CustomOperation "onUpdate">]
+        member inline _.onUpdateOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onUpdate" ==> value |> add state
+        [<CustomOperation "onLoop">]
+        member inline _.onLoopOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onLoop" ==> value |> add state
+        [<CustomOperation "onPause">]
+        member inline _.onPauseOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onPause" ==> value |> add state
+        [<CustomOperation "onComplete">]
+        member inline _.onCompleteOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onComplete" ==> value |> add state
+        [<CustomOperation "andThen">]
+        member inline _.andThenOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "then" ==> value |> add state
+    
+    type ScrollObserverCallbackInjection<'Type> with
+        [<CustomOperation "onEnter">]
+        member inline _.onEnterOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onEnter" ==> value |> add state
+        [<CustomOperation "onEnterForward">]
+        member inline _.onEnterForwardOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onEnterForward" ==> value |> add state
+        [<CustomOperation "onEnterBackward">]
+        member inline _.onEnterBackwardOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onEnterBackward" ==> value |> add state
+        [<CustomOperation "onLeave">]
+        member inline _.onLeaveOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onLeave" ==> value |> add state
+        [<CustomOperation "onLeaveForward">]
+        member inline _.onLeaveForwardOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onLeaveForward" ==> value |> add state
+        [<CustomOperation "onLeaveBackward">]
+        member inline _.onLeaveBackwardOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onLeaveBackward" ==> value |> add state
+        [<CustomOperation "onUpdate">]
+        member inline _.onUpdateOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onUpdate" ==> value |> add state
+        [<CustomOperation "onSyncComplete">]
+        member inline _.onSyncCompleteOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onSyncComplete" ==> value |> add state
+    
+    type AnimationCallbackInjection<'Type> with
+        [<CustomOperation "onBeforeUpdate">]
+        member inline _.onBeforeUpdateOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onBeforeUpdate" ==> value |> add state
+        [<CustomOperation "onRender">]
+        member inline _.onRenderOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
+            "onRender" ==> value |> add state
+
+    
+    type TimerObjectInjection<'Type> with
+        member inline this.Yield(_: unit) = this
+        member inline this.For(_, action) = action()
+        member inline _.Zero() = ()
+        [<CustomOperation "play">]
+        member inline this.playOp _ = this.play()
+        [<CustomOperation "reverse">]
+        member inline this.reverseOp _ = this.reverse()
+        [<CustomOperation "pause">]
+        member inline this.pauseOp _ = this.pause()
+        [<CustomOperation "restart">]
+        member inline this.restartOp _ = this.restart()
+        [<CustomOperation "alternate">]
+        member inline this.alternateOp _ = this.alternate()
+        [<CustomOperation "resume">]
+        member inline this.resumeOp _ = this.resume()
+        [<CustomOperation "complete">]
+        member inline this.completeOp _ = this.complete()
+        [<CustomOperation "cancel">]
+        member inline this.cancelOp _ = this.cancel()
+        [<CustomOperation "revert">]
+        member inline this.revertOp _ = this.revert()
+        [<CustomOperation "seek">]
+        member inline this.seekOp(_, time: float, ?muteCallbacks: bool) = this.seek(!!time,?muteCallbacks=muteCallbacks)
+        [<CustomOperation "stretch">]
+        member inline this.stretchOp(_, duration: float) = this.stretch(!!duration)
+        member inline this.Run(_) = this
+    type TweenPropertyInjection with
+        member inline _.Yield(value: Enums.composition): FableObject = [ "composition" ==> value ]
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: FableObject, value: float) =
+            "delay" ==> value |> add state
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<float>) =
+            "delay" ==> value |> add state
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: FableObject, value: float) =
+            "duration" ==> value |> add state
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<float>) =
+            "duration" ==> value |> add state
+        [<CustomOperation "composition">]
+        member inline _.compositionOp(state: FableObject, value: Enums.composition) =
+            "composition" ==> value |> add state
+        [<CustomOperation "modifier">]
+        member inline _.modifierOp(state: FableObject, [<InlineIfLambda>] value: FloatModifier) =
+            "modifier" ==> value |> add state
+    
+    type PlaybackPropertyInjection with
+        [<CustomOperation "loop">]
+        member inline _.loopOp(state: FableObject, value: int) =
+            "loop" ==> value |> add state
+        [<CustomOperation "loop">]
+        member inline _.loopOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<int>) =
+            "loop" ==> value |> add state
+        [<CustomOperation "loop">]
+        member inline _.loopOp(state: FableObject, value: bool) =
+            "loop" ==> value |> add state
+        [<CustomOperation "loop">]
+        member inline _.loopOp(state: FableObject) =
+            "loop" ==> true |> add state
+        [<CustomOperation "loopDelay">]
+        member inline _.loopDelayOp(state: FableObject, value: float) =
+            "loopDelay" ==> value |> add state
+        [<CustomOperation "loopDelay">]
+        member inline _.loopDelayOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<float>) =
+            "loopDelay" ==> value |> add state
+        [<CustomOperation "alternate">]
+        member inline _.alternateOp(state: FableObject, value: bool) =
+            "alternate" ==> value |> add state
+        [<CustomOperation "alternate">]
+        member inline _.alternateOp(state: FableObject) =
+            "alternate" ==> true |> add state
+        [<CustomOperation "reversed">]
+        member inline _.reversedOp(state: FableObject, value: bool) =
+            "reversed" ==> value |> add state
+        [<CustomOperation "reversed">]
+        member inline _.reversedOp(state: FableObject) =
+            "reversed" ==> true |> add state
+        [<CustomOperation "autoplay">]
+        member inline _.autoplayOp(state: FableObject) =
+            "autoplay" ==> true |> add state
+        [<CustomOperation "autoplay">]
+        member inline _.autoplayOp(state: FableObject, value: bool) =
+            "autoplay" ==> value |> add state
+        [<CustomOperation "autoplay">]
+        member inline _.autoplayOp(state: FableObject, value: ScrollObserver) =
+            "autoplay" ==> value |> add state
+        [<CustomOperation "frameRate">]
+        member inline _.frameRate(state: FableObject, value: int) =
+            "frameRate" ==> value |> add state
+        [<CustomOperation "playbackRate">]
+        member inline _.playbackRate(state: FableObject, value: float) =
+            "playbackRate" ==> value |> add state
+        [<CustomOperation "playbackEase">]
+        member inline _.playbackEase(state: FableObject, [<InlineIfLambda>] value: FloatModifier) =
+            "playbackEase" ==> value |> add state
+    type Timeline with
+        member inline this.Yield(_: unit) = ()
+        member inline this.Zero() = ()
+        [<CustomOperation "add">]
+        member inline this.AddOp(_, target: string, options: obj) =
+            this.add2(Selector target, unbox (options)) |> ignore
+        [<CustomOperation "add">]
+        member inline this.AddOp(_, target: string, options: obj, value: RelativeTimePosition) =
+            this.add3(Selector target, unbox (options), !!value) |> ignore
+        [<CustomOperation "add">]
+        member inline this.AddOp(_, target: string, options: obj, value: FunctionValue<_>) =
+            this.add3(Selector target, unbox (options), !!value) |> ignore
+        [<CustomOperation "init">]
+        member inline this.initOp _ = this.init() |> ignore
+        [<CustomOperation "refresh">]
+        member inline this.refreshOp _ = this.refresh() |> ignore
+        [<CustomOperation "set">]
+        member inline this.setOp(_, targets: obj, properties: obj, position: RelativeTimePosition) = this.set(!!targets,properties,position = !!position) |> ignore
+        [<CustomOperation "set">]
+        member inline this.setOp(_, targets: obj, properties: obj) = this.set(!!targets,properties) |> ignore
+        [<CustomOperation "label">]
+        member inline this.label(_, label: string, ?position: RelativeTimePosition) = this.label(label, ?position = position) |> ignore
+        member inline this.Run _ = this
+    type stagger with
+        member inline _.Yield(value: staggerFrom) = [ "from" ==> value ]
+        [<CustomOperation "start">]
+        member inline _.startOp(state: FableObject, value: float) = "start" ==> value |> add state
+        [<CustomOperation "start">]
+        member inline _.startOp(state: FableObject, value: RelativeTimePosition) = "start" ==> value |> add state
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: FableObject, value: int) = "from" ==> value |> add state
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: FableObject, value: staggerFrom) = "from" ==> value |> add state
+        [<CustomOperation "reversed">]
+        member inline _.reversedOp(state: FableObject, ?value: bool) = "reversed" ==> (value |> Option.defaultValue true) |> add state
+        [<CustomOperation "grid">]
+        member inline _.gridOp(state: FableObject, value1: float, value2: float) = "grid" ==> [|value1;value2|] |> add state
+        [<CustomOperation "axis">]
+        member inline _.axisOp(state: FableObject, value: Enums.axis) = "axis" ==> value |> add state 
+        [<CustomOperation "modifier">]
+        member inline _.modifierOp(state: FableObject, value: FloatModifier) = "modifier" ==> value |> add state 
+        [<CustomOperation "modifier">]
+        member inline _.modifierOp(state: FableObject, value: float -> string) = "modifier" ==> value |> add state 
+        member inline this.Run(state: FableObject) = AnimeJs.stagger(this,createObj state)
+
+    type EasePropertyInjection with
+        member inline _.Yield(value: EasingFun) = ("ease" ==> value)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(state: FableObject, value: float -> float) =
+            "ease" ==> value |> add state
+        // [<CompilerMessage("You can directly yield an EasingFun delegate and it will be transformed into a 'ease' key value pair. The 'ease' operation is not required",0)>]
+        // [<CustomOperation "ease">]
+        // member inline _.easeOp(state: FableObject, value: EasingFun) =
+        //     "ease" ==> value |> add state
+
+    type BoundsBuilder with
+        [<CustomOperation "top">]
+        member inline _.TopOp(_object_builder, _property_value: float) = ("top" ==> _property_value) :: _object_builder
+        [<CustomOperation "bottom">]
+        member inline _.BottomOp(_object_builder, _property_value: float) = ("bottom" ==> _property_value) :: _object_builder
+        [<CustomOperation "left">]
+        member inline _.LeftOp(_object_builder, _property_value: float) = ("left" ==> _property_value) :: _object_builder
+        [<CustomOperation "right">]
+        member inline _.RightOp(_object_builder, _property_value: float) = ("right" ==> _property_value) :: _object_builder
+        member inline _.Run(_object_builder_run: FableObject): Bounds =
+            unbox (_object_builder_run |> createObj)
+    
+    type SpringBuilder with
+        [<CustomOperation "mass">]
+        member inline _.MassOp(_object_builder, _property_value: float) = _object_builder @ [("mass" ==> _property_value)]
+        [<CustomOperation "stiffness">]
+        member inline _.StiffnessOp(_object_builder, _property_value: float) = _object_builder @ [("stiffness" ==> _property_value)]
+        [<CustomOperation "damping">]
+        member inline _.DampingOp(_object_builder, _property_value: float) = _object_builder @ [("damping" ==> _property_value)]
+        [<CustomOperation "velocity">]
+        member inline _.VelocityOp(_object_builder, _property_value: float) = _object_builder @ [("velocity" ==> _property_value)]
+        member inline _.Run(_object_builder_run: FableObject): EasingFun =
+            Eases.createSpring(_object_builder_run |> createObj)
+    
+    type KeyframePercentValue with
+        member inline _.Yield(_: unit): FableObject = []
+        member inline _.Yield(value: string * obj) = value
+        member inline _.Yield(object: FableObject) = object
+        member inline _.Combine(_: unit, value: string * obj) =
+            [ value ]
+        member inline _.Combine(value: string * obj, _: unit) =
+            [ value ]
+        member inline _.Combine(_: unit, value: FableObject) = value
+        member inline _.Combine(value: FableObject, _: unit) = value
+        member inline _.Combine(left: string * obj, right: string * obj) =
+            [ left; right ]
+        member inline _.Combine(left: FableObject, right: string * obj) =
+            right :: left
+        member inline _.Combine(left: string * obj, right: FableObject) =
+            left :: right
+        member inline _.Combine(left: FableObject, right: FableObject) =
+            left @ right
+        member inline _.Delay([<InlineIfLambda>] value) = value()
+        member inline _.For(state: FableObject, [<InlineIfLambda>] value: string * obj -> FableObject) =
+            state |> List.collect value
+        member inline _.For(state: FableObject, [<InlineIfLambda>] value: unit -> FableObject) =
+            state @ value()
+        member inline _.For(state: FableObject, [<InlineIfLambda>] value: unit -> string * obj) =
+            value() :: state
+        member inline _.For(state, [<InlineIfLambda>] value) =
+            state |> value
+        member inline _.Yield(value: StyleValue) = [unbox<string * obj> value]
+        member inline _.Yield([<InlineIfLambda>] value: EasingFun) = [ "ease" ==> value ]
+        member inline _.Yield([<InlineIfLambda>] value: FloatModifier) = [ "ease" ==> value ]
+        member inline this.Run(state: FableObject): PercentKeyframe = !!(!!this ==> createObj state)
+    type AnimationBuilder with
+        member inline _.Yield(value: StyleValue) = [unbox<string * obj> value]
+        member inline _.Yield(value: StyleValueFunction) = [ unbox<string * obj> value ]
+        member inline _.Yield(value: StyleObj) = [ unbox<string * obj> value ]
+        member inline _.Yield(value: #StyleAnimationObj) = [ unbox<string * obj> value ]
+        member inline _.Yield(value: StyleArray) = [ unbox<string * obj> value ]
+        member inline _.Run(state: FableObject) =
+            createObj state |> unbox<AnimationOptions>
+    type AnimationOptions with
+        member inline _.Yield(_: unit) = ()
+        member inline _.Yield(value: string) = Target value
+        member inline _.Yield(value: Selector) = Target value
+        member inline _.Yield(value: #HTMLElement) = Target value
+        member inline _.Yield(value: #HTMLElement list) = targets !!value
+        member inline _.Yield(value: Targets) = value
+        member inline _.Delay(value) = value()
+        member inline _.Combine(x) = fun () -> x
+        member inline this.Run(state: Target<_>) =
+            AnimeJs.animate(!!state, this)
+        member inline this.Run(state: Targets) =
+            AnimeJs.animate(state, this)
+    type CssStyle with
+        member inline _.Yield(value: stagger): StyleValueFunction = !!AnimeJs.stagger(value)
+        member inline _.Yield(value: string): StyleValue = !!value
+        member inline _.Yield(value: float): StyleValue = !!value
+        member inline _.Yield(value: ITuple): StyleValue = !!value
+        member inline _.Yield(value: RelativeTweenValue): StyleValue = !!value
+        member inline _.Yield([<InlineIfLambda>] value: FunctionValue<_>): StyleValueFunction = !!value
+        member inline _.Yield([<InlineIfLambda>] value: EasingFun): string * obj = "ease" ==> value
+        member inline _.Combine(left: string * obj, right: string * obj): FableObject =
+            [left;right]
+        member inline _.Combine(left: FableObject, right: string * obj): FableObject =
+            right |> add left
+        member inline _.Combine(left: string * obj, right: FableObject): FableObject =
+            left :: right
+        member inline _.Combine(left: FableObject, right: FableObject): FableObject =
+            left @ right
+        member inline _.Combine(left: FableObject, right: ^T when ^T :> StyleObj) =
+            (left @ !!right) |> unbox<^T>
+        member inline _.Combine(left: ^T when ^T :> StyleObj, right: FableObject) =
+            (!!left @ right) |> unbox<^T>
+        member inline _.Combine(left: ^T when ^T :> StyleObj, right: string * obj) =
+            right |> add (unbox<FableObject> left) |> unbox<^T>
+        member inline _.Combine(left: string * obj, right: ^T when ^T :> StyleObj) =
+            left :: (unbox<FableObject> right) |> unbox<^T>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: float) =
+            "to" ==> value |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: float, value2: float) =
+            "to" ==> [| value; value2 |] |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: string) =
+            "to" ==> value |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: string, value2: string) =
+            "to" ==> [| value; value2 |] |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: float, value2: string) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: string, value2: float) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: RelativeTweenValue) =
+            "to" ==> value |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<_>) =
+            "to" ==> value |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: RelativeTweenValue, value2: RelativeTweenValue) =
+            "to" ==> [| value; value2 |] |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<_>, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> [| value; value2 |] |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: float, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<_>, value2: float) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: RelativeTweenValue, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<_>, value2: RelativeTweenValue) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: RelativeTweenValue, value2: string) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: string, value2: RelativeTweenValue) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: RelativeTweenValue, value2: float) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: float, value2: RelativeTweenValue) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<_>, value2: string) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: FableObject, value: string, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> (value, value2) |> add state |> unbox<StyleToObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: FableObject, value: float) =
+            "from" ==> value |> add state |> unbox<StyleFromObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: FableObject, value: string) =
+            "from" ==> value |> add state |> unbox<StyleFromObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<_>) =
+            "from" ==> value |> add state |> unbox<StyleFromObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: FableObject, value: RelativeTweenValue) =
+            "from" ==> value |> add state |> unbox<StyleFromObj>
+        [<CustomOperation "delay"; CompilerMessage("A style object value cannot have raw values. Place them in a `too` or `from` field.", 10_001, IsError=true)>]
+        member inline _.delayOp(state: StyleValue, value) = 
+            ["delay" ==> value; "to" ==> state] |> unbox<FableObject>
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: ^T when ^T :> StyleAnimationObj, value: float) =
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<float>) =
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: FableObject, value: float): StyleAnimationObj =
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<float>): StyleAnimationObj =
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox
+        [<CustomOperation "duration"; CompilerMessage("A style object value cannot have raw values. Place them in a `too` or `from` field.", 10_001, IsError=true)>]
+        member inline _.durationOp(state: StyleValue, value) =
+            ["duration" ==> value; "to" ==> state] |> unbox<FableObject>
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: ^T when ^T :> StyleObj, value: float) =
+            "duration" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: ^T when ^T :> StyleObj, [<InlineIfLambda>] value: FunctionValue<float>) =
+            "duration" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+        [<CustomOperation "composition"; CompilerMessage("A style object value cannot have raw values. Place them in a `too` or `from` field.", 10_001, IsError=true)>]
+        member inline _.compositionOp(state: StyleValue, value) =
+            ["composition" ==> value; "to" ==> state] |> unbox<FableObject>
+        [<CustomOperation "composition">]
+        member inline _.compositionOp(state: ^T when ^T :> StyleAnimationObj, value: Enums.composition) =
+            "composition" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
+        [<CustomOperation "composition">]
+        member inline _.compositionOp(state: FableObject, value: Enums.composition): StyleAnimationObj =
+            "composition" ==> value |> add (unbox<FableObject> state) |> unbox
+        [<CustomOperation "modifier"; CompilerMessage("A style object value cannot have raw values. Place them in a `too` or `from` field.", 10_001, IsError=true)>]
+        member inline _.modifierOp(state: StyleValue, value: FloatModifier) =
+            ["modifier" ==> value; "to" ==> state] |> unbox<FableObject>
+        [<CustomOperation "modifier">]
+        member inline _.modifierOp(state: ^T, [<InlineIfLambda>] value: FloatModifier) =
+            "modifier" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
+        [<CustomOperation "ease"; CompilerMessage("A style object value cannot have raw values. Place them in a `too` or `from` field.", 10_001, IsError=true)>]
+        member inline _.easeOp(state: StyleValue, value: EasingFun) =
+            ["ease" ==> value; "to" ==> state] |> unbox<FableObject>
+        [<CustomOperation "ease">]
+        member inline _.easeOp(state: ^T, value: EasingFun) =
+            "ease" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+        [<CustomOperation "ease">]
+        member inline _.easeOp(state: ^T, [<InlineIfLambda>] value: FloatModifier) =
+            "ease" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+        [<CustomOperation "unit">]
+        member inline _.unitOp(state: FableObject, value: string): StyleAnimatableObj =
+            "unit" ==> value |> add state |> unbox
+    type ICssStyle with
+        member inline this.Run(value: StyleValue): string * obj = !!this ==> value
+        member inline this.Run(value: StyleValueFunction): string * obj = !!this ==> value
+        member inline this.Run(value: FableObject): StyleObj =
+            !!(!!this ==> createObj value)
+        member inline this.Run(value: StyleAnimatableObj): StyleAnimatableObj =
+            !!(!!this ==> createObj !!value)
+        member inline this.Run(value: StyleAnimationObj): StyleAnimationObj =
+            !!(!!this ==> createObj !!value)
+        member inline this.Run(value: StyleToObj): StyleToObj =
+            !!(!!this ==> createObj !!value)
+        member inline this.Run(value: StyleFromObj): StyleFromObj =
+            !!(!!this ==> createObj !!value)
+        member inline this.Run(value: StyleValueList): StyleValueList =
+            !!(!!this ==> (!!value |> List.toArray))
+
+    type KeyframeBuilder with
+        member inline _.Yield(value: StyleValue): string * obj = !!value
+        member inline _.Yield(value: StyleObj): string * obj = !!value
+        member inline _.Yield(value: StyleValueFunction): string * obj = !!value
+        member inline _.Yield(value: StyleValueList): string * obj = !!value
+        member inline _.Run(value: FableObject): KeyframeValue =
+            !!createObj value
+
+    type CursorBuilder with
+        member inline _.Yield(_: unit): unit = ()
+        member inline _.Yield(value: string * obj): string * obj = value
+        member inline _.Yield(value: bool) = value
+        member inline _.Combine(value: string * obj, value2: string * obj): (string * obj) * (string * obj) = value,value2
+        member inline _.Delay(value: unit -> (string * obj)) = value()
+        member inline _.Delay(value: unit -> bool) = value()
+        member inline _.Delay(value: unit -> ((string * obj) * (string * obj))) = value()
+        member inline _.Combine(value: string * obj): string * obj = value
+        /// <summary>
+        /// <c>onHover</c><br/>
+        /// <c>bool -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onHover</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onHover">]
+        member inline _.OnHoverOp(_object_builder: unit, value: bool) = "onHover" ==> value
+        /// <summary>
+        /// <c>onHover</c><br/>
+        /// <c>bool -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onHover</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onHover">]
+        member inline _.OnHoverOp(_object_builder: string * obj, value: bool) = _object_builder,("onHover" ==> value)
+        /// <summary>
+        /// <c>onGrab</c><br/>
+        /// <c>bool -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onGrab</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onGrab">]
+        member inline _.OnGrabOp(_object_builder: unit, value: bool) = "onGrab" ==> value
+        /// <summary>
+        /// <c>onGrab</c><br/>
+        /// <c>bool -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onGrab</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onGrab">]
+        member inline _.OnGrabOp(_object_builder: string * obj, value: bool) = _object_builder,("onGrab" ==> value)
+        /// <summary>
+        /// <c>onHover</c><br/>
+        /// <c>string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onHover</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onHover">]
+        member inline _.OnHoverOp(_object_builder: unit, value: string) = "onHover" ==> value
+        /// <summary>
+        /// <c>onHover</c><br/>
+        /// <c>string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onHover</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onHover">]
+        member inline _.OnHoverOp(_object_builder: string * obj, value: string) = _object_builder,("onHover" ==> value)
+        /// <summary>
+        /// <c>onGrab</c><br/>
+        /// <c>string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onGrab</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onGrab">]
+        member inline _.OnGrabOp(_object_builder: unit, value: string) = "onGrab" ==> value
+        /// <summary>
+        /// <c>onGrab</c><br/>
+        /// <c>string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>onGrab</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string | bool</c></p>
+        /// </remarks>
+        /// <returns><c>string * obj</c></returns>
+        [<CustomOperation "onGrab">]
+        member inline _.OnGrabOp(_object_builder: string * obj, value: string) = _object_builder,("onGrab" ==> value)
+        member inline _.Run(_object_run: (string * obj)): DraggableCursor = !!([|_object_run|] |> createObj)
+        member inline _.Run(_object_run: ((string * obj) * (string * obj))): DraggableCursor = !!([|_object_run |> fst; _object_run |> snd|] |> createObj)
+        member inline _.Run(_object_run: bool): DraggableCursor = !! _object_run
+
+    type AnimatableBuilder with
+        member inline _.Yield(value: StyleValue): string * obj = !!value
+        member inline _.Yield(value: StyleAnimatableObj): string * obj = !!value
+        member inline _.Yield(value: StyleObj): string * obj = !!value
+        [<CustomOperation "unit">]
+        member inline _.unitOp(state: FableObject, value: string) =
+            "unit" ==> value |> add state
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: FableObject, value: float) =
+            "duration" ==> value |> add state
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: FableObject, value: FunctionValue<float>) =
+            "duration" ==> value |> add state
+        [<CustomOperation "modifier">]
+        member inline _.modifierOp(state: FableObject, value: FloatModifier) =
+            "modifier" ==> value |> add state
+    type Animatable with
+        member inline _.Yield(value: unit): unit = ()
+        member inline _.Yield(value: string): StyleNoValue = StyleNoValue value
+        member inline _.Yield(value: ICssStyle): StyleNoValue = StyleNoValue !!value
+        
+        member inline _.Yield(value: float): float = value
+        member inline _.Yield(value: int): int = value
+        member inline _.Yield(value: float * float): ITuple = value
+        member inline _.Yield(value: float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float * float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float * float * float): ITuple = value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float * float * float * float): ITuple = value
+        member inline _.Yield(value: float[]): float[] = value
+        member inline _.Yield(value: float list): float[] = value |> List.toArray
+        member inline this.Run(value: StyleNoValue): U2<float, float[]> = emitJsExpr (this,value) "$0[$1]()"
+        member inline this.Run(StyleWithValue(prop, value)): Animatable = emitJsExpr (this,prop,value) "$0[$1]($2)"
+        member inline this.Run(StyleWithValueDuration(prop, value,duration)): Animatable = emitJsExpr (this,prop,value,duration) "$0[$1]($2,$3)"
+        member inline this.Run(StyleWithValueEase(prop, value,ease)): Animatable = emitJsExpr (this,prop,value,ease) "$0[$1]($2, easing = $3)"
+        member inline this.Run(StyleWithValueDurationEase(prop, value,duration,ease)): Animatable = emitJsExpr (this,prop,value,duration,ease) "$0[$1]($2,$3,$4)"
+        member inline _.Delay(value) = value()
+        member inline _.Combine(StyleNoValue(prop), value) =
+            StyleWithValue(prop,value) 
+        member inline _.Combine(StyleWithDuration(prop,duration), value) =
+            StyleWithValueDuration(prop,value,duration) 
+        member inline _.Combine(StyleWithEase(prop,ease), value) =
+            StyleWithValueEase(prop,value,ease)
+        member inline _.Combine(StyleWithDurationEase(prop,duration,ease), value) =
+            StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(value, _:unit) = value
+        [<CustomOperation "duration">]
+        member inline _.durationOp(StyleNoValue(prop), value: float) = StyleWithDuration(prop,value)
+        [<CustomOperation "duration">]
+        member inline _.durationOp(StyleWithValue(prop,value), duration: float) = StyleWithValueDuration(prop,value,duration)
+        [<CustomOperation "duration">]
+        member inline _.durationOp(StyleWithValueEase(prop,value,ease), duration: float) = StyleWithValueDurationEase(prop,value,duration,ease)
+        [<CustomOperation "duration">]
+        member inline _.durationOp(StyleWithEase(prop,ease), duration: float) = StyleWithDurationEase(prop,duration,ease)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(StyleNoValue(prop), value: float -> float) = StyleWithEase(prop,value)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(StyleWithValue(prop,value), ease: float -> float) = StyleWithValueEase(prop,value,ease)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(StyleWithValueDuration(prop,value,duration), ease: float -> float) = StyleWithValueDurationEase(prop,value,duration,ease)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(StyleWithDuration(prop,duration), ease: float -> float) = StyleWithDurationEase(prop,duration,ease)
+        member inline _.For(_object_instance: StyleWithValueDuration, _object_builder_action: StyleWithValueDuration -> StyleWithValueDurationEase) = _object_instance |> _object_builder_action
+        member inline _.Run(state: FableObject): AnimatableOptions = createObj state |> unbox
+    type AnimatableOptions with
+        member inline _.Yield(_: unit) = ()
+        member inline _.Yield(value: string) = Target value
+        member inline _.Yield(value: Selector) = Target value
+        member inline _.Yield(value: #HTMLElement) = Target value
+        member inline _.Yield(value: #HTMLElement list) = targets !!value
+        member inline _.Yield(value: Targets) = value
+        member inline this.Run(state: Target<_>) =
+            AnimeJs.createAnimatable(!!state, this)
+        member inline this.Run(state: Targets) =
+            AnimeJs.createAnimatable(!!state, this)
+
+    type DraggableBuilder with
+        member inline _.Yield(value: DraggableCursor) = "cursor" ==> value
+        /// <summary>
+        /// <c>cursor</c><br/>
+        /// <c>bool -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>cursor</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>bool</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        
+        [<CustomOperation "cursor">]
+        member inline _.CursorOp(_object_builder: FableObject, value: bool) = ("cursor" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>x</c><br/>
+        /// <c>bool -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>x</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>bool | FSharp.Axis</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "x">]
+        member inline  _.XOp(_object_builder: FableObject, value: bool) = ("x" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>y</c><br/>
+        /// <c>bool -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>y</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>bool | FSharp.Axis</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "y">]
+        member inline _.YOp(_object_builder: FableObject, value: bool) = ("y" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>x</c><br/>
+        /// <c>FSharp.Axis -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>x</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>bool | FSharp.Axis</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "x">]
+        member inline _.XOp(_object_builder: FableObject, value: AxisOptions) = ("x" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>y</c><br/>
+        /// <c>FSharp.Axis -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>y</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>bool | FSharp.Axis</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "y">]
+        member inline _.YOp(_object_builder: FableObject, value: AxisOptions) = ("y" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c>Selector -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.ContainerOp(_object_builder: FableObject, _object_value: Selector) = ("container" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c> string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.ContainerOp(_object_builder: FableObject, _object_value: string) = ("container" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c>#HTMLElement-> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.ContainerOp(_object_builder: FableObject, _object_value: #HTMLElement) = ("container" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c>SBounds -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.ContainerOp(_object_builder: FableObject, _object_value: Bounds) = ("container" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c>FunctionValue&lt;Bounds> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.ContainerOp(_object_builder: FableObject, _object_value: FunctionValue<Bounds>) = ("container" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>containerPadding</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>containerPadding</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "containerPadding">]
+        member inline _.containerPaddingOp(_object_builder: FableObject, _object_value: float) = ("containerPadding" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>containerPadding</c><br/>
+        /// <c>Bounds -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>containerPadding</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "containerPadding">]
+        member inline _.containerPaddingOp(_object_builder: FableObject, _object_value: Bounds) = ("containerPadding" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>containerPadding</c><br/>
+        /// <c>FunctionValue&lt;Bounds> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>containerPadding</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "containerPadding">]
+        member inline _.containerPaddingOp(_object_builder: FableObject, _object_value: FunctionValue<Bounds>) = ("containerPadding" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>containerPadding</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>containerPadding</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | Bounds | FunctionValue&lt;Bounds></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "containerPadding">]
+        member inline _.containerPaddingOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("containerPadding" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>containerFriction</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>containerFriction</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "containerFriction">]
+        member inline _.containerFrictionOp(_object_builder: FableObject, _object_value: float) = ("containerFriction" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseMass</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseMass</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseMass">]
+        member inline _.releaseMassOp(_object_builder: FableObject, _object_value: float) = ("releaseMass" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseMass</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseMass</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseMass">]
+        member inline _.releaseMassOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseMass" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseStiffness</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseStiffness</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseStiffness">]
+        member inline _.releaseStiffnessOp(_object_builder: FableObject, _object_value: float) = ("releaseStiffness" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseStiffness</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseStiffness</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseStiffness">]
+        member inline _.releaseStiffnessOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseStiffness" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseDamping</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseDamping</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseDamping">]
+        member inline _.releaseDampingOp(_object_builder: FableObject, _object_value: float) = ("releaseDamping" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseDamping</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseDamping</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseDamping">]
+        member inline _.releaseDampingOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseDamping" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseEase</c><br/>
+        /// <c>(float -> float) -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseEase</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float -> float | FunctionValue&lt;float -> float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseEase">]
+        member inline _.releaseEaseOp(_object_builder: FableObject, _object_value: float -> float) = ("releaseEase" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseEase</c><br/>
+        /// <c>FunctionValue&lt;float -> float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseEase</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float -> float | FunctionValue&lt;float -> float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseEase">]
+        member inline _.releaseEaseOp(_object_builder: FableObject, _object_value: FunctionValue<float -> float>) = ("releaseEase" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseContainerFriction</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseContainerFriction</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseContainerFriction">]
+        member inline _.releaseContainerFrictionOp(_object_builder: FableObject, _object_value: float) = ("releaseContainerFriction" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>releaseContainerFriction</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>releaseContainerFriction</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "releaseContainerFriction">]
+        member inline _.releaseContainerFrictionOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("releaseContainerFriction" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>minVelocity</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>minVelocity</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "minVelocity">]
+        member inline _.minVelocityOp(_object_builder: FableObject, _object_value: float) = ("minVelocity" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>minVelocity</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>minVelocity</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "minVelocity">]
+        member inline _.minVelocityOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("minVelocity" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>maxVelocity</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>maxVelocity</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "maxVelocity">]
+        member inline _.maxVelocityOp(_object_builder: FableObject, _object_value: float) = ("maxVelocity" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>maxVelocity</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>maxVelocity</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "maxVelocity">]
+        member inline _.maxVelocityOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("maxVelocity" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>velocityMultiplier</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>velocityMultiplier</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "velocityMultiplier">]
+        member inline _.velocityMultiplierOp(_object_builder: FableObject, _object_value: float) = ("velocityMultiplier" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>velocityMultiplier</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>velocityMultiplier</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "velocityMultiplier">]
+        member inline _.velocityMultiplierOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("velocityMultiplier" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>dragSpeed</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>dragSpeed</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "dragSpeed">]
+        member inline _.dragSpeedOp(_object_builder: FableObject, _object_value: float) = ("dragSpeed" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>dragSpeed</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>dragSpeed</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "dragSpeed">]
+        member inline _.dragSpeedOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("dragSpeed" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>scrollThreshold</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>scrollThreshold</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "scrollThreshold">]
+        member inline _.scrollThresholdOp(_object_builder: FableObject, _object_value: float) = ("scrollThreshold" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>scrollThreshold</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>scrollThreshold</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "scrollThreshold">]
+        member inline _.scrollThresholdOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("scrollThreshold" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>scrollSpeed</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>scrollSpeed</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "scrollSpeed">]
+        member inline _.scrollSpeedOp(_object_builder: FableObject, _object_value: float) = ("scrollSpeed" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>scrollSpeed</c><br/>
+        /// <c>FunctionValue&lt;float> -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>scrollSpeed</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float></c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "scrollSpeed">]
+        member inline _.scrollSpeedOp(_object_builder: FableObject, _object_value: FunctionValue<float>) = ("scrollSpeed" ==> _object_value) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: float) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>float -> float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: float, value2: float) = ("snap" ==> (value, value2)) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>FunctionValue&lt;float></c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float>) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>FunctionValue&lt;float * float></c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&llt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float * float>) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>modifier</c><br/>
+        /// <c>(float -> float) -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>modifier</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float -> float</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "modifier">]
+        member inline _.ModifierOp(_object_builder: FableObject, value: FloatModifier) = ("modifier" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>mapTo</c><br/>
+        /// <c>string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>mapTo</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "mapTo">]
+        member inline _.MapToOp(_object_builder: FableObject, value: string) = ("mapTo" ==> value) :: _object_builder
+        member inline _.Run(_object_builder: FableObject): DraggableOptions = !!createObj !!_object_builder
+    type DraggableOptions with
+        member inline _.Yield(_: unit) = ()
+        member inline _.Yield(value: string) = Target value
+        member inline _.Yield(value: Selector) = Target value
+        member inline _.Yield(value: #HTMLElement) = Target value
+        member inline _.Yield(value: #HTMLElement list) = targets !!value
+        member inline _.Yield(value: Targets) = value
+        member inline this.Run(state: Target<_>) =
+            AnimeJs.createDraggable(!!state, this)
+        member inline this.Run(state: Targets) =
+            AnimeJs.createDraggable(state, this)
+    type axis with
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: float) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>float -> float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: float, value2: float) = ("snap" ==> (value, value2)) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>FunctionValue&lt;float></c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float>) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>FunctionValue&lt;float * float></c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float * float>) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>modifier</c><br/>
+        /// <c>(float -> float) -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>modifier</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float -> float</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "modifier">]
+        member inline _.ModifierOp(_object_builder: FableObject, value: FloatModifier) = ("modifier" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>mapTo</c><br/>
+        /// <c>string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>mapTo</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "mapTo">]
+        member inline _.MapToOp(_object_builder: FableObject, value: string) = ("mapTo" ==> value) :: _object_builder
+        member inline _.Yield(value: bool) = value
+        member inline this.Run(_object_run: FableObject): string * obj = !!this ==> !!createObj _object_run
+        member inline this.Run(_object_run: bool): string * obj = !!this ==> !!_object_run
+        
+    type AxisBuilder with
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: float) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>float -> float -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: float, value2: float) = ("snap" ==> (value, value2)) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>FunctionValue&lt;float></c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float>) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>snap</c><br/>
+        /// <c>FunctionValue&lt;float * float></c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>snap</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float | FunctionValue&lt;float> | FunctionValue&lt;float * flooat></c></p>
+        /// <p><c>float float</c></p>
+        /// </remarks>
+        /// <returns><c></c>(string * obj) list</returns>
+        [<CustomOperation "snap">]
+        member inline _.SnapOp(_object_builder: FableObject, value: FunctionValue<float * float>) = ("snap" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>modifier</c><br/>
+        /// <c>(float -> float) -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>modifier</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>float -> float</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "modifier">]
+        member inline _.ModifierOp(_object_builder: FableObject, value: FloatModifier) = ("modifier" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>mapTo</c><br/>
+        /// <c>string -> ...</c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>mapTo</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>string</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "mapTo">]
+        member inline _.MapToOp(_object_builder: FableObject, value: string) = ("mapTo" ==> value) :: _object_builder
+        member inline _.Yield(value: bool) = value
+        member inline _.Run(_object_run: FableObject): AxisOptions = !!createObj _object_run
+        member inline _.Run(_object_run: bool): AxisOptions = !!_object_run
+    type ScrollObserverBuilder with
+        /// <summary>
+        /// <c>axis</c><br/>
+        /// <c> Enums.Axis -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Axis</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "axis">]
+        member inline _.axisOp(_object_builder: FableObject, value: axis) = ("axis" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c> Selector -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.containerOp(_object_builder: FableObject, value: Selector) = ("container" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.containerOp(_object_builder: FableObject, value: string) = ("container" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>container</c><br/>
+        /// <c> #HTMLElement -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>container</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "container">]
+        member inline _.containerOp(_object_builder: FableObject, value: #HTMLElement) = ("container" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>target</c><br/>
+        /// <c> Selector -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>target</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "target">]
+        member inline _.targetOp(_object_builder: FableObject, value: Selector) = ("target" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>target</c><br/>
+        /// <c> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>target</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "target">]
+        member inline _.targetOp(_object_builder: FableObject, value: string) = ("target" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>target</c><br/>
+        /// <c> #HTMLElement -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>target</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>Selector | string | #HTMLElement</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "target">]
+        member inline _.targetOp(_object_builder: FableObject, value: #HTMLElement) = ("target" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>debug</c><br/>
+        /// <c> unit -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>debug</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0-1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>unit | bool</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "debug">]
+        member inline _.debugOp(_object_builder: FableObject) = ("debug" ==> true) :: _object_builder
+        /// <summary>
+        /// <c>debug</c><br/>
+        /// <c> bool -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>debug</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0-1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>unit | bool</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "debug">]
+        member inline _.debugOp(_object_builder: FableObject, value: bool) = ("debug" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>repeat</c><br/>
+        /// <c> unit -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>repeat</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0-1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>unit | bool</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "repeat">]
+        member inline _.repeatOp(_object_builder: FableObject) = ("repeat" ==> true) :: _object_builder
+        /// <summary>
+        /// <c>repeat</c><br/>
+        /// <c> bool -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>repeat</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0-1</c>
+        /// </description> </item>
+        /// </list>
+        /// <p><c>unit | bool</c></p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "repeat">]
+        member inline _.repeatOp(_object_builder: FableObject, value: bool) = ("repeat" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>sync</c><br/>
+        /// <c> unit -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>sync</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0 | 1 | 2 | 4</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 0: <c>unit</c><br/>
+        /// 1: <c>bool | string | float | float -> float</c><br/>
+        /// 2: <c>string string</c><br/>
+        /// 4: <c>string string string string</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "sync">]
+        member inline _.syncOp(_object_builder: FableObject) = ("sync" ==> true) :: _object_builder
+        /// <summary>
+        /// <c>sync</c><br/>
+        /// <c> bool -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>sync</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0 | 1 | 2 | 4</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 0: <c>unit</c><br/>
+        /// 1: <c>bool | string | float | float -> float</c><br/>
+        /// 2: <c>string string</c><br/>
+        /// 4: <c>string string string string</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "sync">]
+        member inline _.syncOp(_object_builder: FableObject, value: bool) = ("sync" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>sync</c><br/>
+        /// <c> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>sync</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0 | 1 | 2 | 4</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 0: <c>unit</c><br/>
+        /// 1: <c>bool | string | float | float -> float</c><br/>
+        /// 2: <c>string string</c><br/>
+        /// 4: <c>string string string string</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "sync">]
+        member inline _.syncOp(_object_builder: FableObject, enter: string) = ("sync" ==> enter) :: _object_builder
+        /// <summary>
+        /// <c>sync</c><br/>
+        /// <c> string -> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>sync</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0 | 1 | 2 | 4</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 0: <c>unit</c><br/>
+        /// 1: <c>bool | string | float | float -> float</c><br/>
+        /// 2: <c>string string</c><br/>
+        /// 4: <c>string string string string</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "sync">]
+        member inline _.syncOp(_object_builder: FableObject, enter: string, leave: string) = ("sync" ==> $"{enter} {leave}") :: _object_builder
+        /// <summary>
+        /// <c>sync</c><br/>
+        /// <c> string -> string -> string -> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>sync</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0 | 1 | 2 | 4</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 0: <c>unit</c><br/>
+        /// 1: <c>bool | string | float | float -> float</c><br/>
+        /// 2: <c>string string</c><br/>
+        /// 4: <c>string string string string</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "sync">]
+        member inline _.syncOp(_object_builder: FableObject, enter: string, leave: string, enterBackward: string, leaveBackward: string) = ("sync" ==> $"{enter} {leave} {enterBackward} {leaveBackward}") :: _object_builder
+        /// <summary>
+        /// <c>sync</c><br/>
+        /// <c> float -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>sync</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0 | 1 | 2 | 4</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 0: <c>unit</c><br/>
+        /// 1: <c>bool | string | float | float -> float</c><br/>
+        /// 2: <c>string string</c><br/>
+        /// 4: <c>string string string string</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "sync">]
+        member inline _.syncOp(_object_builder: FableObject, value: float) = ("sync" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>sync</c><br/>
+        /// <c> (float -> float) -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>sync</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>0 | 1 | 2 | 4</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 0: <c>unit</c><br/>
+        /// 1: <c>bool | string | float | float -> float</c><br/>
+        /// 2: <c>string string</c><br/>
+        /// 4: <c>string string string string</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "sync">]
+        member inline _.syncOp(_object_builder: FableObject, value: float -> float) = ("sync" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>enter</c><br/>
+        /// <c>string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>enter</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "enter">]
+        member inline _.enterOp(_object_builder: FableObject, value: string) = ("enter" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>enter</c><br/>
+        /// <c> ObserverThreshold -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>enter</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "enter">]
+        member inline _.enterOp(_object_builder: FableObject, value: observerThreshold) = ("enter" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>enter</c><br/>
+        /// <c> ObserverTreshold -> ObserverThreshold -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>enter</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "enter">]
+        member inline _.enterOp(_object_builder: FableObject, value: observerThreshold, target: observerThreshold) = ("enter" ==> {| container = value; target = target |}) :: _object_builder
+        /// <summary>
+        /// <c>enter</c><br/>
+        /// <c> string -> ObserverThreshold -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>enter</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "enter">]
+        member inline _.enterOp(_object_builder: FableObject, value: string, target: observerThreshold) = ("enter" ==> {| container = value; target = target |}) :: _object_builder
+        /// <summary>
+        /// <c>enter</c><br/>
+        /// <c> string -> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>enter</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "enter">]
+        member inline _.enterOp(_object_builder: FableObject, value: string, target: string) = ("enter" ==> {| container = value; target = target |}) :: _object_builder
+        /// <summary>
+        /// <c>enter</c><br/>
+        /// <c> ObserverThreshold -> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>enter</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "enter">]
+        member inline _.enterOp(_object_builder: FableObject, value: observerThreshold, target: string) = ("enter" ==> {| container = value; target = target |}) :: _object_builder
+        /// <summary>
+        /// <c>leave</c><br/>
+        /// <c> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>leave</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "leave">]
+        member inline _.leaveOp(_object_builder: FableObject, value: string) = ("leave" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>leave</c><br/>
+        /// <c> ObserverTreshold -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>leave</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "leave">]
+        member inline _.leaveOp(_object_builder: FableObject, value: observerThreshold) = ("leave" ==> value) :: _object_builder
+        /// <summary>
+        /// <c>leave</c><br/>
+        /// <c> ObserverTreshold -> ObserverThreshold -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>leave</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "leave">]
+        member inline _.leaveOp(_object_builder: FableObject, value: observerThreshold, target: observerThreshold) = ("leave" ==> {| container = value; target = target |}) :: _object_builder
+        /// <summary>
+        /// <c>leave</c><br/>
+        /// <c> string -> ObserverThreshold -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>leave</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "leave">]
+        member inline _.leaveOp(_object_builder: FableObject, value: string, target: observerThreshold) = ("leave" ==> {| container = value; target = target |}) :: _object_builder
+        /// <summary>
+        /// <c>leave</c><br/>
+        /// <c> string -> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>leave</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "leave">]
+        member inline _.leaveOp(_object_builder: FableObject, value: string, target: string) = ("leave" ==> {| container = value; target = target |}) :: _object_builder
+        /// <summary>
+        /// <c>leave</c><br/>
+        /// <c>ObserverTreshold -> string -> ... </c>
+        /// </summary>
+        /// <remarks>
+        /// <list type="table">
+        /// <item> <term>
+        /// Operation:
+        /// </term> <description>
+        /// <c>leave</c>
+        /// </description> </item>
+        /// <item> <term>
+        /// Args Num:
+        /// </term> <description>
+        /// <c>1 | 2</c>
+        /// </description> </item>
+        /// </list>
+        /// <p>
+        /// 1: <c>string | ObserverThreshold</c><br/>
+        /// 2: <c>(string | ObserverThreshold) (string | ObserverThreshold)</c><br/>
+        /// </p>
+        /// </remarks>
+        /// <returns><c>(string * obj) list</c></returns>
+        [<CustomOperation "leave">]
+        member inline _.leaveOp(_object_builder: FableObject, value: observerThreshold, target: string) = ("leave" ==> {| container = value; target = target |}) :: _object_builder
+        member inline _.Run(_object_run: FableObject): ScrollObserver = AnimeJs.onScroll(createObj _object_run)
+    type Engine with
+        member inline _.Zero() = ()
+        member inline _.Yield(_) = ()
+        [<CustomOperation "timeUnit">]
+        member inline this.timeUnitOp(_, value: Enums.timeUnit) = this.timeUnit <- value
+        [<CustomOperation "precision">]
+        member inline this.precisionOp(_, value: int) = this.precision <- value
+        [<CustomOperation "speed">]
+        member inline this.speedOp(_, value: float) = this.speed <- value
+        [<CustomOperation "fps">]
+        member inline this.fpsOp(_, value: int) = this.fps <- value
+        [<CustomOperation "useDefaultMainLoop">]
+        member inline this.useDefaultMainLoopOp(_, value: bool) = this.useDefaultMainLoop <- value
+        [<CustomOperation "useDefaultMainLoop">]
+        member inline this.useDefaultMainLoopOp(_) = this.useDefaultMainLoop <- true
+        [<CustomOperation "pauseOnDocumentHidden">]
+        member inline this.pauseOnDocumentHiddenOp(_, value: bool) = this.pauseOnDocumentHidden <- value
+        [<CustomOperation "pauseOnDocumentHidden">]
+        member inline this.pauseOnDocumentHiddenOp(_) = this.pauseOnDocumentHidden <- true
+        [<CustomOperation "playbackEase">]
+        member inline this.playbackEaseOp(_, value: float -> float) = this.defaults.playbackEase <- !!value
+        [<CustomOperation "playbackRate">]
+        member inline this.playbackRateOp(_, value: float) = this.defaults.playbackRate <- value
+        [<CustomOperation "frameRate">]
+        member inline this.frameRateOp(_, value: float) = this.defaults.frameRate <- !!value
+        [<CustomOperation "loop">]
+        member inline this.loopOp(_, value: int) = this.defaults.loop <- !!value
+        [<CustomOperation "loop">]
+        member inline this.loopOp(_, value: bool) = this.defaults.loop <- !^value
+        [<CustomOperation "loop">]
+        member inline this.loopOp(_) = this.defaults.loop <- !^true
+        [<CustomOperation "reversed">]
+        member inline this.reversedOp(_) = this.defaults.reversed <- true
+        [<CustomOperation "alternate">]
+        member inline this.alternateOp(_) = this.defaults.alternate <- true
+        [<CustomOperation "autoplay">]
+        member inline this.autoplayOp(_) = this.defaults.autoplay <- true
+        [<CustomOperation "duration">]
+        member inline this.durationOp(_, value: float) = this.defaults.duration <- value
+        [<CustomOperation "delay">]
+        member inline this.delayOp(_, value: float) = this.defaults.delay <- value
+        [<CustomOperation "composition">]
+        member inline this.compositionOp(_, value) = this.defaults.composition <- value
+        [<CustomOperation "ease">]
+        member inline this.easeOp(_, value: EasingFun) = this.defaults.ease <- !!value
+        [<CustomOperation "loopDelay">]
+        member inline this.loopDelayOp(_, value: float) = this.defaults.loopDelay <- value
+        [<CustomOperation "modifier">]
+        member inline this.modifierOp(_, value: float -> float) = this.defaults.modifier <- value
+        member inline this.Run(_) = this
+    type TimelineBuilder with
+        member inline _.Zero(): FableObject = []
+        member inline _.Run(state: FableObject) = AnimeJs.createTimeline(createObj state)
+type style = CssStyle
+let animate: AnimationBuilder = unbox ()
+let timeline: TimelineBuilder = unbox ()
+let inline (!~) (value: string) = unbox<ICssStyle> value
+let inline mkStyle (value: string) = unbox<ICssStyle> value
+let inline mkTimeLabel (value: string) = unbox<TimeLabel> value
+let onScroll: ScrollObserverBuilder = unbox ()
+let draggable: DraggableBuilder = unbox ()
+let spring: SpringBuilder = unbox ()

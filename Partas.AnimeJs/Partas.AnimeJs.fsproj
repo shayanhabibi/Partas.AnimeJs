@@ -6,13 +6,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Style.fs" />
         <Compile Include="Core.fs" />
-        <Compile Include="Binding.fs" />
         <Content Include="package.json" />
-        <Compile Include="Wrapper.fs" />
         <Compile Include="CE.fs" />
-        <Compile Include="ComputationExpressions.fs" />
     </ItemGroup>
 
     <ItemGroup>

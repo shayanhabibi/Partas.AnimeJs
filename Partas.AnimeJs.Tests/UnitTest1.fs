@@ -15,7 +15,7 @@ type SetupUtils() =
         cli {
             Shell platformShell
             WorkingDirectory dir
-            Command "fable -e .fs.jsx -o output --typedArrays false --run dotnet restore"
+            Command "fable -e .fs.js -o output --typedArrays false --run dotnet restore"
         }
         |> Command.execute
         |> Output.toExitCode
@@ -23,4 +23,5 @@ type SetupUtils() =
 
 [<Test>]
 let Test1 () =
+    System.Console.WriteLine ""
     Assert.Pass()

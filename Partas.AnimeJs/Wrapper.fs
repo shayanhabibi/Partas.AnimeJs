@@ -406,26 +406,7 @@ type ITimerCallbackProp<'T> = interface end
 [<Interface>]
 type IAnimationCallbackProp<'T> =
     inherit ITimerCallbackProp<'T>
-[<Interface>]
-type TimerCallbacks<'T> =
-    static member inline onBegin (callback: Callback<'T>): #ITimerCallbackProp<'T> = "onBegin" ==< callback
-    static member inline onComplete (callback: Callback<'T>): #ITimerCallbackProp<'T> = "onComplete" ==< callback
-    static member inline onUpdate (callback: Callback<'T>): #ITimerCallbackProp<'T> = "onUpdate" ==< callback
-    static member inline onLoop (callback: Callback<'T>): #ITimerCallbackProp<'T> = "onLoop" ==< callback
-    static member inline onPause (callback: Callback<'T>): #ITimerCallbackProp<'T> = "onPause" ==< callback
-    static member inline andThen (callback: Callback<'T> -> JS.Promise<unit>): #ITimerCallbackProp<'T> = "then" ==< callback
-    
-[<Interface>]
-type AnimationCallbacks<'T> =
-    inherit TimerCallbacks<'T>
-    static member inline onBeforeUpdate (callback: Callback<'T>): #IAnimationCallbackProp<'T> = "onBeforeUpdate" ==< callback
-    static member inline onRender (callback: Callback<'T>): #IAnimationCallbackProp<'T> = "onRender" ==< callback
 
-[<Interface>]
-type IScrollObserverCallbackProp<'T> = interface end
-[<Interface>]
-type IScrollObserverProp =
-    inherit IScrollObserverCallbackProp<ScrollObserver>
 
 [<Interface>]
 type Playback =
@@ -531,41 +512,66 @@ type AnimeJs with
 type TimeLabelMap =
     [<EmitIndexer>]
     abstract member Item: TimeLabel -> ITimePosition with get,set
+[<Erase>]
 type TimelineObj =
 
     [<EmitMethod("add")>]
-    member this._add([<ParamCollection>] values): TimelineObj= jsNative
+    member this._add([<ParamList>] values): TimelineObj= jsNative
     member inline this.add(targets: Targets, animationBuilder: IAnimationProp list, ?position: ITimePosition): TimelineObj = this._add(targets, createObj !!animationBuilder, position)
     member inline this.add(targets: Selector, animationBuilder: IAnimationProp list, ?position: ITimePosition): TimelineObj = this._add(targets, createObj !!animationBuilder, position)
     member inline this.add(timerParameters: ITimerProp list, ?position: ITimePosition) = this._add(createObj !!timerParameters, position)
+    [<EmitMethod "sync">]
     member this.sync(synced: Binding.Timer, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "sync">]
     member this.sync(synced: Binding.Animation, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "sync">]
     member this.sync(synced: TimelineObj, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "call">]
     member this.call(handler: Callback<unit>, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "label">]
     member this.label(label: TimeLabel, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "set">]
     member this.set(target: Targets, properties: obj, ?position: ITimePosition): TimelineObj = jsNative
     member inline this.set(target: Targets, listPropValues: (string * obj) list, ?position: ITimePosition): TimelineObj = this.set(target, createObj listPropValues, ?position = position)
+    [<EmitMethod "remove">]
     member this.remove(targets: Targets): TimelineObj = jsNative
+    [<EmitMethod "remove">]
     member this.remove(targets: Targets, propertyName: string): TimelineObj = jsNative
     member inline this.remove(targets: #CSSStyleDeclaration, propertyMap: #CSSStyleDeclaration -> string): TimelineObj =
         this.remove(!!targets, Experimental.nameofLambda propertyMap)
     member inline this.remove(targets: #CSSStyleDeclaration[], propertyMap: #CSSStyleDeclaration -> string): TimelineObj =
         this.remove(!!targets, Experimental.nameofLambda propertyMap)
+    [<EmitMethod "remove">]
     member this.remove(object: Binding.Animation, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "remove">]
     member this.remove(object: Binding.Timer, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "remove">]
     member this.remove(object: TimelineObj, ?position: ITimePosition): TimelineObj = jsNative
+    [<EmitMethod "init">]
     member this.init(): TimelineObj = jsNative
+    [<EmitMethod "play">]
     member this.play(): TimelineObj = jsNative
+    [<EmitMethod "reverse">]
     member this.reverse(): TimelineObj = jsNative
+    [<EmitMethod "pause">]
     member this.pause(): TimelineObj = jsNative
+    [<EmitMethod "restart">]
     member this.restart(): TimelineObj = jsNative
+    [<EmitMethod "alternate">]
     member this.alternate(): TimelineObj = jsNative
+    [<EmitMethod "resume">]
     member this.resume(): TimelineObj = jsNative
+    [<EmitMethod "complete">]
     member this.complete(): TimelineObj = jsNative
+    [<EmitMethod "cancel">]
     member this.cancel(): TimelineObj = jsNative
+    [<EmitMethod "revert">]
     member this.revert(): TimelineObj = jsNative
+    [<EmitMethod "seek">]
     member this.seek(time: int, ?muteCallbacks: bool): TimelineObj = jsNative
+    [<EmitMethod "stretch">]
     member this.stretch(duration: int): TimelineObj = jsNative
+    [<EmitMethod "refresh">]
     member this.refresh(): TimelineObj = jsNative
     
     [<Emit("$0")>]
