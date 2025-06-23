@@ -1,10 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <FablePackageType>library</FablePackageType>
         <TargetFramework>net9.0</TargetFramework>
+        <PackageId>Partas.AnimeJs</PackageId>
+        <Title>Partas.AnimeJs</Title>
+        <RootNamespace>Partas.AnimeJs</RootNamespace>
+        <AssemblyName>Partas.AnimeJs</AssemblyName>
+        <Company>F# Community</Company>
+        <Description>Strongly opinionated bindings to AnimeJs for Fable F#</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/shayanhabibi/Partas.AnimeJs</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>Partas;F#;FSharp;Fable;fable-javascript;Web;animejs;animation;ce</PackageTags>
+        <Authors>Shayan Habibi</Authors>
+        <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
+        <Version>0.0.1</Version>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageVersion>0.0.1</PackageVersion>
+<!--        <PackageReleaseNotes></PackageReleaseNotes>-->
     </PropertyGroup>
-
     <ItemGroup>
         <Compile Include="Core.fs" />
         <Content Include="package.json" />

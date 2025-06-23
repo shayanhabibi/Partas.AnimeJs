@@ -6,10 +6,27 @@ open Partas.AnimeJs.CE
 open Partas.AnimeJs.Core
 open Partas.AnimeJs.Core.Operators
 
-
-mkTimeLabel "Chock"
-|> ignore
-
+let ``builders work`` () =
+    let animationOptions = animate {}
+    let animatableBuild = animatable {}
+    let animatableObj = animatableBuild { "target" }
+    let workingAnimatable = animatableObj {
+        mkStyle "test"
+        3.,4.,5.
+        duration 500.
+        Eases.inCubic
+    }
+    ignore <| animatableObj {
+        Eases.inOutExpo
+        1.2
+        style.backgroundColor
+        duration 300
+    }
+    let workingAnimation = animationOptions {
+        "target"
+    }
+    
+    ()
 let x2 = animate {
     duration 500
     alternate
@@ -26,7 +43,7 @@ let x2 = animate {
         }
     ]
     
-    ease id
+    ease Eases.inCubic
 }
 let x3 = x2 { Unchecked.defaultof<string> }
 
@@ -124,116 +141,61 @@ let animationObj = animate {
 
 
 
+let a1 =
+    (animate {
+        style.rotate <-- 90
+        loop
+        Eases.inOutExpo
+    }) { ".square"}
 
-let tl =
-    (
-        timeline {}
-    )
-        {
-            add
-                null
-                (animate {
-                    !~ "y" { !-= 6 }
-                    duration 50
-                })
-            add
-                null (
-                    animate {
-                        style.rotate { 360 }
-                        duration 1920
-                        // inOutElastic
-                })
-                !+= 50
-            
+let a2 =
+    (animate {
+        style.x { AnimeJs.random(-100,100)}
+        style.y { AnimeJs.random(-100,100)}
+        style.rotate { AnimeJs.random(-180,180)}
+        duration (AnimeJs.random(500,1000))
+        composition.blend
+    }) { ".shape"}
+
+let drawa =
+    (animate {
+        style.draw {
+            "0 0",
+            "0 1",
+            "1 1"
         }
+        delay (stagger(40).asFunctionValue)
+        Eases.inOut 3
+        autoplay (onScroll { sync })
+    })
 
-
-let asd = animate {
-    style.rotate <-- 90
-    loop
-    Eases.inOutExpo
-}
-
-let transformsT = animate {
-    style.x <-- AnimeJs.random(-100,100)
-    style.y { AnimeJs.random(-100,100) }
-    style.rotate { AnimeJs.random(-180,180) }
-    duration (AnimeJs.random(500,1000))
-    composition.blend
-}
-
-let scroller = animate {
-    style.draw {"0 0", "0 1", "1 1"}
-    delay (stagger(40) {})
-    Eases.inOut 3
-    autoplay (
-        onScroll {
-            sync
-        }
-        )
-}
-
-let tsts = timeline {} {
+let tl = timeline {} {
     add
         ".dot"
         (animate {
-            style.scale {
-                stagger(10) {
-                grid 13 13; staggerFrom.center
-            }}
+            style.scale { stagger(1.1,0.75) { grid 13 13; staggerFrom.center}}
             Eases.inOutQuad
         })
-        (stagger(200) { grid 13 13; staggerFrom.center })
+        (stagger(200) { grid 13 13; staggerFrom.center})
+
 }
 
-let dragga = draggable {
-    releaseEase (unbox<float -> float> <| spring { stiffness 120; damping 6 })
-    
-}
+let dragg =
+    (draggable {
+        releaseEase (spring {
+            stiffness 120
+            damping 6
+        })
+    }) { yield ".circle" }
 
-let tasdt = timeline {} {
-    add
-        null
-        (animate {
+let timelinesdf =
+    timeline {} {
+        add ".tick" (animate {
             style.y { !-= 6 }
-            duration 50
-        })
-        (stagger(10) {})
-    add
-        null
-        (animate {
-            style.rotate <-- 360
+            duration 500
+        }) (stagger(10).asFunctionValue)
+        add ".ticker" (animate {
+            style.rotate {360}
             duration 1920
-        })
-        !< 0
-}
-
-let animationExample1 = animate {
-    style.y {
-        tween {
-            Eases.outExpo
-            duration 600
-            too "-2.75rem"
-        },
-        tween {
-            Eases.outBounce
-            delay 100
-            duration 800 //todo: reorder to see error
-            too 0.
-        }
+        }) !< 0
     }
-    style.rotate {
-        delay 0
-        duration 100 //reorder to see error TODO
-        from "-1turn"
-    }
-    delay (FunctionValue<float>(fun _ i _ -> 50. * !!i ))
-    Eases.inOutCirc
-    loopDelay 1000
-    loop
-}
-
-
-
-
-

@@ -752,10 +752,10 @@ type CssStyle =
 type stagger [<Emit("$0")>] (value: obj) =
     interface FableObjectBuilder
     interface EasePropertyInjection
-    [<Emit("$0")>] new (value: string * string) = stagger(value)
-    [<Emit("$0")>] new (value: float * string) = stagger(value)
-    [<Emit("$0")>] new (value: float * float) = stagger(value)
-    [<Emit("$0")>] new (value: string * float) = stagger(value)
+    [<Emit("$0")>] new (value: string, value2: string) = stagger((value,value2))
+    [<Emit("$0")>] new (value: float, value2: string) = stagger((value,value2))
+    [<Emit("$0")>] new (value: float,value2: float) = stagger((value,value2))
+    [<Emit("$0")>] new (value: string, value2: float) = stagger((value,value2))
     [<Emit("$0")>] new (value: string) = stagger(value)
     [<Emit("$0")>] new (value: float) = stagger(value)
     member inline this.asFunctionValue = AnimeJs.stagger(this)
@@ -783,8 +783,7 @@ type StyleAnimatableObj =
 type StyleArray() =
     interface CssStyle
     member inline _.Run(state: FableObject): StyleObj = !!createObj state
-    member inline _.Run(state: StyleFromObj): StyleFromObj = !!createObj state
-    member inline _.Run(state: StyleToObj): StyleFromObj = !!createObj state
+    member inline _.Run(state: ^T when ^T :> StyleAnimationObj): ^T = !!createObj state
     
 type KeyframeValue = interface end
 type KeyframeBuilder() =
@@ -818,6 +817,23 @@ type TimelineBuilder =
 type AnimatableBuilder =
     inherit FableObjectBuilder
     inherit EasePropertyInjection
+[<Erase>]
+type StyleNoStyle = StyleNoStyle of unit
+[<Erase>]
+type NoStyleValue = NoStyleValue of obj
+[<Erase>]
+type NoStyleWithDuration = NoStyleWithDuration of duration: float
+[<Erase>]
+type NoStyleWithEase = NoStyleWithEase of ease: EasingFun
+[<Erase>]
+type NoStyleWithDurationEase = NoStyleWithDurationEase of duration: float * ease: EasingFun
+[<Erase>]
+type NoStyleValueDuration = NoStyleValueDuration of value: obj * duration: float
+[<Erase>]
+type NoStyleValueEase = NoStyleValueEase of value: obj * ease: EasingFun
+[<Erase>]
+type NoStyleValueDurationEase = NoStyleValueDurationEase of value: obj * duration: float * ease: EasingFun
+
 [<Erase>]
 type StyleNoValue = StyleNoValue of string
 [<Erase>]
@@ -898,9 +914,9 @@ module AutoOpenComputationImplementations =
             state @ value()
         member inline _.For(state: FableObject, [<InlineIfLambda>] value: unit -> string * obj) =
             value() :: state
-        member inline _.For(state, [<InlineIfLambda>] value) =
+        member inline _.For(state: ^T, [<InlineIfLambda>] value: ^T -> _) =
             state |> value
-        member inline _.For(_:unit, [<InlineIfLambda>] value) = value()
+        // member inline _.For(_:unit, [<InlineIfLambda>] value) = value()
         
     
     type DraggableCallbackInjection<'Type> with
@@ -1133,9 +1149,12 @@ module AutoOpenComputationImplementations =
         member inline this.Run(state: FableObject) = AnimeJs.stagger(this,createObj state)
 
     type EasePropertyInjection with
-        member inline _.Yield(value: EasingFun) = ("ease" ==> value)
+        member inline _.Yield(value: EasingFun) = [("ease" ==> value)]
         [<CustomOperation "ease">]
         member inline _.easeOp(state: FableObject, value: float -> float) =
+            "ease" ==> value |> add state
+        [<CustomOperation "ease">]
+        member inline _.easeOp(state: FableObject, value: EasingFun) =
             "ease" ==> value |> add state
         // [<CompilerMessage("You can directly yield an EasingFun delegate and it will be transformed into a 'ease' key value pair. The 'ease' operation is not required",0)>]
         // [<CustomOperation "ease">]
@@ -1225,7 +1244,6 @@ module AutoOpenComputationImplementations =
         member inline _.Yield(value: ITuple): StyleValue = !!value
         member inline _.Yield(value: RelativeTweenValue): StyleValue = !!value
         member inline _.Yield([<InlineIfLambda>] value: FunctionValue<_>): StyleValueFunction = !!value
-        member inline _.Yield([<InlineIfLambda>] value: EasingFun): string * obj = "ease" ==> value
         member inline _.Combine(left: string * obj, right: string * obj): FableObject =
             [left;right]
         member inline _.Combine(left: FableObject, right: string * obj): FableObject =
@@ -1240,8 +1258,12 @@ module AutoOpenComputationImplementations =
             (!!left @ right) |> unbox<^T>
         member inline _.Combine(left: ^T when ^T :> StyleObj, right: string * obj) =
             right |> add (unbox<FableObject> left) |> unbox<^T>
+        member inline _.Combine(_:unit, right: ^T when ^T :> StyleObj) = right
+        member inline _.Combine(left: ^T when ^T :> StyleObj, _: unit) = left
         member inline _.Combine(left: string * obj, right: ^T when ^T :> StyleObj) =
             left :: (unbox<FableObject> right) |> unbox<^T>
+        member inline _.For(left: ^T when ^T :> StyleObj, right: unit -> FableObject): ^T =
+            !!(!!left @ !!right())
         [<CustomOperation "too">]
         member inline _.toOp(state: FableObject, value: float) =
             "to" ==> value |> add state |> unbox<StyleToObj>
@@ -1314,15 +1336,93 @@ module AutoOpenComputationImplementations =
         [<CustomOperation "from">]
         member inline _.fromOp(state: FableObject, value: RelativeTweenValue) =
             "from" ==> value |> add state |> unbox<StyleFromObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: float) =
+            "to" ==> value |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: float, value2: float) =
+            "to" ==> [| value; value2 |] |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: string) =
+            "to" ==> value |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: string, value2: string) =
+            "to" ==> [| value; value2 |] |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: float, value2: string) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: string, value2: float) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: RelativeTweenValue) =
+            "to" ==> value |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<_>) =
+            "to" ==> value |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: RelativeTweenValue, value2: RelativeTweenValue) =
+            "to" ==> [| value; value2 |] |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<_>, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> [| value; value2 |] |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: float, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<_>, value2: float) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: RelativeTweenValue, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<_>, value2: RelativeTweenValue) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: RelativeTweenValue, value2: string) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: string, value2: RelativeTweenValue) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: RelativeTweenValue, value2: float) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: float, value2: RelativeTweenValue) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<_>, value2: string) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "too">]
+        member inline _.toOp(state: ^T when ^T :> StyleAnimationObj, value: string, [<InlineIfLambda>] value2: FunctionValue<_>) =
+            "to" ==> (value, value2) |> add (unbox<FableObject> state) |> unbox<StyleToObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: ^T when ^T :> StyleAnimationObj, value: float) =
+            "from" ==> value |> add (unbox<FableObject> state) |> unbox<StyleFromObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: ^T when ^T :> StyleAnimationObj, value: string) =
+            "from" ==> value |> add (unbox<FableObject> state) |> unbox<StyleFromObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<_>) =
+            "from" ==> value |> add (unbox<FableObject> state) |> unbox<StyleFromObj>
+        [<CustomOperation "from">]
+        member inline _.fromOp(state: ^T when ^T :> StyleAnimationObj, value: RelativeTweenValue) =
+            "from" ==> value |> add (unbox<FableObject> state) |> unbox<StyleFromObj>
         [<CustomOperation "delay"; CompilerMessage("A style object value cannot have raw values. Place them in a `too` or `from` field.", 10_001, IsError=true)>]
         member inline _.delayOp(state: StyleValue, value) = 
             ["delay" ==> value; "to" ==> state] |> unbox<FableObject>
         [<CustomOperation "delay">]
         member inline _.delayOp(state: ^T when ^T :> StyleAnimationObj, value: float) =
-            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
         [<CustomOperation "delay">]
         member inline _.delayOp(state: ^T when ^T :> StyleAnimationObj, [<InlineIfLambda>] value: FunctionValue<float>) =
-            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: StyleObj, value: float) =
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<StyleAnimationObj>
+        [<CustomOperation "delay">]
+        member inline _.delayOp(state: StyleObj, [<InlineIfLambda>] value: FunctionValue<float>) =
+            "delay" ==> value |> add (unbox<FableObject> state) |> unbox<StyleAnimationObj>
         [<CustomOperation "delay">]
         member inline _.delayOp(state: FableObject, value: float): StyleAnimationObj =
             "delay" ==> value |> add (unbox<FableObject> state) |> unbox
@@ -1334,10 +1434,16 @@ module AutoOpenComputationImplementations =
             ["duration" ==> value; "to" ==> state] |> unbox<FableObject>
         [<CustomOperation "duration">]
         member inline _.durationOp(state: ^T when ^T :> StyleObj, value: float) =
-            "duration" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+            "duration" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
         [<CustomOperation "duration">]
         member inline _.durationOp(state: ^T when ^T :> StyleObj, [<InlineIfLambda>] value: FunctionValue<float>) =
-            "duration" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+            "duration" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: FableObject, value: float) =
+            "duration" ==> value |> add (unbox<FableObject> state)
+        [<CustomOperation "duration">]
+        member inline _.durationOp(state: FableObject, [<InlineIfLambda>] value: FunctionValue<float>) =
+            "duration" ==> value |> add (unbox<FableObject> state)
         [<CustomOperation "composition"; CompilerMessage("A style object value cannot have raw values. Place them in a `too` or `from` field.", 10_001, IsError=true)>]
         member inline _.compositionOp(state: StyleValue, value) =
             ["composition" ==> value; "to" ==> state] |> unbox<FableObject>
@@ -1358,10 +1464,10 @@ module AutoOpenComputationImplementations =
             ["ease" ==> value; "to" ==> state] |> unbox<FableObject>
         [<CustomOperation "ease">]
         member inline _.easeOp(state: ^T, value: EasingFun) =
-            "ease" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+            "ease" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
         [<CustomOperation "ease">]
         member inline _.easeOp(state: ^T, [<InlineIfLambda>] value: FloatModifier) =
-            "ease" ==> value |> add (unbox<FableObject> state) |> unbox<'Type>
+            "ease" ==> value |> add (unbox<FableObject> state) |> unbox<^T>
         [<CustomOperation "unit">]
         member inline _.unitOp(state: FableObject, value: string): StyleAnimatableObj =
             "unit" ==> value |> add state |> unbox
@@ -1370,14 +1476,16 @@ module AutoOpenComputationImplementations =
         member inline this.Run(value: StyleValueFunction): string * obj = !!this ==> value
         member inline this.Run(value: FableObject): StyleObj =
             !!(!!this ==> createObj value)
-        member inline this.Run(value: StyleAnimatableObj): StyleAnimatableObj =
+        // member inline this.Run(value: StyleAnimatableObj): StyleAnimatableObj =
+        //     !!(!!this ==> createObj !!value)
+        member inline this.Run(value: ^T when ^T :> StyleObj): ^T =
             !!(!!this ==> createObj !!value)
-        member inline this.Run(value: StyleAnimationObj): StyleAnimationObj =
-            !!(!!this ==> createObj !!value)
-        member inline this.Run(value: StyleToObj): StyleToObj =
-            !!(!!this ==> createObj !!value)
-        member inline this.Run(value: StyleFromObj): StyleFromObj =
-            !!(!!this ==> createObj !!value)
+        // member inline this.Run(value: StyleAnimationObj): StyleAnimationObj =
+        //     !!(!!this ==> createObj !!value)
+        // member inline this.Run(value: StyleToObj): StyleToObj =
+        //     !!(!!this ==> createObj !!value)
+        // member inline this.Run(value: StyleFromObj): StyleFromObj =
+        //     !!(!!this ==> createObj !!value)
         member inline this.Run(value: StyleValueList): StyleValueList =
             !!(!!this ==> (!!value |> List.toArray))
 
@@ -1594,40 +1702,88 @@ module AutoOpenComputationImplementations =
         [<CustomOperation "modifier">]
         member inline _.modifierOp(state: FableObject, value: FloatModifier) =
             "modifier" ==> value |> add state
+        member inline _.Run(state: FableObject): AnimatableOptions =
+            !!createObj state
+        member inline _.Run(state: ^T when ^T :> StyleAnimatableObj): AnimatableOptions =
+            !!createObj state
     type Animatable with
         member inline _.Yield(value: unit): unit = ()
         member inline _.Yield(value: string): StyleNoValue = StyleNoValue value
         member inline _.Yield(value: ICssStyle): StyleNoValue = StyleNoValue !!value
         
-        member inline _.Yield(value: float): float = value
-        member inline _.Yield(value: int): int = value
-        member inline _.Yield(value: float * float): ITuple = value
-        member inline _.Yield(value: float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float * float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float * float * float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float * float * float * float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float * float * float * float * float * float * float): ITuple = value
-        member inline _.Yield(value: float * float * float * float * float * float * float * float * float * float * float): ITuple = value
-        member inline _.Yield(value: float[]): float[] = value
-        member inline _.Yield(value: float list): float[] = value |> List.toArray
+        member inline _.Yield(value: float): NoStyleValue = !!value
+        member inline _.Yield(value: int): NoStyleValue = !!value
+        member inline _.Yield(value: float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float * float * float * float * float * float * float * float * float * float * float): NoStyleValue = !!value
+        member inline _.Yield(value: float[]): NoStyleValue = !!value
+        member inline _.Yield(value: float list): NoStyleValue = value |> List.toArray |> unbox
+        member inline _.Yield(value: EasingFun): NoStyleWithEase = NoStyleWithEase value
         member inline this.Run(value: StyleNoValue): U2<float, float[]> = emitJsExpr (this,value) "$0[$1]()"
         member inline this.Run(StyleWithValue(prop, value)): Animatable = emitJsExpr (this,prop,value) "$0[$1]($2)"
         member inline this.Run(StyleWithValueDuration(prop, value,duration)): Animatable = emitJsExpr (this,prop,value,duration) "$0[$1]($2,$3)"
         member inline this.Run(StyleWithValueEase(prop, value,ease)): Animatable = emitJsExpr (this,prop,value,ease) "$0[$1]($2, easing = $3)"
         member inline this.Run(StyleWithValueDurationEase(prop, value,duration,ease)): Animatable = emitJsExpr (this,prop,value,duration,ease) "$0[$1]($2,$3,$4)"
         member inline _.Delay(value) = value()
-        member inline _.Combine(StyleNoValue(prop), value) =
-            StyleWithValue(prop,value) 
-        member inline _.Combine(StyleWithDuration(prop,duration), value) =
-            StyleWithValueDuration(prop,value,duration) 
-        member inline _.Combine(StyleWithEase(prop,ease), value) =
-            StyleWithValueEase(prop,value,ease)
-        member inline _.Combine(StyleWithDurationEase(prop,duration,ease), value) =
-            StyleWithValueDurationEase(prop,value,duration,ease)
         member inline _.Combine(value, _:unit) = value
+        member inline _.Combine(_: unit, value) = value
+        member inline _.Combine(NoStyleValue(value), ease: EasingFun) = NoStyleValueEase(value, ease)
+        member inline _.Combine(NoStyleWithDuration(duration), ease: EasingFun) = NoStyleWithDurationEase(duration, ease)
+        member inline _.Combine(NoStyleValueDuration(value,duration), ease: EasingFun) = NoStyleValueDurationEase(value, duration, ease)
+        member inline _.Combine(NoStyleValueDurationEase(value,duration,ease), StyleNoValue(style)) = StyleWithValueDurationEase(style,value,duration,ease)
+        member inline _.Combine(NoStyleValue(value), StyleNoValue(prop)) = StyleWithValue(prop,value)
+        member inline _.Combine(NoStyleValue(value), StyleWithDuration(props,duration)) = StyleWithValueDuration(props,value,duration)
+        member inline _.Combine(NoStyleValue(value), StyleWithEase(prop,ease)) = StyleWithValueEase(prop,value,ease)
+        member inline _.Combine(NoStyleValue(value), StyleWithDurationEase(prop,duration,ease)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(NoStyleValue(value), NoStyleWithDuration(duration)) = NoStyleValueDuration(value,duration)
+        member inline _.Combine(NoStyleValue(value), NoStyleWithEase(ease)) = NoStyleValueEase(value,ease)
+        member inline _.Combine(NoStyleValue(value), NoStyleWithDurationEase(duration,ease)) = NoStyleValueDurationEase(value,duration,ease)
+        member inline _.Combine(NoStyleWithDuration(duration), StyleNoValue(prop)) = StyleWithDuration(prop,duration)
+        member inline _.Combine(NoStyleWithDuration(duration), StyleWithValue(prop,value)) = StyleWithValueDuration(prop,value,duration)
+        member inline _.Combine(NoStyleWithDuration(duration), StyleWithEase(prop,ease)) = StyleWithDurationEase(prop,duration,ease)
+        member inline _.Combine(NoStyleWithDuration(duration), StyleWithValueEase(prop,value,ease)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(NoStyleWithDuration(duration), NoStyleValue(value)) = NoStyleValueDuration(value,duration)
+        member inline _.Combine(NoStyleWithDuration(duration), NoStyleWithEase(ease)) = NoStyleWithDurationEase(duration,ease)
+        member inline _.Combine(NoStyleWithDuration(duration), NoStyleValueEase(value,ease)) = NoStyleValueDurationEase(value,duration,ease)
+        member inline _.Combine(NoStyleWithEase(ease), StyleNoValue(prop)) = StyleWithEase(prop,ease)
+        member inline _.Combine(NoStyleWithEase(ease), StyleWithValue(prop,value)) = StyleWithValueEase(prop,value,ease)
+        member inline _.Combine(NoStyleWithEase(ease), StyleWithValueDuration(prop,value,duration)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(NoStyleWithEase(ease), StyleWithDuration(prop,duration)) = StyleWithDurationEase(prop,duration,ease)
+        member inline _.Combine(NoStyleWithEase(ease), NoStyleValue(value)) = NoStyleValueEase(value,ease)
+        member inline _.Combine(NoStyleWithEase(ease), NoStyleWithDuration(duration)) = NoStyleWithDurationEase(duration,ease)
+        member inline _.Combine(NoStyleWithEase(ease), NoStyleValueDuration(value,duration)) = NoStyleValueDurationEase(value,duration,ease)
+        member inline _.Combine(NoStyleWithDurationEase(duration,ease), StyleNoValue(prop)) = StyleWithDurationEase(prop,duration,ease)
+        member inline _.Combine(NoStyleWithDurationEase(duration,ease), StyleWithValue(prop,value)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(NoStyleWithDurationEase(duration,ease), NoStyleValue(value)) = NoStyleValueDurationEase(value,duration,ease)
+        member inline _.Combine(StyleNoValue(prop), ease: EasingFun) = StyleWithEase(prop,ease)
+        member inline _.Combine(StyleWithValue(prop,value), ease: EasingFun) = StyleWithValueEase(prop,value,ease)
+        member inline _.Combine(StyleWithValueDuration(prop,value,duration), ease: EasingFun) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(StyleWithDuration(prop,duration), ease: EasingFun) = StyleWithDurationEase(prop,duration,ease)
+        member inline _.Combine(StyleNoValue(prop), NoStyleValue(value)) = StyleWithValue(prop,value)
+        member inline _.Combine(StyleNoValue(prop), NoStyleWithDuration(duration)) = StyleWithDuration(prop,duration)
+        member inline _.Combine(StyleNoValue(prop), NoStyleWithEase(ease)) = StyleWithEase(prop,ease)
+        member inline _.Combine(StyleNoValue(prop), NoStyleValueDuration(value,duration)) = StyleWithValueDuration(prop,value,duration)
+        member inline _.Combine(StyleNoValue(prop), NoStyleValueEase(value,ease)) = StyleWithValueEase(prop,value,ease)
+        member inline _.Combine(StyleNoValue(prop), NoStyleValueDurationEase(value,duration,ease)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(StyleWithValue(prop,value), NoStyleWithDuration(duration)) = StyleWithValueDuration(prop,value,duration)
+        member inline _.Combine(StyleWithValue(prop,value), NoStyleWithEase(ease)) = StyleWithValueEase(prop,value,ease)
+        member inline _.Combine(StyleWithValue(prop,value), NoStyleWithDurationEase(duration,ease)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(StyleWithDuration(prop,duration), NoStyleValue(value)) = StyleWithValueDuration(prop,value,duration)
+        member inline _.Combine(StyleWithDuration(prop,duration), NoStyleWithEase(ease)) = StyleWithDurationEase(prop,duration,ease)
+        member inline _.Combine(StyleWithDuration(prop,duration), NoStyleValueEase(value,ease)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(StyleWithEase(prop,ease), NoStyleValue(value)) = StyleWithValueEase(prop,value,ease)
+        member inline _.Combine(StyleWithEase(prop,ease), NoStyleWithDuration(duration)) = StyleWithDurationEase(prop,duration,ease)
+        member inline _.Combine(StyleWithEase(prop,ease), NoStyleValueDuration(value,duration)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(StyleWithDurationEase(prop,duration,ease), NoStyleValue(value)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(StyleWithValueDuration(prop,value,duration), NoStyleWithEase(ease)) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.Combine(StyleWithValueEase(prop,value,ease), NoStyleWithDuration(duration)) = StyleWithValueDurationEase(prop,value,duration,ease)
         [<CustomOperation "duration">]
         member inline _.durationOp(StyleNoValue(prop), value: float) = StyleWithDuration(prop,value)
         [<CustomOperation "duration">]
@@ -1636,15 +1792,40 @@ module AutoOpenComputationImplementations =
         member inline _.durationOp(StyleWithValueEase(prop,value,ease), duration: float) = StyleWithValueDurationEase(prop,value,duration,ease)
         [<CustomOperation "duration">]
         member inline _.durationOp(StyleWithEase(prop,ease), duration: float) = StyleWithDurationEase(prop,duration,ease)
+        [<CustomOperation "duration">]
+        member inline _.durationOp(NoStyleValue(value), duration: float) = NoStyleValueDuration(value,duration)
+        [<CustomOperation "duration">]
+        member inline _.durationOp(NoStyleWithEase(ease), duration: float) = NoStyleWithDurationEase(duration,ease)
+        [<CustomOperation "duration">]
+        member inline _.durationOp(NoStyleValueEase(value,ease), duration: float) = NoStyleValueDurationEase(value,duration,ease)
         [<CustomOperation "ease">]
-        member inline _.easeOp(StyleNoValue(prop), value: float -> float) = StyleWithEase(prop,value)
+        member inline _.easeOp(StyleNoValue(prop), value: EasingFun) = StyleWithEase(prop,value)
         [<CustomOperation "ease">]
-        member inline _.easeOp(StyleWithValue(prop,value), ease: float -> float) = StyleWithValueEase(prop,value,ease)
+        member inline _.easeOp(StyleWithValue(prop,value), ease: EasingFun) = StyleWithValueEase(prop,value,ease)
         [<CustomOperation "ease">]
-        member inline _.easeOp(StyleWithValueDuration(prop,value,duration), ease: float -> float) = StyleWithValueDurationEase(prop,value,duration,ease)
+        member inline _.easeOp(StyleWithValueDuration(prop,value,duration), ease: EasingFun) = StyleWithValueDurationEase(prop,value,duration,ease)
         [<CustomOperation "ease">]
-        member inline _.easeOp(StyleWithDuration(prop,duration), ease: float -> float) = StyleWithDurationEase(prop,duration,ease)
-        member inline _.For(_object_instance: StyleWithValueDuration, _object_builder_action: StyleWithValueDuration -> StyleWithValueDurationEase) = _object_instance |> _object_builder_action
+        member inline _.easeOp(StyleWithDuration(prop,duration), ease: EasingFun) = StyleWithDurationEase(prop,duration,ease)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(NoStyleValue(value), ease: EasingFun) = NoStyleValueEase(value,ease)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(NoStyleWithDuration(duration), ease: EasingFun) = NoStyleWithDurationEase(duration,ease)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(NoStyleValueDuration(value,duration), ease: EasingFun) = NoStyleValueDurationEase(value,duration,ease)
+        [<CustomOperation "ease">]
+        member inline _.easeOp(_:unit, value: EasingFun) = NoStyleWithEase value
+        member inline _.For(value: ^T, [<InlineIfLambda>] f: ^T -> 'T2): 'T2 = value |> f
+        member inline _.For(StyleNoValue(prop), [<InlineIfLambda>] f: unit -> NoStyleWithEase) = StyleWithEase(prop,!!f()) 
+        member inline _.For(StyleWithValue(prop,value), [<InlineIfLambda>] f: unit -> NoStyleWithEase) = StyleWithValueEase(prop,value,!!f())
+        member inline _.For(StyleWithValueDuration(prop,value,duration), [<InlineIfLambda>] f: unit -> NoStyleWithEase) = StyleWithValueDurationEase(prop,value,duration,!!f())
+        member inline _.For(StyleWithDuration(prop,duration), [<InlineIfLambda>] f: unit -> NoStyleWithEase) = StyleWithDurationEase(prop,duration,!!f())
+        member inline _.For(NoStyleValue(value), [<InlineIfLambda>] f: unit -> NoStyleWithEase) = NoStyleValueEase(value,!!f())
+        member inline _.For(NoStyleWithDuration(duration), [<InlineIfLambda>] f: unit -> NoStyleWithEase) = NoStyleWithDurationEase(duration,!!f())
+        member inline _.For(NoStyleValueDuration(value,duration), [<InlineIfLambda>] f: unit -> NoStyleWithEase) = NoStyleValueDurationEase(value,duration,!!f())
+        
+        member inline this.For(value: StyleNoValue, [<InlineIfLambda>] f: unit -> NoStyleValue) =
+            this.Combine(value,f())
+        
         member inline _.Run(state: FableObject): AnimatableOptions = createObj state |> unbox
     type AnimatableOptions with
         member inline _.Yield(_: unit) = ()
@@ -1653,6 +1834,8 @@ module AutoOpenComputationImplementations =
         member inline _.Yield(value: #HTMLElement) = Target value
         member inline _.Yield(value: #HTMLElement list) = targets !!value
         member inline _.Yield(value: Targets) = value
+        member inline _.Delay(value) = value()
+        member inline _.Combine(value) = value()
         member inline this.Run(state: Target<_>) =
             AnimeJs.createAnimatable(!!state, this)
         member inline this.Run(state: Targets) =
@@ -2144,7 +2327,7 @@ module AutoOpenComputationImplementations =
         /// </remarks>
         /// <returns><c>(string * obj) list</c></returns>
         [<CustomOperation "releaseEase">]
-        member inline _.releaseEaseOp(_object_builder: FableObject, _object_value: float -> float) = ("releaseEase" ==> _object_value) :: _object_builder
+        member inline _.releaseEaseOp(_object_builder: FableObject, _object_value: EasingFun) = ("releaseEase" ==> _object_value) :: _object_builder
         /// <summary>
         /// <c>releaseEase</c><br/>
         /// <c>FunctionValue&lt;float -> float> -> ...</c>
@@ -3695,7 +3878,7 @@ let animate: AnimationBuilder = unbox ()
 let timeline: TimelineBuilder = unbox ()
 let inline (!~) (value: string) = unbox<ICssStyle> value
 let inline mkStyle (value: string) = unbox<ICssStyle> value
-let inline mkTimeLabel (value: string) = unbox<TimeLabel> value
 let onScroll: ScrollObserverBuilder = unbox ()
 let draggable: DraggableBuilder = unbox ()
 let spring: SpringBuilder = unbox ()
+let animatable: AnimatableBuilder = unbox ()
