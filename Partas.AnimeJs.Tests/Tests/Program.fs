@@ -2,31 +2,31 @@
 
 open Fable.Core.JsInterop
 open Partas.Solid
-open Partas.AnimeJs.CE
+open Partas.AnimeJs.Style
 open Partas.AnimeJs.Core
 open Partas.AnimeJs.Core.Operators
 
-let ``builders work`` () =
-    let animationOptions = animate {}
-    let animatableBuild = animatable {}
-    let animatableObj = animatableBuild { "target" }
-    let workingAnimatable = animatableObj {
-        mkStyle "test"
-        3.,4.,5.
-        duration 500.
-        Eases.inCubic
-    }
-    ignore <| animatableObj {
-        Eases.inOutExpo
-        1.2
-        style.backgroundColor
-        duration 300
-    }
-    let workingAnimation = animationOptions {
-        "target"
-    }
-    
-    ()
+// let ``builders work`` () =
+//     // let animationOptions = animate {}
+//     // let animatableBuild = animatable {}
+//     let animatableObj = animatableBuild { "target" }
+//     let workingAnimatable = animatableObj {
+//         mkStyle "test"
+//         3.,4.,5.
+//         duration 500.
+//         Eases.inCubic
+//     }
+//     ignore <| animatableObj {
+//         Eases.inOutExpo
+//         1.2
+//         style.backgroundColor
+//         duration 300
+//     }
+//     let workingAnimation = animationOptions {
+//         "target"
+//     }
+//     
+//     ()
 let x2 = animate {
     duration 500
     alternate
@@ -146,7 +146,7 @@ let a1 =
         style.rotate <-- 90
         loop
         Eases.inOutExpo
-    }) { ".square"}
+    }) { null}
 
 let a2 =
     (animate {
@@ -155,7 +155,7 @@ let a2 =
         style.rotate { AnimeJs.random(-180,180)}
         duration (AnimeJs.random(500,1000))
         composition.blend
-    }) { ".shape"}
+    }) { ".shape" }
 
 let drawa =
     (animate {
@@ -167,7 +167,7 @@ let drawa =
         delay (stagger(40).asFunctionValue)
         Eases.inOut 3
         autoplay (onScroll { sync })
-    })
+    }) { AnimeJs.createDrawable(Selector "path") }
 
 let tl = timeline {} {
     add
@@ -190,12 +190,20 @@ let dragg =
 
 let timelinesdf =
     timeline {} {
-        add ".tick" (animate {
+        add null (animate {
             style.y { !-= 6 }
             duration 500
         }) (stagger(10).asFunctionValue)
-        add ".ticker" (animate {
+        add null (animate {
             style.rotate {360}
             duration 1920
         }) !< 0
     }
+
+let a11 =
+    (animate {
+        style.rotate <-- 90
+        loop
+        Eases.inOutExpo
+    }) { ".square" }
+    

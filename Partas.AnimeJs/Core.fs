@@ -1,13 +1,11 @@
-﻿module Partas.AnimeJs.Core
+﻿[<AutoOpen>]
+module Partas.AnimeJs.Core
 
 open System
 open System.Runtime.CompilerServices
 open Fable.Core
 open Fable.Core.JsInterop
 open Browser.Types
-open Partas.Solid
-open Partas.Solid.Experimental.U
-open Partas.Solid.Style.Types.DataType
     
 [<Erase>]
 module Spec =
@@ -253,26 +251,15 @@ module Types =
         abstract member onGrab: string with get,set
         abstract member onDrag: string with get,set
     
-module Operators =
-    let inline (!<<+=) value: RelativeTimePosition = unbox $"<<+={value}"
-    let inline (!<<-=) value: RelativeTimePosition = unbox $"<<-={value}"
-    let inline (!<<*=) value: RelativeTimePosition = unbox $"<<*={value}"
-    let inline (!<) _: RelativeTimePosition = unbox "<"
-    let inline (!<<) _: RelativeTimePosition = unbox "<<"
-    let inline (!+=) value: RelativeTweenValue = unbox $"+={value}"
-    let inline (!-=) value: RelativeTweenValue = unbox $"-={value}"
-    let inline (!*=) value: RelativeTweenValue = unbox $"*={value}"
-    let inline timeLabel (value: string): TimeLabel = !!value
-    let inline (==<) x y: 'Type = unbox (x,y)
-    let inline (!%) value: KeyframePercentValue = !! $"{value}%%"
+
 
 open Operators
 
 [<Erase>]
 type Eases =
     [<Import("eases.irregular", Spec.path)>] static member irregular(?length:float,?randomness:float): EasingFun = jsNative
-    [<Import("eases.steps", Spec.path)>] static member steps(?steps: float , ?fromStart: bool ): EasingFunction = jsNative
-    [<Import("eases.cubicBezier", Spec.path)>] static member cubicBezier( ?mX1: float , ?mY1: float , ?mX2: float , ?mY2: float ): EasingFunction = jsNative
+    [<Import("eases.steps", Spec.path)>] static member steps(?steps: float , ?fromStart: bool ): EasingFun = jsNative
+    [<Import("eases.cubicBezier", Spec.path)>] static member cubicBezier( ?mX1: float , ?mY1: float , ?mX2: float , ?mY2: float ): EasingFun = jsNative
     [<Import("eases.in", Spec.path)>] static member ``in``(?power: float ): EasingFun = jsNative
     [<Import("eases.out", Spec.path)>] static member out( ?power: float ): EasingFun = jsNative
     [<Import("eases.inOut", Spec.path)>] static member inOut( ?power: float ): EasingFun = jsNative
@@ -618,7 +605,7 @@ module rec AutoOpenInstanceDefinitions =
     [<Interface>]
     type AnimatablePropertySetter =
         [<Emit("$0($1...)")>]
-        abstract member Invoke: ``to``: U2<float, ResizeArray<float>> * ?duration: float * ?ease: EasingFunction -> Animation
+        abstract member Invoke: ``to``: U2<float, ResizeArray<float>> * ?duration: float * ?ease: EasingFun -> Animation
 
     [<AllowNullLiteral>]
     [<Interface>]
@@ -810,6 +797,11 @@ type SpringBuilder = inherit FableObjectBuilder
 type TimerPropertyInjection =
     inherit PlaybackPropertyInjection
     inherit TimerCallbackInjection<Timer>
+
+type TimerBuilder =
+    inherit FableObjectBuilder
+    inherit TimerPropertyInjection
+
 type TimelineBuilder =
     inherit FableObjectBuilder
     inherit PlaybackPropertyInjection
@@ -918,7 +910,8 @@ module AutoOpenComputationImplementations =
             state |> value
         // member inline _.For(_:unit, [<InlineIfLambda>] value) = value()
         
-    
+    type TimerBuilder with
+        member inline _.Run(state: FableObject) = AnimeJs.createTimer(createObj state)
     type DraggableCallbackInjection<'Type> with
         [<CustomOperation "onGrab">]
         member inline _.onGrabOp(state: FableObject, [<InlineIfLambda>] value: Callback<'Type>) =
@@ -1231,6 +1224,7 @@ module AutoOpenComputationImplementations =
         member inline _.Yield(value: #HTMLElement) = Target value
         member inline _.Yield(value: #HTMLElement list) = targets !!value
         member inline _.Yield(value: Targets) = value
+        member inline _.Yield(value: SVGElementInstanceList) = Target value
         member inline _.Delay(value) = value()
         member inline _.Combine(x) = fun () -> x
         member inline this.Run(state: Target<_>) =
@@ -1472,6 +1466,7 @@ module AutoOpenComputationImplementations =
         member inline _.unitOp(state: FableObject, value: string): StyleAnimatableObj =
             "unit" ==> value |> add state |> unbox
     type ICssStyle with
+        member inline this.Value = unbox<string> this
         member inline this.Run(value: StyleValue): string * obj = !!this ==> value
         member inline this.Run(value: StyleValueFunction): string * obj = !!this ==> value
         member inline this.Run(value: FableObject): StyleObj =
@@ -3858,9 +3853,9 @@ module AutoOpenComputationImplementations =
         [<CustomOperation "autoplay">]
         member inline this.autoplayOp(_) = this.defaults.autoplay <- true
         [<CustomOperation "duration">]
-        member inline this.durationOp(_, value: float) = this.defaults.duration <- value
+        member inline this.durationOp(_, value: float) = this.defaults.duration <- !^value
         [<CustomOperation "delay">]
-        member inline this.delayOp(_, value: float) = this.defaults.delay <- value
+        member inline this.delayOp(_, value: float) = this.defaults.delay <- !^value
         [<CustomOperation "composition">]
         member inline this.compositionOp(_, value) = this.defaults.composition <- value
         [<CustomOperation "ease">]
@@ -3876,9 +3871,25 @@ module AutoOpenComputationImplementations =
 type style = CssStyle
 let animate: AnimationBuilder = unbox ()
 let timeline: TimelineBuilder = unbox ()
-let inline (!~) (value: string) = unbox<ICssStyle> value
 let inline mkStyle (value: string) = unbox<ICssStyle> value
 let onScroll: ScrollObserverBuilder = unbox ()
 let draggable: DraggableBuilder = unbox ()
 let spring: SpringBuilder = unbox ()
 let animatable: AnimatableBuilder = unbox ()
+let timer: TimerBuilder = unbox ()
+let engine: Engine = import "engine" Spec.path
+let bounds: BoundsBuilder = unbox ()
+let cursor: CursorBuilder = unbox ()
+module Operators =
+    let inline (!<<+=) value: RelativeTimePosition = unbox $"<<+={value}"
+    let inline (!<<-=) value: RelativeTimePosition = unbox $"<<-={value}"
+    let inline (!<<*=) value: RelativeTimePosition = unbox $"<<*={value}"
+    let inline (!<) _: RelativeTimePosition = unbox "<"
+    let inline (!<<) _: RelativeTimePosition = unbox "<<"
+    let inline (!+=) value: RelativeTweenValue = unbox $"+={value}"
+    let inline (!-=) value: RelativeTweenValue = unbox $"-={value}"
+    let inline (!*=) value: RelativeTweenValue = unbox $"*={value}"
+    let inline timeLabel (value: string): TimeLabel = !!value
+    let inline (==<) x y: 'Type = unbox (x,y)
+    let inline (!%) value: KeyframePercentValue = !! $"{value}%%"
+    let inline (!~) (value: string) = unbox<ICssStyle> value

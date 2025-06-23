@@ -16,14 +16,13 @@
         <Authors>Shayan Habibi</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
         <Version>0.0.1</Version>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageVersion>0.0.1</PackageVersion>
 <!--        <PackageReleaseNotes></PackageReleaseNotes>-->
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Core.fs" />
-        <Content Include="package.json" />
-        <Compile Include="CE.fs" />
+        <None Include="package.json" />
+        <Compile Include="Style.fs" />
     </ItemGroup>
 
     <ItemGroup>
