@@ -6,6 +6,8 @@ open System.Runtime.CompilerServices
 open Fable.Core
 open Fable.Core.JsInterop
 open Browser.Types
+
+#nowarn 3535
     
 [<Erase>]
 module Spec =
@@ -175,11 +177,55 @@ module Types =
     type Target<'Type> = Target of 'Type
     [<Erase>]
     type Targets = Targets of ResizeArray<obj>
+    /// <summary>
+    /// Delegate representation of Value Functions in AnimeJs.
+    /// </summary>
+    /// <remarks>
+    /// This function type is used to conditionally change a property based on
+    /// the targets index position in an animation. This is automatically done
+    /// through methods like <c>stagger</c>.
+    /// <br/>
+    /// Stagger can therefor be used in other scenarios, so long as you invoke the method
+    /// with the relevant parameters.
+    /// </remarks>
+    /// <param name="target">The target object</param>
+    /// <param name="index">The objects index in the collection</param>
+    /// <param name="length">The collection length</param>
     type FunctionValue<'Type> = delegate of target: obj * ?index: int * ?length: int -> 'Type
-    type FunctionValue = FunctionValue<string>
+    /// <summary>
+    /// Alias for <c>float -> float</c>
+    /// </summary>
     type FloatModifier = float -> float
+    /// <summary>
+    /// Delegate for <c>float -> float</c> which is the signature for any easing function.
+    /// </summary>
+    /// <remarks>
+    /// The difference between using a normal function and the delegate pertains mostly to
+    /// the syntax sugar of an easing function being automatically associated with the
+    /// <c>ease</c> property in computations. Since the library easing functions all produce
+    /// this delegate, they will be automatically picked up without having to wrap them in the
+    /// delegate type.
+    /// </remarks>
     type EasingFun = delegate of float -> float
-    type KeyframePercentValue = interface end
+    /// <summary>
+    /// Interface backed by a simple string.
+    /// </summary>
+    /// <remarks>
+    /// You can create a percent keyframe using the operator <c>!%</c> or via the
+    /// static member <c>create</c>. You will have to ensure you pass valid input if using
+    /// the static member. The operator will automatically suffix the number with <c>%</c>
+    /// <br/>
+    /// You can access the backing string by <c>.Value</c>
+    /// </remarks>
+    /// <seealso href="https://animejs.com/documentation/animation/keyframes/percentage-based-keyframes">
+    /// AnimeJs Documentation
+    /// </seealso>
+    [<Interface>]
+    type KeyframePercentValue =
+        [<Emit "$0">]
+        static member create: string -> KeyframePercentValue = jsNative
+        [<Emit "$0">]
+        abstract member Value: string with get
 
     /// <summary>
     /// Returned and set in some properties. Can use the <c>Coordinate</c> record with
@@ -240,78 +286,88 @@ module Types =
             y = snd !!value
         }
     
-
+    /// <summary>
+    /// Interface backed by a simple string to represent Relative Time Positions in AnimeJs
+    /// </summary>
+    /// <remarks>
+    /// You can create relative time positions by the static method <c>create</c>. Ensure you
+    /// pass a valid string. You can access the backing string using <c>.Value</c>
+    /// <br/>
+    /// Alternatively, use the operators in the <c>Operators</c> module such as <c>!&lt;&lt;*= 5</c>. 
+    /// </remarks>
+    /// <seealso href="https://animejs.com/documentation/timeline/time-position">
+    /// AnimeJs Documentation
+    /// </seealso>
+    [<Interface>]
     type RelativeTimePosition =
         [<Emit("$0")>]
         abstract member Value: string with get
+        [<Emit("$0")>]
+        static member create: string -> RelativeTimePosition = jsNative
     type RelativeTweenValue = inherit RelativeTimePosition
-    type TimeLabel = inherit RelativeTimePosition
+    /// <summary>
+    /// Interface backed by a simple string to represent a time label as a concrete type.
+    /// </summary>
+    /// <remarks>
+    /// <para>You can create a time label using the static member create, or using the operator
+    /// accessed method <c>timeLabel</c></para>
+    /// <para>The underlying value is accessible by <c>.Value</c></para>
+    /// </remarks>
+    /// <seealso href="https://animejs.com/documentation/timeline/timeline-methods/label">
+    /// AnimeJs Documentation
+    /// </seealso>
+    [<Interface>]
+    type TimeLabel =
+        inherit RelativeTimePosition
+        [<Emit "$0">]
+        static member create: string -> TimeLabel = jsNative
     [<Interface; AllowNullLiteral>]
     type DraggableCursor =
         abstract member onGrab: string with get,set
         abstract member onDrag: string with get,set
     
-
-
-open Operators
-
-[<Erase>]
+[<Import("eases", Spec.path); Interface>]
 type Eases =
-    [<Import("eases.irregular", Spec.path)>] static member irregular(?length:float,?randomness:float): EasingFun = jsNative
-    [<Import("eases.steps", Spec.path)>] static member steps(?steps: float , ?fromStart: bool ): EasingFun = jsNative
-    [<Import("eases.cubicBezier", Spec.path)>] static member cubicBezier( ?mX1: float , ?mY1: float , ?mX2: float , ?mY2: float ): EasingFun = jsNative
-    [<Import("eases.in", Spec.path)>] static member ``in``(?power: float ): EasingFun = jsNative
-    [<Import("eases.out", Spec.path)>] static member out( ?power: float ): EasingFun = jsNative
-    [<Import("eases.inOut", Spec.path)>] static member inOut( ?power: float ): EasingFun = jsNative
-    [<Import("eases.inQuad", Spec.path)>] static member inQuad: EasingFun = jsNative
-    [<Import("eases.outQuad", Spec.path)>] static member outQuad: EasingFun = jsNative
-    [<Import("eases.inOutQuad", Spec.path)>] static member inOutQuad: EasingFun = jsNative
-    [<Import("eases.inCubic", Spec.path)>] static member inCubic: EasingFun = jsNative
-    [<Import("eases.outCubic", Spec.path)>] static member outCubic: EasingFun = jsNative
-    [<Import("eases.inOutCubic", Spec.path)>] static member inOutCubic: EasingFun = jsNative
-    [<Import("eases.inQuart", Spec.path)>] static member inQuart: EasingFun = jsNative
-    [<Import("eases.outQuart", Spec.path)>] static member outQuart: EasingFun = jsNative
-    [<Import("eases.inOutQuart", Spec.path)>] static member inOutQuart: EasingFun = jsNative
-    [<Import("eases.inQuint", Spec.path)>] static member inQuint: EasingFun = jsNative
-    [<Import("eases.outQuint", Spec.path)>] static member outQuint: EasingFun = jsNative
-    [<Import("eases.inOutQuint", Spec.path)>] static member inOutQuint: EasingFun = jsNative
-    [<Import("eases.inSine", Spec.path)>] static member inSine: EasingFun = jsNative
-    [<Import("eases.outSine", Spec.path)>] static member outSine: EasingFun = jsNative
-    [<Import("eases.inOutSine", Spec.path)>] static member inOutSine: EasingFun = jsNative
-    [<Import("eases.inCirc", Spec.path)>] static member inCirc: EasingFun = jsNative
-    [<Import("eases.outCirc", Spec.path)>] static member outCirc: EasingFun = jsNative
-    [<Import("eases.inOutCirc", Spec.path)>] static member inOutCirc: EasingFun = jsNative
-    [<Import("eases.inExpo", Spec.path)>] static member inExpo: EasingFun = jsNative
-    [<Import("eases.outExpo", Spec.path)>] static member outExpo: EasingFun = jsNative
-    [<Import("eases.inOutExpo", Spec.path)>] static member inOutExpo: EasingFun = jsNative
-    [<Import("eases.inBounce", Spec.path)>] static member inBounce: EasingFun = jsNative
-    [<Import("eases.outBounce", Spec.path)>] static member outBounce: EasingFun = jsNative
-    [<Import("eases.inOutBounce", Spec.path)>] static member inOutBounce: EasingFun = jsNative
-    [<Import("eases.inBack", Spec.path)>] static member inBack( ?overshoot: float ): EasingFun = jsNative
-    [<Import("eases.outBack", Spec.path)>] static member outBack( ?overshoot: float ): EasingFun = jsNative
-    [<Import("eases.inOutBack", Spec.path)>] static member inOutBack( ?overshoot: float ): EasingFun = jsNative
-    [<Import("eases.inElastic", Spec.path)>] static member inElastic( ?amplitude: float , ?period: float ): EasingFun = jsNative
-    [<Import("eases.outElastic", Spec.path)>] static member outElastic( ?amplitude: float , ?period: float ): EasingFun = jsNative
-    [<Import("eases.inOutElastic", Spec.path)>] static member inOutElastic( ?amplitude: float , ?period: float ): EasingFun = jsNative
-    [<Import("createSpring", Spec.path)>] static member
+    static abstract irregular: ?length: float * ?randomness: float -> EasingFun
+    static abstract steps: ?steps: float * ?fromStart: bool -> EasingFun
+    static abstract cubicBezier: ?mX1: float * ?mY1: float * ?mX2: float * ?mY2: float -> EasingFun
+    static abstract ``in``: ?power: float -> EasingFun
+    static abstract out: ?power: float -> EasingFun
+    static abstract inOut: ?power: float -> EasingFun
+    static abstract inQuad: EasingFun
+    static abstract outQuad: EasingFun
+    static abstract inOutQuad: EasingFun
+    static abstract inCubic: EasingFun
+    static abstract outCubic: EasingFun
+    static abstract inOutCubic: EasingFun
+    static abstract inQuart: EasingFun
+    static abstract outQuart: EasingFun
+    static abstract inOutQuart: EasingFun
+    static abstract inQuint: EasingFun
+    static abstract outQuint: EasingFun
+    static abstract inOutQuint: EasingFun
+    static abstract inSine: EasingFun
+    static abstract outSine: EasingFun
+    static abstract inOutSine: EasingFun
+    static abstract inCirc: EasingFun
+    static abstract outCirc: EasingFun
+    static abstract inOutCirc: EasingFun
+    static abstract inExpo: EasingFun
+    static abstract outExpo: EasingFun
+    static abstract inOutExpo: EasingFun
+    static abstract inBounce: EasingFun
+    static abstract outBounce: EasingFun
+    static abstract inOutBounce: EasingFun
+    static abstract inBack: ?overshoot: float -> EasingFun
+    static abstract outBack: ?overshoot: float -> EasingFun
+    static abstract inOutBack: ?overshoot: float -> EasingFun
+    static abstract inElastic: ?amplitude: float * ?period: float -> EasingFun
+    static abstract outElastic: ?amplitude: float * ?period: float -> EasingFun
+    static abstract inOutElastic: ?amplitude: float * ?period: float -> EasingFun
+    [<Import("createSpring", Spec.path); ParamObject>] static member
         createSpring(?mass:float,?stiffness:float,?damping:float,?velocity:float): EasingFun = jsNative
     [<Import("createSpring", Spec.path)>] static member
         createSpring(options: obj): EasingFun = jsNative
-
-[<AutoOpen>]
-type Utils =
-    [<ImportMember(Spec.path)>]
-    static member cleanInlineStyles(renderable: 'Type): 'Type = jsNative
-    [<Import("utils.random",Spec.path)>]
-    static member random(min: 'a when 'a: unmanaged,max: 'b when 'b:unmanaged,?decimalLength:'c): float = jsNative
-    [<ImportMember(Spec.path)>]
-    [<Import("utils.randomPick", "animejs")>]
-    static member randomPick (items: string): char = nativeOnly
-    [<Import("utils.randomPick", "animejs")>]
-    static member randomPick (items: 'Type[]): 'Type = nativeOnly
-    [<Import("utils.shuffle", "animejs")>]
-    static member shuffle (items: 'Type[]): 'Type[] = nativeOnly
-
 
 [<AutoOpen; Erase>]
 module rec AutoOpenInstanceDefinitions =
@@ -446,14 +502,46 @@ module rec AutoOpenInstanceDefinitions =
         abstract member labels: obj with get,set
         abstract member targets: Targets with get
         abstract member duration: int with get
-    type TimelineOptions = interface end
+    type TimelineOptions =
+        abstract defaults: TimeLineOptionsDefaults with set // & callbacks
+        abstract delay: int with set
+        abstract loop: int with set
+        abstract loopDelay: int with set
+        abstract alternate: bool with set
+        abstract reversed: bool with set
+        abstract autoPlay: U2<bool, ScrollObserver> with set
+        abstract frameRate: int with set
+        abstract playbackRate: float with set
+        abstract playbackEase: float with set
+        abstract onBegin: Callback<Timeline> with set
+        abstract onComplete: Callback<Timeline> with set
+        abstract onBeforeUpdate: Callback<Timeline> with set
+        abstract onUpdate: Callback<Timeline> with set
+        abstract onRender: Callback<Timeline> with set
+        abstract onLoop: Callback<Timeline> with set
+        abstract onPause: Callback<Timeline> with set
+        abstract ``then``: (Callback<Timeline> -> JS.Promise<unit>) with set
+    type TimeLineOptionsDefaults =
+        abstract loop: int
+        abstract loopDelay: int
+        abstract alternate: bool
+        abstract reversed: bool
+        abstract autoPlay: U2<bool, ScrollObserver>
+        abstract frameRate: int
+        abstract playbackRate: float
+        abstract playbackEase: float
+        abstract delay: U2<int, FunctionValue<int>>
+        abstract duration: U2<int, FunctionValue<int>>
+        abstract ease: EasingFun
+        abstract composition: composition
+        abstract modifier: FloatModifier   
     type Draggable =
         abstract member disable: ChainMethod<Draggable>
         abstract member enable: ChainMethod<Draggable>
         abstract member setX: float * ?muteCallback: bool -> Draggable
         abstract member setY: float * ?muteCallback: bool -> Draggable
-        abstract member animateInView: ?duration: int * ?gap: bool * ?ease: Eases -> Draggable
-        abstract member scrollInView: ?duration: int * ?gap: bool * ?ease: Eases -> Draggable
+        abstract member animateInView: ?duration: int * ?gap: bool * ?ease: EasingFun -> Draggable
+        abstract member scrollInView: ?duration: int * ?gap: bool * ?ease: EasingFun -> Draggable
         abstract member stop: ChainMethod<Draggable>
         abstract member reset: ChainMethod<Draggable>
         abstract member revert: ChainMethod<Draggable>
@@ -467,7 +555,7 @@ module rec AutoOpenInstanceDefinitions =
         abstract member maxVelocity: float with get,set
         abstract member minVelocity: float with get,set
         abstract member velocityMultiplier: float with get,set
-        abstract member releaseEase: (unit -> Eases) with get,set
+        abstract member releaseEase: (unit -> EasingFun) with get,set
         abstract member releaseSpring: EasingFun with get
         abstract member containerPadding: Bounds with get,set
         abstract member containerFriction: float with get,set
@@ -522,7 +610,40 @@ module rec AutoOpenInstanceDefinitions =
         abstract member onSnap: Callback<Draggable> with get,set
         abstract member onResize: Callback<Draggable> with get,set
         abstract member onAfterResize: Callback<Draggable> with get,set
-    type DraggableOptions = interface end
+    type DraggableOptions =
+        abstract x: AxisOptions with set
+        abstract y: AxisOptions with set
+        abstract snap: U8<float, float[], FunctionValue<float>, FunctionValue<int>, int, int[], FunctionValue<float[]>, FunctionValue<int[]>> with set
+        abstract modifier: (float -> float) with set
+        // Maps axis value to different property
+        abstract mapTo: string with set
+        /// <summary>
+        /// Specifies a different element than the defined target to trigger the drag animation
+        /// </summary>
+        abstract trigger: obj with set
+        abstract container: U4<string, HTMLElement, Bounds, unit -> Bounds> with set
+        abstract containerPadding: U3<float, Bounds, unit -> Bounds> with set
+        abstract containerFriction: float with set
+        abstract releaseContainerFriction: U2<float, unit -> float> with set
+        abstract releaseMass: float with set
+        abstract releaseStiffness: float with set
+        abstract releaseDamping: float with set
+        abstract velocityMultiplier: U2<float, unit -> float> with set
+        abstract minVelocity: U2<float, unit -> float> with set
+        abstract maxVelocity: U2<float, unit -> float> with set
+        abstract releaseEase: EasingFun with set
+        abstract dragSpeed: U2<float, unit -> float> with set
+        abstract scrollThreshold: U2<float, unit -> float> with set
+        abstract scrollSpeed: U2<float, unit -> float> with set
+        //callbacks
+        abstract onGrab: Callback<Draggable> with set
+        abstract onDrag: Callback<Draggable> with set
+        abstract onUpdate: Callback<Draggable> with set
+        abstract onRelease: Callback<Draggable> with set
+        abstract onSnap: Callback<Draggable> with set
+        abstract onSettle: Callback<Draggable> with set
+        abstract onResize: Callback<Draggable> with set
+        abstract onAfterResize: Callback<Draggable> with set
     type AxisOptions = interface end
     type Scope =
         abstract member add: Scope -> (unit -> unit)
@@ -539,7 +660,7 @@ module rec AutoOpenInstanceDefinitions =
         abstract member mediaQueryLists: obj with get
     type ScopeOptions = interface end
     type EngineDefaults =        
-        abstract member playbackEase: Eases with get, set
+        abstract member playbackEase: EasingFun with get, set
         abstract member playbackRate: float with get, set
         abstract member frameRate: int with get, set
         abstract member loop: U2<float, bool> with get, set
@@ -549,7 +670,7 @@ module rec AutoOpenInstanceDefinitions =
         abstract member duration: U2<float, FunctionValue<float>> with get, set
         abstract member delay: U2<float, FunctionValue<float>> with get, set
         abstract member loopDelay: float with get, set
-        abstract member ease: Eases with get, set
+        abstract member ease: EasingFun with get, set
         abstract member composition: composition with get, set
         abstract member modifier: (float -> float) with get, set
         abstract member onBegin: Callback<obj> with get, set
@@ -580,13 +701,13 @@ module rec AutoOpenInstanceDefinitions =
         abstract loopDelay: int with set
         abstract alternate: bool with set
         abstract reversed: bool with set
-        abstract autoPlay: U2<bool, ScrollObserver> with set
+        abstract autoplay: U2<bool, ScrollObserver> with set
         abstract frameRate: int with set
         abstract playbackRate: float with set
         abstract playbackEase: float with set
-        abstract delay: U2<int, FunctionValue<int>> with set
-        abstract duration: U2<int, FunctionValue<int>> with set
-        abstract ease: Eases with set
+        abstract delay: U2<float, FunctionValue<float>> with set
+        abstract duration: U2<float, FunctionValue<float>> with set
+        abstract ease: EasingFun with set
         abstract composition: composition with set
         abstract modifier: FloatModifier with set  
         abstract onBegin: Callback<unit> with set
@@ -594,7 +715,6 @@ module rec AutoOpenInstanceDefinitions =
         abstract onRender: Callback<unit> with set
         abstract onLoop: Callback<unit> with set
         abstract onComplete: Callback<unit> with set
-
     [<AllowNullLiteral; Interface>]
     type MotionPath =
         abstract member translateX : FunctionValue<float> with get, set
@@ -647,21 +767,39 @@ module rec AutoOpenInstanceDefinitions =
         abstract member completed: bool with get,set
         abstract member reversed: bool with get,set
 
+[<AutoOpen; Import("utils", Spec.path); Interface>]
+type Utils =
+    static abstract cleanInlineStyles: 'T -> 'T
+    static abstract random: min: 'a * max: 'b -> float
+    static abstract randomPick: items: 'T seq -> 'T
+    static abstract shuffle: items: 'T seq -> 'T seq
+    static abstract clamp: value: float * min: float * max: float -> float
+    static abstract round: value: float * ?decimalLength: int -> float
+    static abstract wrap: value: float * min: float * max: float -> float
+    static abstract interpolate: start: float * ``end``: float * progress: float -> float
+    static abstract mapRange: value: float * inLow: float * inHigh: float * outLow: float * outHigh: float -> float 
+    static abstract roundPad: value: float * ?decimalLength: int -> string
+    static abstract roundPad: value: string * ?decimalLength: int -> string 
+    static abstract padStart: value: float * totalLength: int * padString: string -> string
+    static abstract padEnd: value: float * totalLength: int * padString: string -> string
+    static abstract degToRad: degrees: float -> float
+    static abstract degToRad: degrees: int -> float
+    static abstract radToDeg: rads: float -> float
+    static abstract radToDeg: rads: int -> float
+
+[<Import("svg", Spec.path); Interface>]
+type Svg =
+    static abstract createDrawable: selector: obj * ?start: float * ?``end``: float -> SVGElementInstanceList
+    static abstract createMotionPath: path: obj -> MotionPath
+    static abstract morphTo: path: obj * ?precision: int -> FunctionValue<_>
+
 type AnimeJs with
     [<Import("createTimer", "animejs")>]
     static member createTimer (parameters: obj) : Timer = nativeOnly
     [<ImportMember(Spec.path)>]
     static member createTimeline (parameters: obj): Timeline = nativeOnly
-    [<Import("utils.cleanInlineStyles", "animejs")>]
-    static member cleanInlineStyles (renderable: 'Type) : 'Type = nativeOnly    
     [<Import("animate", "animejs")>]
     static member animate (targets: Targets, parameters: obj) : Animation = nativeOnly
-    [<Import("utils.random", "animejs")>]
-    static member random (min: float, max: float, ?decimalLength: float) : float = nativeOnly
-    [<Import("utils.randomPick", "animejs")>]
-    static member randomPick (items: U2<string, ResizeArray<obj>>) : obj = nativeOnly
-    [<Import("utils.shuffle", "animejs")>]
-    static member shuffle (items: ResizeArray<obj>) : ResizeArray<obj> = nativeOnly
     [<ImportMember "animejs">]
     static member stagger (target: obj, ?parameters: obj) : FunctionValue<float> = nativeOnly
     [<Import("createAnimatable", "animejs")>]
@@ -672,46 +810,18 @@ type AnimeJs with
     static member createSpring (?mass: float, ?stiffness: float, ?damping: float, ?velocity: float) : EasingFun = nativeOnly
     [<Import("createScope", "animejs")>]
     static member createScope (?``params``: obj) : Scope = nativeOnly
-    
     [<Import("onScroll", "animejs")>]
     static member inline onScroll (options: obj): ScrollObserver = jsNative 
-    [<Import("svg.createDrawable", Spec.path)>]
-    static member createDrawable(selector: SVGElement, ?start: float, ?``end``: float): SVGElementInstanceList = jsNative
-    [<Import("svg.createDrawable", Spec.path)>]
-    static member createDrawable(selector: Selector, ?start: float, ?``end``: float): SVGElementInstanceList = jsNative
-    [<Import("svg.morphTo", Spec.path)>]
-    static member morphTo (path2: SVGElement, ?precision: float) : FunctionValue<_> = nativeOnly
-    [<Import("svg.morphTo", Spec.path)>]
-    static member morphTo (path2: Selector, ?precision: float) : FunctionValue<_> = nativeOnly
-    [<Import("svg.createMotionPath", Spec.path)>]
-    static member createMotionPath (path: SVGElement) : MotionPath = nativeOnly
-    [<Import("svg.morphTo", Spec.path)>]
-    static member createMotionPath (path: Selector) : MotionPath = nativeOnly
 
 type Targets  with
     [<Emit "$0">]
     member inline this.Value = let (Targets value) = this in value  
-    member inline this.Yield(value: string) = value :> obj |> this.Value.Add
-    member inline this.Yield(value: #Element) = value :> obj |> this.Value.Add
-    member inline this.Yield(value: NodeList) = value :> obj |> this.Value.Add
-    member inline this.Yield(value: #Element seq) = value |> unbox<obj seq> |> this.Value.AddRange
-    member inline this.Yield(value: string seq) = value |> unbox<obj seq> |> this.Value.AddRange
-    member inline this.Yield(value: Target<_>) = value :> obj |> this.Value.Add
-    member inline this.Yield(value: Target<_> seq) = value |> unbox<obj seq> |> this.Value.AddRange
-    member inline this.Yield(value: unit -> #Element) =
-        value() :> obj |> this.Value.Add
-    member inline this.Yield(value: unit -> string) =
-        value() :> obj |> this.Value.Add
-    member inline this.Yield(value: unit -> NodeList) =
-        value() :> obj |> this.Value.Add
-    member inline this.Yield(value: unit -> Target<_>) =
-        value() :> obj |> this.Value.Add
-    member inline this.Yield(value: unit -> #Element seq) =
-        value() |> unbox<obj seq> |> this.Value.AddRange
-    member inline this.Yield(value: unit -> string seq) =
-        value() |> unbox<obj seq> |> this.Value.AddRange
-    member inline this.Yield(value: unit -> Target<_> seq) =
-        value() |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Yield(value: obj) = value |> this.Value.Add
+    member inline this.Yield(value: obj seq) = value |> unbox<obj seq> |> this.Value.AddRange
+    member inline this.Yield(value: unit -> obj) =
+        value() |> this.Value.Add
+    member inline this.Yield(value: unit -> obj seq) =
+        value() |> this.Value.AddRange
     member inline this.Run _ = this
 let targets (value: obj list) = value |> id |> ResizeArray |> Targets
 
@@ -776,15 +886,12 @@ type KeyframeValue = interface end
 type KeyframeBuilder() =
     interface FableObjectBuilder
     interface TweenPropertyInjection
-let keyframe = KeyframeBuilder()
-let tween: StyleArray = StyleArray()
 [<Erase>]
 type StyleArrayBuilder = StyleArrayBuilder of string with
     static member inline (<--) (x: StyleArrayBuilder, keyframes: KeyframeValue list): StyleArray =
         !!(!!x ==> (keyframes |> List.toArray))
     static member inline (<--) (x: StyleArrayBuilder, keyframes: PercentKeyframe list): StyleArray =
         !!(!!x ==> (createObj !!keyframes))
-let keyframes = StyleArrayBuilder "keyframes"
 type TimerCallbackInjection<'Type> = interface end
 type AnimationCallbackInjection<'Type> = inherit TimerCallbackInjection<'Type>
 type ScrollObserverCallbackInjection<'Type> = interface end
@@ -849,13 +956,10 @@ type AxisX() =
     interface AxisBuilder
     member inline _.Run(state: bool): string * obj = "x" ==> state
     member inline _.Run(state: FableObject): string * obj = "x" ==> createObj state
-let axisX = AxisX()
 type AxisY() =
     interface AxisBuilder
     member inline _.Run(state: bool): string * obj = "y" ==> state
     member inline _.Run(state: FableObject): string * obj = "y" ==> createObj state
-let axisY = AxisY()
-let axisOptions = unbox<AxisBuilder> ()
 type DraggableBuilder =
     inherit AxisBuilder
     inherit DraggableCallbackInjection<Draggable>
@@ -872,6 +976,15 @@ type AnimationBuilder =
 type DrawableBuilder = interface end
 
 type UtilsBuilder = interface end
+
+type ScopeDefaultOptionsBuilder =
+    inherit PlaybackPropertyInjection
+    inherit TimerCallbackInjection<ScopeOptionsDefaults>
+type ScopeBuilder =
+    inherit FableObjectBuilder
+
+type TimelineDefaultsBuilder =
+    inherit TimerPropertyInjection
 
 [<AutoOpen; Erase>]
 module AutoOpenComputationImplementations =
@@ -1219,12 +1332,9 @@ module AutoOpenComputationImplementations =
             createObj state |> unbox<AnimationOptions>
     type AnimationOptions with
         member inline _.Yield(_: unit) = ()
-        member inline _.Yield(value: string) = Target value
-        member inline _.Yield(value: Selector) = Target value
-        member inline _.Yield(value: #HTMLElement) = Target value
-        member inline _.Yield(value: #HTMLElement list) = targets !!value
+        member inline _.Yield(value: obj) = Target value
+        member inline _.Yield(value: obj list) = targets value
         member inline _.Yield(value: Targets) = value
-        member inline _.Yield(value: SVGElementInstanceList) = Target value
         member inline _.Delay(value) = value()
         member inline _.Combine(x) = fun () -> x
         member inline this.Run(state: Target<_>) =
@@ -1824,10 +1934,8 @@ module AutoOpenComputationImplementations =
         member inline _.Run(state: FableObject): AnimatableOptions = createObj state |> unbox
     type AnimatableOptions with
         member inline _.Yield(_: unit) = ()
-        member inline _.Yield(value: string) = Target value
-        member inline _.Yield(value: Selector) = Target value
-        member inline _.Yield(value: #HTMLElement) = Target value
-        member inline _.Yield(value: #HTMLElement list) = targets !!value
+        member inline _.Yield(value: obj) = Target value
+        member inline _.Yield(value: obj list) = targets !!value
         member inline _.Yield(value: Targets) = value
         member inline _.Delay(value) = value()
         member inline _.Combine(value) = value()
@@ -2792,11 +2900,10 @@ module AutoOpenComputationImplementations =
         member inline _.Run(_object_builder: FableObject): DraggableOptions = !!createObj !!_object_builder
     type DraggableOptions with
         member inline _.Yield(_: unit) = ()
-        member inline _.Yield(value: string) = Target value
-        member inline _.Yield(value: Selector) = Target value
-        member inline _.Yield(value: #HTMLElement) = Target value
-        member inline _.Yield(value: #HTMLElement list) = targets !!value
-        member inline _.Yield(value: Targets) = value
+        member inline _.Yield(value: obj) = Target value
+        member inline _.Yield(value: obj seq) = targets !!value
+        member inline _.Combine(y) = fun () -> y
+        member inline _.Delay(value) = value()
         member inline this.Run(state: Target<_>) =
             AnimeJs.createDraggable(!!state, this)
         member inline this.Run(state: Targets) =
@@ -3867,7 +3974,35 @@ module AutoOpenComputationImplementations =
         member inline this.Run(_) = this
     type TimelineBuilder with
         member inline _.Zero(): FableObject = []
+        [<CustomOperation "defaults">]
+        member inline _.defaultsOp(state: FableObject, value: TimelineOptionsDefaults) =
+            "defaults" ==> createObj value |> add state
         member inline _.Run(state: FableObject) = AnimeJs.createTimeline(createObj state)
+    type ScopeDefaultOptionsBuilder with
+        member inline _.Run(state: FableObject) = unbox<ScopeOptionsDefaults>(createObj state)
+    type ScopeBuilder with
+        member inline _.Yield(value: ScopeOptionsDefaults): FableObject = [ "defaults" ==> value ]
+        [<CustomOperation "root">]
+        member inline _.rootOp(state: FableObject, value: string) =
+            "root" ==> value |> add state
+        [<CustomOperation "root">]
+        member inline _.rootOp(state: FableObject, value: #Element) =
+            "root" ==> value |> add state
+        [<CustomOperation "defaults">]
+        member inline _.defaultsOp(state: FableObject, value: obj) =
+            "defaults" ==> value |> add state
+        [<CustomOperation "mediaQueries">]
+        member inline _.mediaQueriesOp(state: FableObject, value: obj) =
+            "mediaQueries" ==> value |> add state
+        member inline _.Run(state: FableObject) = 
+            AnimeJs.createScope(createObj state)
+    type Scope with
+        member inline _.Zero() = ()
+        [<CustomOperation "refresh">]
+        member inline this.refreshOp(_) = this.refresh()
+        [<CustomOperation "revert">]
+        member inline this.revertOp(_) = this.revert()
+
 type style = CssStyle
 let animate: AnimationBuilder = unbox ()
 let timeline: TimelineBuilder = unbox ()
@@ -3880,6 +4015,13 @@ let timer: TimerBuilder = unbox ()
 let engine: Engine = import "engine" Spec.path
 let bounds: BoundsBuilder = unbox ()
 let cursor: CursorBuilder = unbox ()
+let axisX = AxisX()
+let axisY = AxisY()
+let axisOptions = unbox<AxisBuilder> ()
+let keyframe = KeyframeBuilder()
+let tween: StyleArray = StyleArray()
+let keyframes = StyleArrayBuilder "keyframes"
+
 module Operators =
     let inline (!<<+=) value: RelativeTimePosition = unbox $"<<+={value}"
     let inline (!<<-=) value: RelativeTimePosition = unbox $"<<-={value}"
