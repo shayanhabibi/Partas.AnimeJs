@@ -15,9 +15,9 @@
         <PackageTags>Partas;F#;FSharp;Fable;fable-javascript;Web;animejs;animation;ce</PackageTags>
         <Authors>Shayan Habibi</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>0.0.1</Version>
-        <PackageVersion>0.0.1</PackageVersion>
-<!--        <PackageReleaseNotes></PackageReleaseNotes>-->
+        <Version>0.0.2</Version>
+        <PackageVersion>0.0.2</PackageVersion>
+        <PackageReleaseNotes>Init</PackageReleaseNotes>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Core.fs" />
@@ -27,12 +27,9 @@
 
     <ItemGroup>
       <PackageReference Include="Fable.Browser.Css" Version="2.5.0" />
-      <PackageReference Include="Fable.Browser.IntersectionObserver" Version="1.0.0" />
       <PackageReference Include="Fable.Browser.ResizeObserver" Version="1.0.0" />
       <PackageReference Include="Fable.Browser.Svg" Version="2.4.0" />
-      <PackageReference Include="Fable.Browser.WebGL" Version="1.3.0" />
       <PackageReference Include="Fable.Core" Version="4.5.0" />
-      <PackageReference Include="Partas.Solid" Version="1.1.0" />
     </ItemGroup>
 
 </Project>

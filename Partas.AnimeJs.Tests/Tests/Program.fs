@@ -1,7 +1,7 @@
 ﻿module Partas.AnimeJs.Tests.Tests.Program
 
 open Fable.Core.JsInterop
-open Partas.Solid
+// open Partas.Solid
 open Partas.AnimeJs.Style
 open Partas.AnimeJs.Core
 open Partas.AnimeJs.Core.Operators
@@ -146,7 +146,7 @@ let a1 =
         style.rotate <-- 90
         loop
         Eases.inOutExpo
-    }) { null}
+    }) { unbox<Selector> null }
 
 let a2 =
     (animate {
