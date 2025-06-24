@@ -503,7 +503,7 @@ module rec AutoOpenInstanceDefinitions =
         abstract member targets: Targets with get
         abstract member duration: int with get
     type TimelineOptions =
-        abstract defaults: TimeLineOptionsDefaults with set // & callbacks
+        abstract defaults: TimelineOptionsDefaults with set // & callbacks
         abstract delay: int with set
         abstract loop: int with set
         abstract loopDelay: int with set
@@ -521,7 +521,7 @@ module rec AutoOpenInstanceDefinitions =
         abstract onLoop: Callback<Timeline> with set
         abstract onPause: Callback<Timeline> with set
         abstract ``then``: (Callback<Timeline> -> JS.Promise<unit>) with set
-    type TimeLineOptionsDefaults =
+    type TimelineOptionsDefaults =
         abstract loop: int
         abstract loopDelay: int
         abstract alternate: bool
@@ -3976,7 +3976,7 @@ module AutoOpenComputationImplementations =
         member inline _.Zero(): FableObject = []
         [<CustomOperation "defaults">]
         member inline _.defaultsOp(state: FableObject, value: TimelineOptionsDefaults) =
-            "defaults" ==> createObj value |> add state
+            "defaults" ==> value |> add state
         member inline _.Run(state: FableObject) = AnimeJs.createTimeline(createObj state)
     type ScopeDefaultOptionsBuilder with
         member inline _.Run(state: FableObject) = unbox<ScopeOptionsDefaults>(createObj state)
@@ -4021,7 +4021,11 @@ let axisOptions = unbox<AxisBuilder> ()
 let keyframe = KeyframeBuilder()
 let tween: StyleArray = StyleArray()
 let keyframes = StyleArrayBuilder "keyframes"
-
+type Timeline with
+    static member defaults: TimelineDefaultsBuilder = unbox ()
+type Scope with
+    static member defaults: ScopeDefaultOptionsBuilder = unbox ()
+let scope: ScopeBuilder = unbox ()
 module Operators =
     let inline (!<<+=) value: RelativeTimePosition = unbox $"<<+={value}"
     let inline (!<<-=) value: RelativeTimePosition = unbox $"<<-={value}"
