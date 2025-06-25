@@ -49,7 +49,7 @@ let x3 = x2 { Unchecked.defaultof<string> }
 
 let z2 = animate {
     mkStyle "translateY" {
-        too (AnimeJs.random(-175, -255))
+        too (Utils.random(-175, -255))
     }
     !~ "translateX" {
         tween {
@@ -57,7 +57,7 @@ let z2 = animate {
         },
         tween {
             Eases.inOut 1.5
-            too (AnimeJs.random(-40,40))
+            too (Utils.random(-40,40))
         }
     }
     style.color { from "#FFDD8E" }
@@ -150,10 +150,10 @@ let a1 =
 
 let a2 =
     (animate {
-        style.x { AnimeJs.random(-100,100)}
-        style.y { AnimeJs.random(-100,100)}
-        style.rotate { AnimeJs.random(-180,180)}
-        duration (AnimeJs.random(500,1000))
+        style.x { Utils.random(-100,100)}
+        style.y { Utils.random(-100,100)}
+        style.rotate { Utils.random(-180,180)}
+        duration (Utils.random(500,1000))
         composition.blend
     }) { ".shape" }
 
@@ -167,7 +167,7 @@ let drawa =
         delay (stagger(40).asFunctionValue)
         Eases.inOut 3
         autoplay (onScroll { sync })
-    }) { AnimeJs.createDrawable(Selector "path") }
+    }) { Svg.createDrawable(Selector "path") }
 
 let tl = timeline {} {
     add

@@ -767,7 +767,7 @@ module rec AutoOpenInstanceDefinitions =
         abstract member completed: bool with get,set
         abstract member reversed: bool with get,set
 
-[<AutoOpen; Import("utils", Spec.path); Interface>]
+[<Import("utils", Spec.path); Interface>]
 type Utils =
     static abstract cleanInlineStyles: 'T -> 'T
     static abstract random: min: 'a * max: 'b -> float
