@@ -846,13 +846,13 @@ type TweenPropertyInjection =
 type CssStyle =
     inherit TweenPropertyInjection
 
-type stagger [<Emit("$0")>] (value: obj) =
+type stagger [<Emit("$0")>] private (value: obj) =
     interface FableObjectBuilder
     interface EasePropertyInjection
-    [<Emit("$0")>] new (value: string, value2: string) = stagger((value,value2))
-    [<Emit("$0")>] new (value: float, value2: string) = stagger((value,value2))
-    [<Emit("$0")>] new (value: float,value2: float) = stagger((value,value2))
-    [<Emit("$0")>] new (value: string, value2: float) = stagger((value,value2))
+    [<Emit("[$0,$1]")>] new (value: string, value2: string) = stagger([| value; value2 |])
+    [<Emit("[$0,$1]")>] new (value: float, value2: string) = stagger([| value; !!value2 |])
+    [<Emit("[$0,$1]")>] new (value: float,value2: float) = stagger([| value; value2 |])
+    [<Emit("[$0,$1]")>] new (value: string, value2: float) = stagger([| value; !!value2 |])
     [<Emit("$0")>] new (value: string) = stagger(value)
     [<Emit("$0")>] new (value: float) = stagger(value)
     member inline this.asFunctionValue = AnimeJs.stagger(this)
@@ -985,6 +985,8 @@ type ScopeBuilder =
 
 type TimelineDefaultsBuilder =
     inherit TimerPropertyInjection
+    inherit FableObjectBuilder
+    inherit TweenPropertyInjection
 
 [<AutoOpen; Erase>]
 module AutoOpenComputationImplementations =
@@ -1022,7 +1024,9 @@ module AutoOpenComputationImplementations =
         member inline _.For(state: ^T, [<InlineIfLambda>] value: ^T -> _) =
             state |> value
         // member inline _.For(_:unit, [<InlineIfLambda>] value) = value()
-        
+    type TimelineDefaultsBuilder with
+        member inline _.Run(state: FableObject) = createObj state |> unbox<TimelineOptionsDefaults>
+            
     type TimerBuilder with
         member inline _.Run(state: FableObject) = AnimeJs.createTimer(createObj state)
     type DraggableCallbackInjection<'Type> with
@@ -1213,14 +1217,14 @@ module AutoOpenComputationImplementations =
         member inline this.Yield(_: unit) = ()
         member inline this.Zero() = ()
         [<CustomOperation "add">]
-        member inline this.AddOp(_, target: string, options: obj) =
-            this.add2(Selector target, unbox (options)) |> ignore
+        member inline this.AddOp(_, target: obj, options: obj) =
+            this.add2(target, unbox (options)) |> ignore
         [<CustomOperation "add">]
-        member inline this.AddOp(_, target: string, options: obj, value: RelativeTimePosition) =
-            this.add3(Selector target, unbox (options), !!value) |> ignore
+        member inline this.AddOp(_, target: obj, options: obj, value: RelativeTimePosition) =
+            this.add3(target, unbox (options), !!value) |> ignore
         [<CustomOperation "add">]
-        member inline this.AddOp(_, target: string, options: obj, value: FunctionValue<_>) =
-            this.add3(Selector target, unbox (options), !!value) |> ignore
+        member inline this.AddOp(_, target: obj, options: obj, value: FunctionValue<_>) =
+            this.add3(target, unbox (options), !!value) |> ignore
         [<CustomOperation "init">]
         member inline this.initOp _ = this.init() |> ignore
         [<CustomOperation "refresh">]
@@ -1946,6 +1950,8 @@ module AutoOpenComputationImplementations =
 
     type DraggableBuilder with
         member inline _.Yield(value: DraggableCursor) = "cursor" ==> value
+        [<CustomOperation "trigger">]
+        member inline _.triggerOp(state: FableObject, value: obj) = "trigger" ==> value |> add state
         /// <summary>
         /// <c>cursor</c><br/>
         /// <c>bool -> ...</c>
