@@ -588,11 +588,11 @@ type SplitParameterBuilder =
 type TextSplitterParameter = TextSplitterParameter of string * obj
 type TextSplitterParameterBuilder(parameter: string) =
     interface SplitParameterBuilder
-    member inline this.Run(state: FableObject) =
+    member this.Run(state: FableObject) =
         parameter ==> createObj state |> TextSplitterParameter
-    member inline this.Run(state: string) =
+    member this.Run(state: string) =
         parameter ==> state |> TextSplitterParameter
-    member inline this.Run(state: bool) =
+    member this.Run(state: bool) =
         parameter ==> state |> TextSplitterParameter
     
 
