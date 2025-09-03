@@ -15,11 +15,15 @@
         <PackageTags>Partas;F#;FSharp;Fable;fable-javascript;Web;animejs;animation;ce</PackageTags>
         <Authors>Shayan Habibi</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>0.0.4</Version>
-        <PackageVersion>0.0.4</PackageVersion>
-        <PackageReleaseNotes>Remove autoopen on interface type</PackageReleaseNotes>
+        <Version>0.0.5</Version>
+        <PackageVersion>0.0.5</PackageVersion>
+        <PackageReleaseNotes>AnimeJs 4.1.3</PackageReleaseNotes>
+        <NpmDependencies>
+            <NpmPackage Name="animejs" Version=">= 4.1.3" />
+        </NpmDependencies>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Binding.fs" />
         <Compile Include="Core.fs" />
         <None Include="package.json" />
         <Compile Include="Style.fs" />

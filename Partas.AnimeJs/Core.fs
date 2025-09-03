@@ -6,6 +6,7 @@ open System.Runtime.CompilerServices
 open Fable.Core
 open Fable.Core.JsInterop
 open Browser.Types
+open Partas.AnimeJs.Bindings
 
 #nowarn 3535
     
@@ -14,144 +15,6 @@ module Spec =
     let [<Literal; Erase>] path = "animejs"
     let [<Literal; Erase>] version = "4.0.2"
 
-[<Erase; AutoOpen>]
-module Enums =
-    [<StringEnum; RequireQualifiedAccess>]
-    type timeUnit =
-        | s
-        | ms
-
-    [<StringEnum; RequireQualifiedAccess>]
-    type staggerFrom =
-        | first
-        | center
-        | last
-
-
-    [<RequireQualifiedAccess>]
-    [<StringEnum>]
-    type axis =
-        | x
-        | y
-        
-    [<StringEnum; RequireQualifiedAccess>]
-    type composition =
-        /// <summary>
-        /// Replace and cancel the current running animation on the property.
-        /// </summary>
-        | replace
-        /// <summary>
-        /// Do not replace the running animation. This means the previous animation will
-        /// continue running if its duration is longer than the new animation. This mode can
-        /// also offer better performance
-        /// </summary>
-        | none
-        /// <summary>
-        /// Creates an additive animation and blends its values with the running animation
-        /// </summary>
-        | blend
-
-    [<StringEnum; RequireQualifiedAccess>]
-    type observerThreshold =
-        /// Top Y value
-        | top
-        /// Bottom Y value
-        | bottom
-        /// Left X value
-        | left
-        /// Right X value
-        | right
-        /// Center X or Y value
-        | center
-        /// Equivalent to Y-Top X-Left
-        | start
-        /// Equivalent to Y-Bottom X-Right
-        | [<CompiledName "end">] end'
-        /// Minimum value possible to meet the enter or leave condition
-        | min
-        /// Maximum value possible to meet the enter or leave condition
-        | max
-        /// Alias for the 'shorthand' position scheme in animejs
-        | [<CompiledName "top bottom">] top_bottom
-        | [<CompiledName "bottom top">] bottom_top
-        | [<CompiledName "top left">] top_left
-        | [<CompiledName "left top">] left_top
-        | [<CompiledName "top right">] top_right
-        | [<CompiledName "right top">] right_top
-        | [<CompiledName "top center">] top_center
-        | [<CompiledName "center top">] center_top
-        | [<CompiledName "top start">] top_start
-        | [<CompiledName "start top">] start_top
-        | [<CompiledName "top end">] top_end
-        | [<CompiledName "end top">] end_top
-        | [<CompiledName "top min">] top_min
-        | [<CompiledName "min top">] min_top
-        | [<CompiledName "top max">] top_max
-        | [<CompiledName "max top">] max_top
-        | [<CompiledName "bottom left">] bottom_left
-        | [<CompiledName "left bottom">] left_bottom
-        | [<CompiledName "bottom right">] bottom_right
-        | [<CompiledName "right bottom">] right_bottom
-        | [<CompiledName "bottom center">] bottom_center
-        | [<CompiledName "center bottom">] center_bottom
-        | [<CompiledName "bottom start">] bottom_start
-        | [<CompiledName "start bottom">] start_bottom
-        | [<CompiledName "bottom end">] bottom_end
-        | [<CompiledName "end bottom">] end_bottom
-        | [<CompiledName "bottom min">] bottom_min
-        | [<CompiledName "min bottom">] min_bottom
-        | [<CompiledName "bottom max">] bottom_max
-        | [<CompiledName "max bottom">] max_bottom
-        | [<CompiledName "left right">] left_right
-        | [<CompiledName "right left">] right_left
-        | [<CompiledName "left center">] left_center
-        | [<CompiledName "center left">] center_left
-        | [<CompiledName "left start">] left_start
-        | [<CompiledName "start left">] start_left
-        | [<CompiledName "left end">] left_end
-        | [<CompiledName "end left">] end_left
-        | [<CompiledName "left min">] left_min
-        | [<CompiledName "min left">] min_left
-        | [<CompiledName "left max">] left_max
-        | [<CompiledName "max left">] max_left
-        | [<CompiledName "right center">] right_center
-        | [<CompiledName "center right">] center_right
-        | [<CompiledName "right start">] right_start
-        | [<CompiledName "start right">] start_right
-        | [<CompiledName "right end">] right_end
-        | [<CompiledName "end right">] end_right
-        | [<CompiledName "right min">] right_min
-        | [<CompiledName "min right">] min_right
-        | [<CompiledName "right max">] right_max
-        | [<CompiledName "max right">] max_right
-        | [<CompiledName "center start">] center_start
-        | [<CompiledName "start center">] start_center
-        | [<CompiledName "center end">] center_end
-        | [<CompiledName "end center">] end_center
-        | [<CompiledName "center min">] center_min
-        | [<CompiledName "min center">] min_center
-        | [<CompiledName "center max">] center_max
-        | [<CompiledName "max center">] max_center
-        | [<CompiledName "start end">] start_end
-        | [<CompiledName "end start">] end_start
-        | [<CompiledName "start min">] start_min
-        | [<CompiledName "min start">] min_start
-        | [<CompiledName "start max">] start_max
-        | [<CompiledName "max start">] max_start
-        | [<CompiledName "end min">] end_min
-        | [<CompiledName "min end">] min_end
-        | [<CompiledName "end max">] end_max
-        | [<CompiledName "max end">] max_end
-        | [<CompiledName "min max">] min_max
-        | [<CompiledName "max min">] max_min
-        static member inline (+) (x: observerThreshold, y: string) =
-            $"{x} {y}"
-        static member inline (+) (x: string, y: observerThreshold) =
-            $"{x} {y}"
-        static member inline (+) (x: observerThreshold, y: float) =
-            $"{x} {y}"
-        static member inline (+) (x: float, y: observerThreshold) =
-            $"{x} {y}"
 [<AutoOpen; Erase>]
 module Types =
     type AnimeJs = interface end
@@ -172,26 +35,12 @@ module Types =
     /// </code></example>
     [<Erase>]
     type Selector = Selector of string with
-        member inline this.find with get(): NodeList = this |> JsInterop.import "utils.$" Spec.path
+        member inline this.find with get(): NodeList = !!this |> Utils.``$``
     [<Erase>]
     type Target<'Type> = Target of 'Type
     [<Erase>]
     type Targets = Targets of ResizeArray<obj>
-    /// <summary>
-    /// Delegate representation of Value Functions in AnimeJs.
-    /// </summary>
-    /// <remarks>
-    /// This function type is used to conditionally change a property based on
-    /// the targets index position in an animation. This is automatically done
-    /// through methods like <c>stagger</c>.
-    /// <br/>
-    /// Stagger can therefor be used in other scenarios, so long as you invoke the method
-    /// with the relevant parameters.
-    /// </remarks>
-    /// <param name="target">The target object</param>
-    /// <param name="index">The objects index in the collection</param>
-    /// <param name="length">The collection length</param>
-    type FunctionValue<'Type> = delegate of target: obj * ?index: int * ?length: int -> 'Type
+
     /// <summary>
     /// Alias for <c>float -> float</c>
     /// </summary>
@@ -328,6 +177,7 @@ module Types =
     
 [<Import("eases", Spec.path); Interface>]
 type Eases =
+    static abstract linear: ?x1: float * ?m1: string * ?x2: float -> EasingFun
     static abstract irregular: ?length: float * ?randomness: float -> EasingFun
     static abstract steps: ?steps: float * ?fromStart: bool -> EasingFun
     static abstract cubicBezier: ?mX1: float * ?mY1: float * ?mX2: float * ?mY2: float -> EasingFun
@@ -413,78 +263,13 @@ module rec AutoOpenInstanceDefinitions =
         abstract member handleScroll: unit -> unit
         abstract member handleEvent: e: Event -> unit
         abstract member revert: unit -> unit
-    type ScrollObserver =
-        abstract member link: obj -> ScrollObserver
-        abstract member refresh: unit -> ScrollObserver
-        abstract member revert: unit -> ScrollObserver
-        abstract member id: float with get,set
-        abstract member container: ScrollContainer with get
-        abstract member target: HTMLElement with get
-        abstract member linked: obj with get
-        abstract member repeat: bool with get
-        abstract member horizontal: bool with get
-        abstract member enter: U2<string, float> with get
-        abstract member leave:  U2<string, float> with get
-        abstract member sync: bool with get
-        abstract member velocity: float with get
-        abstract member backward: bool with get
-        abstract member scroll: float with get
-        abstract member progress: float with get
-        abstract member completed: bool with get
-        abstract member began: bool with get
-        abstract member isInView: bool with get
-        abstract member offset: float with get
-        abstract member offsetStart: float with get
-        abstract member offsetEnd: float with get
-        abstract member distance: float with get
-    type ScrollObserverOptions = interface end
-    type Timer =
-        abstract member play: ChainMethod<Timer>
-        abstract member reverse: ChainMethod<Timer>
-        abstract member pause: ChainMethod<Timer>
-        abstract member restart: ChainMethod<Timer>
-        abstract member alternate: ChainMethod<Timer>
-        abstract member resume: ChainMethod<Timer>
-        abstract member complete: ChainMethod<Timer>
-        /// Pauses the timer, removes it from the engine's main loop and
-        /// frees up the memory
-        abstract member cancel: ChainMethod<Timer>
-        /// <summary>
-        /// Cancels the timer, sets its <c>currentTime</c> to <c>0</c> and reverts
-        /// the linked <c>onScroll()</c> instance if necessary.<br/><br/> Use <c>.revert()</c>
-        /// when you want to completely stop and destroy a timer
-        /// </summary>
-        abstract member revert: ChainMethod<Timer>
-        abstract member seek: time: int * ?muteCallbacks: bool -> Timer
-        /// <summary>
-        /// Changes the total duration of a timer to fit a specific time. The total
-        /// duration is equal to the duration of an iteration multiplied with the total
-        /// number of iterations. So if a timer has a duration of 1000ms and loops twice
-        /// (3 iterations in total) then the total duration is 3000ms.
-        /// </summary>
-        /// <param name="duration">Duration in ms</param>
-        abstract member stretch: duration: int -> Timer
-        
-        abstract member id: U2<string, int> with get,set
-        abstract member deltaTime: int with get
-        abstract member currentTime: int with get,set
-        abstract member iterationCurrentTime: int with get,set
-        /// <summary>
-        /// Value between <c>0.</c> and <c>1.</c>
-        /// </summary>
-        abstract member progress: float with get,set
-        abstract member iterationProgress: float with get,set
-        abstract member currentIteration: int with get,set
-        abstract member speed: float with get,set
-        abstract member fps: int with get,set
-        abstract member paused: bool with get,set
-        abstract member began: bool with get,set
-        abstract member completed: bool with get,set
-        abstract member reversed: bool with get,set
+    type ScrollObserver = Bindings.Types.ScrollObserver
+    type ScrollObserverOptions = Bindings.Types.ScrollObserverOptions
+    type Timer = Bindings.Types.Timer
     type Animation =
         inherit TimerObjectInjection<Animation>
         abstract member targets: Targets with get
-    type AnimationOptions = interface end
+    type AnimationOptions = Bindings.Types.AnimationOptions
     type Timeline =
         inherit TimerObjectInjection<Timeline>
         [<EmitMethod "add">]
@@ -502,163 +287,13 @@ module rec AutoOpenInstanceDefinitions =
         abstract member labels: obj with get,set
         abstract member targets: Targets with get
         abstract member duration: int with get
-    type TimelineOptions =
-        abstract defaults: TimelineOptionsDefaults with set // & callbacks
-        abstract delay: int with set
-        abstract loop: int with set
-        abstract loopDelay: int with set
-        abstract alternate: bool with set
-        abstract reversed: bool with set
-        abstract autoPlay: U2<bool, ScrollObserver> with set
-        abstract frameRate: int with set
-        abstract playbackRate: float with set
-        abstract playbackEase: float with set
-        abstract onBegin: Callback<Timeline> with set
-        abstract onComplete: Callback<Timeline> with set
-        abstract onBeforeUpdate: Callback<Timeline> with set
-        abstract onUpdate: Callback<Timeline> with set
-        abstract onRender: Callback<Timeline> with set
-        abstract onLoop: Callback<Timeline> with set
-        abstract onPause: Callback<Timeline> with set
-        abstract ``then``: (Callback<Timeline> -> JS.Promise<unit>) with set
-    type TimelineOptionsDefaults =
-        abstract loop: int
-        abstract loopDelay: int
-        abstract alternate: bool
-        abstract reversed: bool
-        abstract autoPlay: U2<bool, ScrollObserver>
-        abstract frameRate: int
-        abstract playbackRate: float
-        abstract playbackEase: float
-        abstract delay: U2<int, FunctionValue<int>>
-        abstract duration: U2<int, FunctionValue<int>>
-        abstract ease: EasingFun
-        abstract composition: composition
-        abstract modifier: FloatModifier   
-    type Draggable =
-        abstract member disable: ChainMethod<Draggable>
-        abstract member enable: ChainMethod<Draggable>
-        abstract member setX: float * ?muteCallback: bool -> Draggable
-        abstract member setY: float * ?muteCallback: bool -> Draggable
-        abstract member animateInView: ?duration: int * ?gap: bool * ?ease: EasingFun -> Draggable
-        abstract member scrollInView: ?duration: int * ?gap: bool * ?ease: EasingFun -> Draggable
-        abstract member stop: ChainMethod<Draggable>
-        abstract member reset: ChainMethod<Draggable>
-        abstract member revert: ChainMethod<Draggable>
-        abstract member refresh: ChainMethod<Draggable>
-        //properties
-        abstract member snapX: U2<int, int[]> with get,set
-        abstract member snapY: U2<int, int[]> with get,set
-        abstract member scrollSpeed: float with get,set
-        abstract member scrollThreshold: float with get,set
-        abstract member dragSpeed: float with get,set
-        abstract member maxVelocity: float with get,set
-        abstract member minVelocity: float with get,set
-        abstract member velocityMultiplier: float with get,set
-        abstract member releaseEase: (unit -> EasingFun) with get,set
-        abstract member releaseSpring: EasingFun with get
-        abstract member containerPadding: Bounds with get,set
-        abstract member containerFriction: float with get,set
-        abstract member containerBounds: Bounds with get
-        abstract member containerArray: Option<HTMLElement array> with get
-        abstract member ``$container``: HTMLElement with get,set
-        abstract member ``$target``: HTMLElement with get
-        abstract member ``$scrollContainer``: U2<Window, HTMLElement> with get
-        abstract member x: float with get,set
-        abstract member y: float with get,set
-        abstract member progressX: float with get,set
-        abstract member progressY: float with get,set
-        abstract member velocity: float with get
-        abstract member angle: float with get
-        abstract member xProp: string with get
-        abstract member yProp: string with get
-        abstract member destX: float with get
-        abstract member destY: float with get
-        abstract member deltaX: float with get
-        abstract member deltaY: float with get
-        abstract member enabled: bool with get
-        abstract member grabbed: bool with get
-        abstract member dragged: bool with get
-        abstract member cursor: DraggableCursor with get,set
-        abstract member disabled: x: float * y: float with get
-        abstract member ``fixed``: bool with get
-        abstract member useWin: bool with get
-        abstract member isFinePointer: bool with get,set
-        abstract member initialized: bool with get
-        abstract member canScroll: bool with get
-        abstract member contained: bool with get
-        abstract member manual: bool with get
-        abstract member released: bool with get
-        abstract member updated: bool with get
-        abstract member scroll: JSCoordinatePojo with get
-        abstract member coords: x: float * y: float * prevX: float * prevY: float with get
-        abstract member snapped: x: float * y: float with get
-        abstract member pointer: x: float * y: float * prevX: float * prevY: float with get
-        abstract member scrollView: width: float * height: float with get
-        abstract member dragArea: x: float * y: float * width: float * height: float with get
-        abstract member scrollBounds: top: float * right: float * bottom: float * left: float with get
-        abstract member targetBounds: top: float * right: float * bottom: float * left: float with get
-        abstract member window: width: float * height: float with get
-        abstract member pointerVelocity: float with get
-        abstract member pointerAngle: float with get
-        abstract member activeProp: string with get
-        abstract member onGrab: Callback<Draggable> with get,set
-        abstract member onDrag: Callback<Draggable> with get,set
-        abstract member onRelease: Callback<Draggable> with get,set
-        abstract member onUpdate: Callback<Draggable> with get,set
-        abstract member onSettle: Callback<Draggable> with get,set
-        abstract member onSnap: Callback<Draggable> with get,set
-        abstract member onResize: Callback<Draggable> with get,set
-        abstract member onAfterResize: Callback<Draggable> with get,set
-    type DraggableOptions =
-        abstract x: AxisOptions with set
-        abstract y: AxisOptions with set
-        abstract snap: U8<float, float[], FunctionValue<float>, FunctionValue<int>, int, int[], FunctionValue<float[]>, FunctionValue<int[]>> with set
-        abstract modifier: (float -> float) with set
-        // Maps axis value to different property
-        abstract mapTo: string with set
-        /// <summary>
-        /// Specifies a different element than the defined target to trigger the drag animation
-        /// </summary>
-        abstract trigger: obj with set
-        abstract container: U4<string, HTMLElement, Bounds, unit -> Bounds> with set
-        abstract containerPadding: U3<float, Bounds, unit -> Bounds> with set
-        abstract containerFriction: float with set
-        abstract releaseContainerFriction: U2<float, unit -> float> with set
-        abstract releaseMass: float with set
-        abstract releaseStiffness: float with set
-        abstract releaseDamping: float with set
-        abstract velocityMultiplier: U2<float, unit -> float> with set
-        abstract minVelocity: U2<float, unit -> float> with set
-        abstract maxVelocity: U2<float, unit -> float> with set
-        abstract releaseEase: EasingFun with set
-        abstract dragSpeed: U2<float, unit -> float> with set
-        abstract scrollThreshold: U2<float, unit -> float> with set
-        abstract scrollSpeed: U2<float, unit -> float> with set
-        //callbacks
-        abstract onGrab: Callback<Draggable> with set
-        abstract onDrag: Callback<Draggable> with set
-        abstract onUpdate: Callback<Draggable> with set
-        abstract onRelease: Callback<Draggable> with set
-        abstract onSnap: Callback<Draggable> with set
-        abstract onSettle: Callback<Draggable> with set
-        abstract onResize: Callback<Draggable> with set
-        abstract onAfterResize: Callback<Draggable> with set
+    type TimelineOptions = Bindings.Types.TimelineOptions
+    type TimelineOptionsDefaults = Bindings.Types.TimelineOptionsDefaults
+    type Draggable = Bindings.Types.Draggable
+    type DraggableOptions = Bindings.Types.DraggableOptions
     type AxisOptions = interface end
-    type Scope =
-        abstract member add: Scope -> (unit -> unit)
-        abstract member refresh: unit -> Scope
-        abstract member revert: unit -> Scope
-        abstract member data: obj with get,set
-        abstract member defaults: ScopeOptionsDefaults  with get
-        abstract member root: U2<Document, HTMLElement> with get
-        abstract member constructors: (unit -> unit)[] with get
-        abstract member revertConstructors: (unit -> unit)[] with get
-        abstract member revertibles: obj[] with get
-        abstract member methods: obj with get
-        abstract member matches: obj with get
-        abstract member mediaQueryLists: obj with get
-    type ScopeOptions = interface end
+    type Scope = Bindings.Types.Scope
+    type ScopeOptions = Bindings.Types.ScopeOptions
     type EngineDefaults =        
         abstract member playbackEase: EasingFun with get, set
         abstract member playbackRate: float with get, set
@@ -696,25 +331,7 @@ module rec AutoOpenInstanceDefinitions =
         abstract member useDefaultMainLoop: bool with get,set
         abstract member defaults: EngineDefaults with get,set
         
-    type ScopeOptionsDefaults =
-        abstract loop: int with set
-        abstract loopDelay: int with set
-        abstract alternate: bool with set
-        abstract reversed: bool with set
-        abstract autoplay: U2<bool, ScrollObserver> with set
-        abstract frameRate: int with set
-        abstract playbackRate: float with set
-        abstract playbackEase: float with set
-        abstract delay: U2<float, FunctionValue<float>> with set
-        abstract duration: U2<float, FunctionValue<float>> with set
-        abstract ease: EasingFun with set
-        abstract composition: composition with set
-        abstract modifier: FloatModifier with set  
-        abstract onBegin: Callback<unit> with set
-        abstract onUpdate: Callback<unit> with set
-        abstract onRender: Callback<unit> with set
-        abstract onLoop: Callback<unit> with set
-        abstract onComplete: Callback<unit> with set
+    type ScopeOptionsDefaults = Bindings.Types.ScopeOptionsDefaults
     [<AllowNullLiteral; Interface>]
     type MotionPath =
         abstract member translateX : FunctionValue<float> with get, set
@@ -733,13 +350,8 @@ module rec AutoOpenInstanceDefinitions =
         [<Emit("$0($1...)")>]
         abstract member Invoke: unit -> U2<float, ResizeArray<float>>
 
-    [<AllowNullLiteral>]
-    [<Interface>]
-    type Animatable =
-        abstract member targets: obj array with get
-        abstract member animations: obj with get
-        abstract member revert: ChainMethod<Animatable>
-    type AnimatableOptions = interface end
+    type Animatable = Bindings.Types.Animatable
+    type AnimatableOptions = Bindings.Types.AnimatableOptions
     type TimerObjectInjection<'Type> =
         abstract member play: ChainMethod<'Type>
         abstract member reverse: ChainMethod<'Type>
@@ -767,31 +379,11 @@ module rec AutoOpenInstanceDefinitions =
         abstract member completed: bool with get,set
         abstract member reversed: bool with get,set
 
-[<Import("utils", Spec.path); Interface>]
-type Utils =
-    static abstract cleanInlineStyles: 'T -> 'T
-    static abstract random: min: 'a * max: 'b -> float
-    static abstract randomPick: items: 'T seq -> 'T
-    static abstract shuffle: items: 'T seq -> 'T seq
-    static abstract clamp: value: float * min: float * max: float -> float
-    static abstract round: value: float * ?decimalLength: int -> float
-    static abstract wrap: value: float * min: float * max: float -> float
-    static abstract interpolate: start: float * ``end``: float * progress: float -> float
-    static abstract mapRange: value: float * inLow: float * inHigh: float * outLow: float * outHigh: float -> float 
-    static abstract roundPad: value: float * ?decimalLength: int -> string
-    static abstract roundPad: value: string * ?decimalLength: int -> string 
-    static abstract padStart: value: float * totalLength: int * padString: string -> string
-    static abstract padEnd: value: float * totalLength: int * padString: string -> string
-    static abstract degToRad: degrees: float -> float
-    static abstract degToRad: degrees: int -> float
-    static abstract radToDeg: rads: float -> float
-    static abstract radToDeg: rads: int -> float
-
-[<Import("svg", Spec.path); Interface>]
-type Svg =
-    static abstract createDrawable: selector: obj * ?start: float * ?``end``: float -> SVGElementInstanceList
-    static abstract createMotionPath: path: obj -> MotionPath
-    static abstract morphTo: path: obj * ?precision: int -> FunctionValue<_>
+type TextSplitterOptions = Bindings.Types.TextSplitterOptions
+type SplitParameters = Bindings.Types.SplitParameters
+type TextSplitter = Bindings.Types.TextSplitter
+type Utils = Bindings.Types.Utils
+type Svg = Bindings.Types.Svg
 
 type AnimeJs with
     [<Import("createTimer", "animejs")>]
@@ -987,6 +579,22 @@ type TimelineDefaultsBuilder =
     inherit TimerPropertyInjection
     inherit FableObjectBuilder
     inherit TweenPropertyInjection
+
+type TextSplitterBuilder =
+    inherit FableObjectBuilder
+type SplitParameterBuilder =
+    inherit FableObjectBuilder
+[<Erase; Struct>]
+type TextSplitterParameter = TextSplitterParameter of string * obj
+type TextSplitterParameterBuilder(parameter: string) =
+    interface SplitParameterBuilder
+    member inline this.Run(state: FableObject) =
+        parameter ==> createObj state |> TextSplitterParameter
+    member inline this.Run(state: string) =
+        parameter ==> state |> TextSplitterParameter
+    member inline this.Run(state: bool) =
+        parameter ==> state |> TextSplitterParameter
+    
 
 [<AutoOpen; Erase>]
 module AutoOpenComputationImplementations =
@@ -1255,7 +863,13 @@ module AutoOpenComputationImplementations =
         [<CustomOperation "modifier">]
         member inline _.modifierOp(state: FableObject, value: FloatModifier) = "modifier" ==> value |> add state 
         [<CustomOperation "modifier">]
-        member inline _.modifierOp(state: FableObject, value: float -> string) = "modifier" ==> value |> add state 
+        member inline _.modifierOp(state: FableObject, value: float -> string) = "modifier" ==> value |> add state
+        [<CustomOperation "use'">]
+        member inline _.useOp(state: FableObject, value: string) =
+            "use" ==> value |> add state
+        [<CustomOperation "total">]
+        member inline _.totalOp(state: FableObject, value: int) =
+            "total" ==> value |> add state
         member inline this.Run(state: FableObject) = AnimeJs.stagger(this,createObj state)
 
     type EasePropertyInjection with
@@ -1334,7 +948,7 @@ module AutoOpenComputationImplementations =
         member inline _.Yield(value: StyleArray) = [ unbox<string * obj> value ]
         member inline _.Run(state: FableObject) =
             createObj state |> unbox<AnimationOptions>
-    type AnimationOptions with
+    type Bindings.Types.AnimationOptions with
         member inline _.Yield(_: unit) = ()
         member inline _.Yield(value: obj) = Target value
         member inline _.Yield(value: obj list) = targets value
@@ -1815,7 +1429,7 @@ module AutoOpenComputationImplementations =
             !!createObj state
         member inline _.Run(state: ^T when ^T :> StyleAnimatableObj): AnimatableOptions =
             !!createObj state
-    type Animatable with
+    type Bindings.Types.Animatable with
         member inline _.Yield(value: unit): unit = ()
         member inline _.Yield(value: string): StyleNoValue = StyleNoValue value
         member inline _.Yield(value: ICssStyle): StyleNoValue = StyleNoValue !!value
@@ -1936,7 +1550,7 @@ module AutoOpenComputationImplementations =
             this.Combine(value,f())
         
         member inline _.Run(state: FableObject): AnimatableOptions = createObj state |> unbox
-    type AnimatableOptions with
+    type Bindings.Types.AnimatableOptions with
         member inline _.Yield(_: unit) = ()
         member inline _.Yield(value: obj) = Target value
         member inline _.Yield(value: obj list) = targets !!value
@@ -2904,7 +2518,7 @@ module AutoOpenComputationImplementations =
         [<CustomOperation "mapTo">]
         member inline _.MapToOp(_object_builder: FableObject, value: string) = ("mapTo" ==> value) :: _object_builder
         member inline _.Run(_object_builder: FableObject): DraggableOptions = !!createObj !!_object_builder
-    type DraggableOptions with
+    type Bindings.Types.DraggableOptions with
         member inline _.Yield(_: unit) = ()
         member inline _.Yield(value: obj) = Target value
         member inline _.Yield(value: obj seq) = targets !!value
@@ -4002,12 +3616,111 @@ module AutoOpenComputationImplementations =
             "mediaQueries" ==> value |> add state
         member inline _.Run(state: FableObject) = 
             AnimeJs.createScope(createObj state)
-    type Scope with
+    type Bindings.Types.Scope with
         member inline _.Zero() = ()
         [<CustomOperation "refresh">]
         member inline this.refreshOp(_) = this.refresh()
         [<CustomOperation "revert">]
         member inline this.revertOp(_) = this.revert()
+    type TextSplitterBuilder with
+        member inline _.Zero() = []
+        member inline this.Yield(value: TextSplitterParameter): string * obj =
+            unbox value
+        [<CustomOperation "debug">]
+        member inline this.debugOp(state: FableObject) =
+            "debug" ==> true |> add state
+        [<CustomOperation "debug">]
+        member inline this.debugOp(state: FableObject, value: bool) =
+            "debug" ==> value |> add state
+        [<CustomOperation "includeSpaces">]
+        member inline this.includeSpacesOp(state: FableObject) =
+            "includeSpaces" ==> true |> add state
+        
+        [<CustomOperation "includeSpaces">]
+        member inline this.includeSpacesOp(state: FableObject, value: bool) =
+            "includeSpaces" ==> value |> add state
+        [<CustomOperation "accessible">]
+        member inline this.accessibleOp(state: FableObject, value: bool) =
+            "accessible" ==> value |> add state
+        [<CustomOperation "accessible">]
+        member inline this.accessibleOp(state: FableObject) =
+            "accessible" ==> true |> add state
+        member inline this.Run(state: FableObject) =
+            createObj state |> unbox<TextSplitterOptions>
+    type SplitParameterBuilder with
+        member inline _.Yield(value: bool) = value
+        member inline _.Yield(value: string) = value
+        [<CustomOperation "class'">]
+        member inline _.classOp(state: FableObject, value: string) =
+            "class" ==> value |> add state
+        [<CustomOperation "wrap">]
+        member inline _.wrapOp(state: FableObject, value: bool) =
+            "wrap" ==> value |> add state
+        [<CustomOperation "wrap">]
+        member inline _.wrapOp(state: FableObject) =
+            "wrap" ==> true |> add state
+        [<CustomOperation "wrap">]
+        member inline _.wrapOp(state: FableObject, value: string) =
+            "wrap" ==> value |> add state
+        [<CustomOperation>]
+        member inline _.wrapHidden(state: FableObject) =
+            "wrap" ==> "hidden" |> add state
+        [<CustomOperation>]
+        member inline _.wrapClip(state: FableObject) =
+            "wrap" ==> "clip" |> add state
+        [<CustomOperation>]
+        member inline _.wrapVisible(state: FableObject) =
+            "wrap" ==> "visible" |> add state
+        [<CustomOperation>]
+        member inline _.wrapScroll(state: FableObject) =
+            "wrap" ==> "scroll" |> add state
+        [<CustomOperation>]
+        member inline _.wrapAuto(state: FableObject) =
+            "wrap" ==> "auto" |> add state
+        [<CustomOperation "clone">]
+        member inline _.cloneOp(state: FableObject) =
+            "clone" ==> true |> add state
+        [<CustomOperation "clone">]
+        member inline _.cloneOp(state: FableObject, value: bool) =
+            "clone" ==> value |> add state
+        [<CustomOperation "clone">]
+        member inline _.cloneOp(state: FableObject, value: string) =
+            "clone" ==> value |> add state
+        [<CustomOperation>]
+        member inline _.cloneLeft(state: FableObject) =
+            "clone" ==> "left" |> add state
+        [<CustomOperation>]
+        member inline _.cloneRight(state: FableObject) =
+            "clone" ==> "right" |> add state
+        [<CustomOperation>]
+        member inline _.cloneTop(state: FableObject) =
+            "clone" ==> "top" |> add state
+        [<CustomOperation>]
+        member inline _.cloneBottom(state: FableObject) =
+            "clone" ==> "bottom" |> add state
+        [<CustomOperation>]
+        member inline _.cloneCenter(state: FableObject) =
+            "clone" ==> "center" |> add state
+        [<CustomOperation "clone">]
+        member inline _.cloneOp(state: FableObject, value: cloneText) =
+            "clone" ==> value |> add state
+        member inline _.Yield(value: cloneText): string * obj =
+            "clone" ==> value
+        [<CustomOperation "wrap">]
+        member inline _.wrapOp(state: FableObject, value: wrapText) =
+            "wrap" ==> value |> add state
+        member inline _.Yield(value: wrapText): string * obj =
+            "wrap" ==> value
+    type Bindings.Types.TextSplitterOptions with
+        member inline _.Yield(_: unit) = ()
+        member inline _.Yield(value: obj) = Target value
+        member inline _.Yield(value: obj seq) = targets !!value
+        member inline _.Combine(y) = fun () -> y
+        member inline _.Delay(value) = value()
+        member inline this.Run(state: Target<_>) =
+            Text.split(state, this)
+        member inline this.Run(state: Targets) =
+            Text.split(state, this)
 
 type style = CssStyle
 let animate: AnimationBuilder = unbox ()
@@ -4029,9 +3742,14 @@ let tween: StyleArray = StyleArray()
 let keyframes = StyleArrayBuilder "keyframes"
 type Timeline with
     static member defaults: TimelineDefaultsBuilder = unbox ()
-type Scope with
+type Bindings.Types.Scope with
     static member defaults: ScopeDefaultOptionsBuilder = unbox ()
 let scope: ScopeBuilder = unbox ()
+let splitText: TextSplitterBuilder = unbox ()
+let lines = TextSplitterParameterBuilder("lines")
+let words = TextSplitterParameterBuilder("words")
+let chars = TextSplitterParameterBuilder("chars")
+
 module Operators =
     let inline (!<<+=) value: RelativeTimePosition = unbox $"<<+={value}"
     let inline (!<<-=) value: RelativeTimePosition = unbox $"<<-={value}"
