@@ -13,7 +13,7 @@ open Partas.AnimeJs.Bindings
 [<Erase>]
 module Spec =
     let [<Literal; Erase>] path = "animejs"
-    let [<Literal; Erase>] version = "4.0.2"
+    let [<Literal; Erase>] version = "4.2.0"
 
 [<AutoOpen; Erase>]
 module Types =
@@ -177,48 +177,86 @@ module Types =
     
 [<Import("eases", Spec.path); Interface>]
 type Eases =
+    [<Import("eases.linear", Spec.path)>]
+    static abstract linearBuiltIn: EasingFun
+    [<ImportMember(Spec.path)>] // since 4.2.0 import is required unless parameterless
     static abstract linear: ?x1: float * ?m1: string * ?x2: float -> EasingFun
+    [<ImportMember(Spec.path)>] // since 4.2.0 import is required
     static abstract irregular: ?length: float * ?randomness: float -> EasingFun
+    [<ImportMember(Spec.path)>] // since 4.2.0 import is required
     static abstract steps: ?steps: float * ?fromStart: bool -> EasingFun
+    [<ImportMember(Spec.path)>] // Since 4.2.0 import is required
     static abstract cubicBezier: ?mX1: float * ?mY1: float * ?mX2: float * ?mY2: float -> EasingFun
     static abstract ``in``: ?power: float -> EasingFun
     static abstract out: ?power: float -> EasingFun
     static abstract inOut: ?power: float -> EasingFun
+    static abstract outIn: ?power: float -> EasingFun
     static abstract inQuad: EasingFun
     static abstract outQuad: EasingFun
     static abstract inOutQuad: EasingFun
+    static abstract outInQuad: EasingFun
     static abstract inCubic: EasingFun
     static abstract outCubic: EasingFun
     static abstract inOutCubic: EasingFun
+    static abstract outInCubic: EasingFun
     static abstract inQuart: EasingFun
     static abstract outQuart: EasingFun
     static abstract inOutQuart: EasingFun
+    static abstract outInQuart: EasingFun
     static abstract inQuint: EasingFun
     static abstract outQuint: EasingFun
     static abstract inOutQuint: EasingFun
+    static abstract outInQuint: EasingFun
     static abstract inSine: EasingFun
     static abstract outSine: EasingFun
     static abstract inOutSine: EasingFun
+    static abstract outInSine: EasingFun
     static abstract inCirc: EasingFun
     static abstract outCirc: EasingFun
     static abstract inOutCirc: EasingFun
+    static abstract outInCirc: EasingFun
     static abstract inExpo: EasingFun
     static abstract outExpo: EasingFun
     static abstract inOutExpo: EasingFun
+    static abstract outInExpo: EasingFun
     static abstract inBounce: EasingFun
     static abstract outBounce: EasingFun
     static abstract inOutBounce: EasingFun
+    static abstract outInBounce: EasingFun
     static abstract inBack: ?overshoot: float -> EasingFun
     static abstract outBack: ?overshoot: float -> EasingFun
     static abstract inOutBack: ?overshoot: float -> EasingFun
+    static abstract outInBack: ?overshoot: float -> EasingFun
     static abstract inElastic: ?amplitude: float * ?period: float -> EasingFun
     static abstract outElastic: ?amplitude: float * ?period: float -> EasingFun
     static abstract inOutElastic: ?amplitude: float * ?period: float -> EasingFun
-    [<Import("createSpring", Spec.path); ParamObject>] static member
+    static abstract outInElastic: ?amplitude: float * ?period: float -> EasingFun
+    [<Import("spring", Spec.path); ParamObject; Obsolete("use Eases.spring")>] static member
         createSpring(?mass:float,?stiffness:float,?damping:float,?velocity:float): EasingFun = jsNative
-    [<Import("createSpring", Spec.path)>] static member
+    [<Import("spring", Spec.path); Obsolete("use Eases.spring")>] static member
         createSpring(options: obj): EasingFun = jsNative
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="bounce">Range between -1 to 1; default is 0.5</param>
+    /// <param name="duration">range 10 - 10_000; default is 628</param>
+    /// <param name="onComplete">Only works on js version of animate</param>
+    [<ImportMember(Spec.path); ParamObject>]
+    static member
+        spring(?bounce: float, ?duration: int, ?onComplete: Callback<unit>): EasingFun = jsNative
+    [<ImportMember(Spec.path)>]
+    static member springUnsafe(options: obj): EasingFun = jsNative
+    [<Import("spring", Spec.path); ParamObject>]
+    static member springPhysics(?mass:float,?stiffness:float,?damping:float,?velocity:float): EasingFun = jsNative
+[<Erase>]
+module Eases =
+    [<Erase; RequireQualifiedAccess>]
+    type spring =
+        static member inline default' = Eases.spring()
+        static member inline snappy = Eases.spring(0.15,300)
+        static member inline bouncy = Eases.spring(0.4,500)
+        static member inline strong = Eases.spring(0.65, 400)
+        
 [<AutoOpen; Erase>]
 module rec AutoOpenInstanceDefinitions =
     [<AllowNullLiteral; Interface>]

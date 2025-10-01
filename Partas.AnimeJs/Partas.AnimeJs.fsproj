@@ -3,6 +3,8 @@
     <PropertyGroup>
         <FablePackageType>library</FablePackageType>
         <TargetFramework>net9.0</TargetFramework>
+        <IsTrimmable>false</IsTrimmable>
+        <IsAotCompatible>false</IsAotCompatible>
         <PackageId>Partas.AnimeJs</PackageId>
         <Title>Partas.AnimeJs</Title>
         <RootNamespace>Partas.AnimeJs</RootNamespace>
@@ -15,9 +17,9 @@
         <PackageTags>Partas;F#;FSharp;Fable;fable-javascript;Web;animejs;animation;ce</PackageTags>
         <Authors>Shayan Habibi</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>0.0.5</Version>
-        <PackageVersion>0.0.5</PackageVersion>
-        <PackageReleaseNotes>AnimeJs 4.1.3</PackageReleaseNotes>
+        <Version>0.0.6</Version>
+        <PackageVersion>0.0.6</PackageVersion>
+        <PackageReleaseNotes>FIX - use fable SDK - prevent trimming</PackageReleaseNotes>
         <NpmDependencies>
             <NpmPackage Name="animejs" Version=">= 4.1.3" />
         </NpmDependencies>
@@ -34,6 +36,10 @@
       <PackageReference Include="Fable.Browser.ResizeObserver" Version="1.0.0" />
       <PackageReference Include="Fable.Browser.Svg" Version="2.4.0" />
       <PackageReference Include="Fable.Core" Version="4.5.0" />
+        <PackageReference Include="Fable.Package.SDK" Version="1.3.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

@@ -335,12 +335,12 @@ module rec Types =
         /// Maps a number from one range to another or creates a mapping function
         /// with predefined ranges parameters
         static abstract mapRange: fromLow: float * fromHigh: float * toLow: float * toHigh: float -> (float -> float)
-        /// Interpolates a value between two numbers based on a given progress or creates an interpolation
-        /// function with predefined start and end parameters
-        static abstract interpolate: start: float * ``end``: float * progress: float -> float
-        /// Interpolates a value between two numbers based on a given progress or creates an interpolation
-        /// function with predefined start and end parameters
-        static abstract interpolate: start: float * ``end``: float -> (float -> float)
+        // /// Interpolates a value between two numbers based on a given progress or creates an interpolation
+        // /// function with predefined start and end parameters
+        // static abstract interpolate: start: float * ``end``: float * progress: float -> float
+        // /// Interpolates a value between two numbers based on a given progress or creates an interpolation
+        // /// function with predefined start and end parameters
+        // static abstract interpolate: start: float * ``end``: float -> (float -> float)
         /// Rounds a value to a specified decimal length, pads with zeros if needed, and returns
         /// the result as a string, or creates a rounding and padding function with a predefined
         /// decimal length parameter
@@ -1133,9 +1133,11 @@ type Exports =
     static member createAnimatable (targets: obj, parameters: AnimatableOptions) : Animatable = nativeOnly
     [<Import("createDraggable", "animejs")>]
     static member createDraggable (target: obj, ?parameters: DraggableOptions) : Draggable = nativeOnly
-    [<Import("createSpring", "animejs"); ParamObject>]
+    [<Import("scope", "animejs"); ParamObject>]
     static member createSpring (?mass: float, ?stiffness: float, ?damping: float, ?velocity: float) : EasingFun = nativeOnly
-    [<Import("createScope", "animejs")>]
+    [<Import("scope", "animejs"); ParamObject>]
     static member createScope (?``params``: ScopeOptions) : Scope = nativeOnly
+    [<ImportMember("animejs"); ParamObject>]
+    static member scope(?bounce: float, ?duration: int, ?onCallback: Callback<unit>): EasingFun = nativeOnly
     [<Import("onScroll", "animejs")>]
     static member inline onScroll (options: ScrollObserverOptions): ScrollObserver = jsNative 
