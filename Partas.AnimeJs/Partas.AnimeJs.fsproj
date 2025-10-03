@@ -17,8 +17,8 @@
         <PackageTags>Partas;F#;FSharp;Fable;fable-javascript;Web;animejs;animation;ce</PackageTags>
         <Authors>Shayan Habibi</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>0.0.7</Version>
-        <PackageVersion>0.0.7</PackageVersion>
+        <Version>0.0.8</Version>
+        <PackageVersion>0.0.8</PackageVersion>
         <PackageReleaseNotes>4.2.0</PackageReleaseNotes>
         <NpmDependencies>
             <NpmPackage Name="animejs" Version=">= 4.2.0" />

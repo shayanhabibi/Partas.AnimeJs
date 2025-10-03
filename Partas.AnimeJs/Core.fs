@@ -304,9 +304,9 @@ module rec AutoOpenInstanceDefinitions =
     type ScrollObserver = Bindings.Types.ScrollObserver
     type ScrollObserverOptions = Bindings.Types.ScrollObserverOptions
     type Timer = Bindings.Types.Timer
-    type Animation =
-        inherit TimerObjectInjection<Animation>
-        abstract member targets: Targets with get
+    type Animation = Bindings.Types.Animation
+        // inherit TimerObjectInjection<Animation>
+        // abstract member targets: Targets with get
     type AnimationOptions = Bindings.Types.AnimationOptions
     type Timeline =
         inherit TimerObjectInjection<Timeline>
