@@ -579,6 +579,11 @@ type StyleWithValueDuration = StyleWithValueDuration of prop: string * value: ob
 type StyleWithValueEase = StyleWithValueEase of prop: string * value: obj * ease: EasingFun
 [<Erase>]
 type StyleWithValueDurationEase = StyleWithValueDurationEase of prop: string * value: obj * duration: float * ease: EasingFun
+[<Erase>]
+type SpringPhysicsAttribute = SpringPhysicsAttribute of prop: string * value: obj
+[<Erase>]
+type SpringPerceivedAttribute = SpringPerceivedAttribute of prop: string * value: obj
+[<Erase>]
 type CursorBuilder = interface end
 type AxisBuilder =
     inherit FableObjectBuilder
@@ -937,15 +942,47 @@ module AutoOpenComputationImplementations =
     
     type SpringBuilder with
         [<CustomOperation "mass">]
-        member inline _.MassOp(_object_builder, _property_value: float) = _object_builder @ [("mass" ==> _property_value)]
+        member inline _.MassOp(_object_builder, _property_value: float) : SpringPhysicsAttribute list= unbox (_object_builder @ [("mass" ==> _property_value)])
         [<CustomOperation "stiffness">]
-        member inline _.StiffnessOp(_object_builder, _property_value: float) = _object_builder @ [("stiffness" ==> _property_value)]
+        member inline _.StiffnessOp(_object_builder, _property_value: float) : SpringPhysicsAttribute list = unbox(_object_builder @ [("stiffness" ==> _property_value)])
         [<CustomOperation "damping">]
-        member inline _.DampingOp(_object_builder, _property_value: float) = _object_builder @ [("damping" ==> _property_value)]
+        member inline _.DampingOp(_object_builder, _property_value: float): SpringPhysicsAttribute list = unbox(_object_builder @ [("damping" ==> _property_value)])
         [<CustomOperation "velocity">]
-        member inline _.VelocityOp(_object_builder, _property_value: float) = _object_builder @ [("velocity" ==> _property_value)]
+        member inline _.VelocityOp(_object_builder, _property_value: float): SpringPhysicsAttribute list = unbox (_object_builder @ [("velocity" ==> _property_value)])
+        [<CustomOperation "mass">]
+        member inline _.MassOp(_object_builder: SpringPhysicsAttribute list, _property_value: float): SpringPhysicsAttribute list = _object_builder @ unbox [("mass" ==> _property_value)]
+        [<CustomOperation "stiffness">]
+        member inline _.StiffnessOp(_object_builder: SpringPhysicsAttribute list, _property_value: float): SpringPhysicsAttribute list = _object_builder @ unbox [("stiffness" ==> _property_value)]
+        [<CustomOperation "damping">]
+        member inline _.DampingOp(_object_builder: SpringPhysicsAttribute list, _property_value: float): SpringPhysicsAttribute list = _object_builder @ unbox [("damping" ==> _property_value)]
+        [<CustomOperation "velocity">]
+        member inline _.VelocityOp(_object_builder: SpringPhysicsAttribute list, _property_value: float): SpringPhysicsAttribute list = _object_builder @ unbox [("velocity" ==> _property_value)]
+        [<CustomOperation "bounce">]
+        member inline _.BounceOp(_object_builder: FableObject, _property_value: float): SpringPerceivedAttribute list = unbox(_object_builder @ [ ("bounce" ==> _property_value) ])
+        [<CustomOperation "bounce">]
+        member inline _.BounceOp(_object_builder: SpringPerceivedAttribute list, _property_value: float): SpringPerceivedAttribute list = unbox(_object_builder @ unbox [ ("bounce" ==> _property_value) ])
+        [<Obsolete("Cannot use the perceived attributes and the physics based attributes together", true)>]
+        member inline _.Combine(l: SpringPhysicsAttribute list, r: SpringPerceivedAttribute list): FableObject = unbox l @ unbox r
+        [<Obsolete("Cannot use the perceived attributes and the physics based attributes together", true)>]
+        member inline _.Combine(l: SpringPerceivedAttribute list, r: SpringPhysicsAttribute list): FableObject = unbox l @ unbox r
+        member inline _.Combine(l: SpringPerceivedAttribute list, r: SpringPerceivedAttribute list): SpringPerceivedAttribute = unbox(l @ r)
+        member inline _.Combine(l: SpringPhysicsAttribute list, r: SpringPhysicsAttribute list): SpringPhysicsAttribute = unbox(l @ r)
+        member inline _.Yield(value: SpringPhysicsAttribute) = [ value ]
+        member inline _.Yield(value: SpringPerceivedAttribute) = [ value ]
+        member inline _.For(state: SpringPerceivedAttribute list, [<InlineIfLambda>] fn: SpringPerceivedAttribute -> SpringPerceivedAttribute list) =
+            state |> List.collect fn
+        member inline _.For(state: SpringPhysicsAttribute list, [<InlineIfLambda>] fn: SpringPhysicsAttribute -> SpringPhysicsAttribute list) =
+            state |> List.collect fn
+        member inline _.For(state: SpringPerceivedAttribute list, [<InlineIfLambda>] fn: unit -> SpringPerceivedAttribute list) =
+            state @ fn()
+        member inline _.For(state: SpringPhysicsAttribute list, [<InlineIfLambda>] fn: unit -> SpringPhysicsAttribute list) =
+            state @ fn()
         member inline _.Run(_object_builder_run: FableObject): EasingFun =
-            Eases.createSpring(_object_builder_run |> createObj)
+            Eases.springUnsafe(_object_builder_run |> createObj)
+        member inline _.Run(_object_builder_run: SpringPhysicsAttribute list): EasingFun =
+            Eases.springUnsafe(unbox _object_builder_run |> createObj)
+        member inline _.Run(_object_builder_run: SpringPerceivedAttribute list): EasingFun =
+            Eases.springUnsafe(unbox _object_builder_run |> createObj)
     
     type KeyframePercentValue with
         member inline _.Yield(_: unit): FableObject = []

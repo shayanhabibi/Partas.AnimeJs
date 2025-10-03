@@ -186,45 +186,64 @@ module Enums =
 
 [<Import("eases", Spec.path); Interface>]
 type Eases =
+    [<ImportMember(Spec.path)>]
     static abstract linear: ?x1: float * ?m1: string * ?x2: float -> EasingFun
+    [<ImportMember(Spec.path)>]
     static abstract irregular: ?length: float * ?randomness: float -> EasingFun
+    [<ImportMember(Spec.path)>]
     static abstract steps: ?steps: float * ?fromStart: bool -> EasingFun
+    [<ImportMember(Spec.path)>]
     static abstract cubicBezier: ?mX1: float * ?mY1: float * ?mX2: float * ?mY2: float -> EasingFun
     static abstract ``in``: ?power: float -> EasingFun
     static abstract out: ?power: float -> EasingFun
     static abstract inOut: ?power: float -> EasingFun
+    static abstract outIn: ?power: float -> EasingFun
     static abstract inQuad: EasingFun
     static abstract outQuad: EasingFun
     static abstract inOutQuad: EasingFun
+    static abstract outInQuad: EasingFun
     static abstract inCubic: EasingFun
     static abstract outCubic: EasingFun
     static abstract inOutCubic: EasingFun
+    static abstract outInCubic: EasingFun
     static abstract inQuart: EasingFun
     static abstract outQuart: EasingFun
     static abstract inOutQuart: EasingFun
+    static abstract outInQuart: EasingFun
     static abstract inQuint: EasingFun
     static abstract outQuint: EasingFun
     static abstract inOutQuint: EasingFun
+    static abstract outInQuint: EasingFun
     static abstract inSine: EasingFun
     static abstract outSine: EasingFun
     static abstract inOutSine: EasingFun
+    static abstract outInSine: EasingFun
     static abstract inCirc: EasingFun
     static abstract outCirc: EasingFun
     static abstract inOutCirc: EasingFun
+    static abstract outInCirc: EasingFun
     static abstract inExpo: EasingFun
     static abstract outExpo: EasingFun
     static abstract inOutExpo: EasingFun
+    static abstract outInExpo: EasingFun
     static abstract inBounce: EasingFun
     static abstract outBounce: EasingFun
     static abstract inOutBounce: EasingFun
+    static abstract outInBounce: EasingFun
     static abstract inBack: ?overshoot: float -> EasingFun
     static abstract outBack: ?overshoot: float -> EasingFun
     static abstract inOutBack: ?overshoot: float -> EasingFun
+    static abstract outInBack: ?overshoot: float -> EasingFun
     static abstract inElastic: ?amplitude: float * ?period: float -> EasingFun
     static abstract outElastic: ?amplitude: float * ?period: float -> EasingFun
     static abstract inOutElastic: ?amplitude: float * ?period: float -> EasingFun
-    [<Import("createSpring", Spec.path); ParamObject>] static member
+    static abstract outInElastic: ?amplitude: float * ?period: float -> EasingFun
+    [<Import("spring", Spec.path); ParamObject>] static member
         createSpring(?mass:float,?stiffness:float,?damping:float,?velocity:float): EasingFun = jsNative
+    [<Import("spring", Spec.path); ParamObject>] static member
+        spring(?bounce: float, ?duration: float, ?onComplete: unit -> unit): EasingFun = jsNative
+    [<Import("spring", Spec.path); ParamObject>] static member
+        unsafeSpring(obj: obj): EasingFun = jsNative
 
 [<AutoOpen>]
 module rec Types =
