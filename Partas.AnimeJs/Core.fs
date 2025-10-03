@@ -436,8 +436,10 @@ type AnimeJs with
     static member createAnimatable (targets: Targets, parameters: obj) : Animatable = nativeOnly
     [<Import("createDraggable", "animejs")>]
     static member createDraggable (target: Targets, ?parameters: obj) : Draggable = nativeOnly
-    [<Import("createSpring", "animejs"); ParamObject>]
+    [<Import("spring", "animejs"); ParamObject>]
     static member createSpring (?mass: float, ?stiffness: float, ?damping: float, ?velocity: float) : EasingFun = nativeOnly
+    [<Import("spring", "animejs"); ParamObject>]
+    static member spring (?bounce: float, ?duration: float, ?onComplete: unit -> unit) : EasingFun = nativeOnly
     [<Import("createScope", "animejs")>]
     static member createScope (?``params``: obj) : Scope = nativeOnly
     [<Import("onScroll", "animejs")>]
