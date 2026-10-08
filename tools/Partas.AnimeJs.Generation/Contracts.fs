@@ -59,4 +59,6 @@ type DslModel = {
     TypeDefinitions: Map<string, DslType>
     CssProperties: CssProperty list
     CssFields: FieldSpec list
+    Transforms: string list
+    ValueFields: Map<string, FieldSpec list>
 }

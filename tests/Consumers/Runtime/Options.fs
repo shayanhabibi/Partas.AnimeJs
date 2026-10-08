@@ -1,6 +1,7 @@
 module RuntimeConsumer
 
 open Partas.AnimeJs
+open Fable.Core.JsInterop
 
 type AnimationContext = private AnimationContext of unit
 type TimerContext = private TimerContext of unit
@@ -26,3 +27,18 @@ let evaluationOrder =
             duration value
     } |> Options.toObject
 let executionTrace = trace.ToArray()
+let nestedSpec = animation {
+    Field.create<AnimationContext> "tween" (createObj ["values", box [|0.; 50.; 100.|]])
+}
+let nestedFirst = Options.toObject nestedSpec
+let nestedSecond = Options.toObject nestedSpec
+type ReferenceHandle() =
+    member val Value = 0. with get, set
+let referenceHandle = ReferenceHandle()
+let referenceCallback (_: obj) = ()
+let referenceCallbackValue = box referenceCallback
+let retainedReferences =
+    animation {
+        Field.create<AnimationContext> "handle" (box referenceHandle)
+        Field.create<AnimationContext> "callback" referenceCallbackValue
+    } |> Options.toObject

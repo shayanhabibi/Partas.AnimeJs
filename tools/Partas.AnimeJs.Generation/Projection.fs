@@ -142,4 +142,6 @@ module Projection =
                 Fields = List.ofSeq selected; Factories = List.ofSeq factories; Diagnostics = []
                 ExcludedFields = List.ofSeq excluded |> List.distinct |> List.sort
                 TweenType = if Map.containsKey "TweenOptions" aliases then Some(Named "TweenOptions") else None
-                ReservedKeys = List.ofSeq reserved |> List.distinct |> List.sort; TypeDefinitions = definitions; CssProperties = []; CssFields = [] }
+                ReservedKeys = List.ofSeq reserved |> List.distinct |> List.sort; TypeDefinitions = definitions; CssProperties = []; CssFields = []
+                Transforms = policy.Transforms
+                ValueFields = if Map.containsKey "TweenKeyValue" interfaces then Map.ofList [ "TweenKeyValue", fields "Tween" Set.empty Map.empty (FsNamed "TweenKeyValue") |> deduplicate "Tween" ] else Map.empty }

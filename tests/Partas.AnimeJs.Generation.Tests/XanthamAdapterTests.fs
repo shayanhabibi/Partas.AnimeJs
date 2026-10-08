@@ -17,6 +17,8 @@ let request () =
 
 let run workingDirectory executable arguments =
     let info = ProcessStartInfo(executable, RedirectStandardOutput = true, RedirectStandardError = true, WorkingDirectory = workingDirectory)
+    info.StandardOutputEncoding <- System.Text.Encoding.UTF8
+    info.StandardErrorEncoding <- System.Text.Encoding.UTF8
     for argument in arguments do info.ArgumentList.Add argument
     use child = Process.Start info
     let stdout = child.StandardOutput.ReadToEndAsync()

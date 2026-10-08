@@ -8,3 +8,5 @@ riderModule.iml
 .superpowers/
 node_modules/
 tests/Consumers/**/output/
+tests/Consumers/**/input/
+tests/Consumers/Animation/Animation.fsproj

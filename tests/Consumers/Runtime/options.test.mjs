@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { duplicate, absent, explicitNull, first, second, empty, fromSequence, fromOptions, loops, ordered, executionTrace } from './output/Options.fs.js';
+import { duplicate, absent, explicitNull, first, second, empty, fromSequence, fromOptions, loops, ordered, executionTrace, nestedFirst, nestedSecond, referenceHandle, referenceCallbackValue, retainedReferences } from './output/Options.fs.js';
 
 test('last field wins', () => assert.equal(duplicate.duration, 200));
 test('absence differs from null', () => {
@@ -22,4 +22,12 @@ test('zero, sequences, options, and loops preserve accumulation', () => {
 test('arrays and evaluation remain in source order', () => {
   assert.deepEqual(ordered.keyframes, [0, 50, 100]);
   assert.deepEqual(executionTrace, [0, 50, 100]);
+});
+test('reusable nested specifications do not share mutable objects or arrays', () => {
+  nestedFirst.tween.values[0] = 999;
+  assert.deepEqual(nestedSecond.tween.values, [0, 50, 100]);
+});
+test('materialization preserves callback and class instance identities', () => {
+  assert.equal(retainedReferences.handle, referenceHandle);
+  assert.equal(retainedReferences.callback, referenceCallbackValue);
 });
