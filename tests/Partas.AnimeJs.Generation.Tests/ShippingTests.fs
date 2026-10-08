@@ -15,7 +15,7 @@ let ``actual shipped library compiles the documented example and runs AnimeJs`` 
 [<Test>]
 let ``Nacara publishes tested guide migration and API reference`` () =
     let root = AnimeJs.Build.Paths.findRoot __SOURCE_DIRECTORY__
-    let code, output = XanthamAdapterTests.run root "dotnet" ["run"; "--project"; "Build.fsproj"; "--"; "docs"]
+    let code, output = XanthamAdapterTests.run root "dotnet" [Path.Combine(System.AppContext.BaseDirectory, "Build.dll"); "docs"]
     Assert.That(code, Is.Zero, output)
     let site = Path.Combine(root, "site/output")
     Assert.That(File.Exists(Path.Combine(site, "getting-started/index.html")), Is.True)

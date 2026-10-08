@@ -27,6 +27,7 @@
     </PropertyGroup>
     <ItemGroup>
         <None Include="package.json" />
+        <None Include="Generated/Generated.props" Pack="true" PackagePath="fable/Generated/Generated.props" />
     </ItemGroup>
 
     <ItemGroup>
@@ -40,4 +41,10 @@
     </ItemGroup>
 
     <Import Project="Generated/Generated.props" />
+    <Target Name="UseGeneratedFablePackageProject" AfterTargets="CreateFablePackageFiles">
+      <ItemGroup>
+        <_PackageFiles Remove="$(MSBuildProjectFullPath)" />
+        <_PackageFiles Include="Generated/Package.fsproj" Pack="true" PackagePath="fable/Partas.AnimeJs.fsproj" BuildAction="None" />
+      </ItemGroup>
+    </Target>
 </Project>

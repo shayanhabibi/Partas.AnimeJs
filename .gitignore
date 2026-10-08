@@ -14,3 +14,4 @@ site/output/
 site/.nacara/
 test-results/
 playwright-report/
+artifacts/

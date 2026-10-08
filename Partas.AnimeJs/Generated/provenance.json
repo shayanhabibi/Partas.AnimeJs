@@ -116,13 +116,14 @@
     "tools/Partas.AnimeJs.Generation/Emit.fs": "9b3342678dcee8df5a38c179d2b5fa074bf21c63eea9bd98f3854631b6e117a1",
     "tools/Partas.AnimeJs.Generation/Findings.fs": "06f0386acfab325ef1c8ea032c5d91d3d37902cd2f085b88633029e8af766400",
     "tools/Partas.AnimeJs.Generation/Library.fs": "2e9f19922c5980752ca8b71a7bb2e8673738f896c2a186ad4c80a8b7c8a6bf18",
-    "tools/Partas.AnimeJs.Generation/Pipeline.fs": "1712d90e6fd6e8f9fcab503f0492f8f4162426d9e2cad9881752be545d87f9fc",
+    "tools/Partas.AnimeJs.Generation/Pipeline.fs": "2954fe613c98bf98bbd14a39dc2eea51850f50873152146cdb20e2edfc2df2f5",
     "tools/Partas.AnimeJs.Generation/Projection.fs": "29939279db743720763a1e3eecbf7460394175b962963d294f34e840b577b99a",
     "tools/Partas.AnimeJs.Generation/XanthamAdapter.fs": "812c7acd1f04e8f504bdbb00efbf986d96fd5a5dff5dafbb3994cecd06b01b73"
   },
   "ArtifactHashes": {
     "Dsl.fs": "f590e4b5cb0e1a99d1d8d083f389d28cae00f9ac12edce2cdbd2c7fedbc142c7",
-    "Generated.props": "efc32adbe4dd4e1fef68d5536abfbd5abc452e8bbe97e40946526bb5f810d92d",
+    "Generated.props": "99bb56d88628b12f10c1fc4f960ce85b1e34e7d8a9264abc33df4082633cdb16",
+    "Package.fsproj": "99bb56d88628b12f10c1fc4f960ce85b1e34e7d8a9264abc33df4082633cdb16",
     "Raw/CompilerLibAliases.fs": "c6bf415e9d33e2b9dbb17ab62c77050daff342da55ea4a65258246cfa2668eb7",
     "Raw/Partas.AnimeJs.Raw.fs": "721e7eecc35aa72118b5afee25fc90a9193a2851bd527ccc375b1f06034ec27a",
     "Raw/manifest.json": "98a39c90bc7f486883a92265d4245ad9d79ec01ef7677bad026ad5ed76bfec90",
@@ -521,5 +522,5 @@
     }
   ],
   "ExcludedFields": [],
-  "CompilationDigest": "6c8d3751ffb72d3d71786ce7d425c2a10c03446f0ce773f9b88532eb4c504711"
+  "CompilationDigest": "1b0fe27e12acab0c992dc5630d3e0fc2f15d21547348d2fed4079e19e3ac0921"
 }

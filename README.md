@@ -32,6 +32,10 @@ All repository commands use the compiled Partas.Build CLI:
 dotnet run --project Build.fsproj -- restore
 dotnet run --project Build.fsproj -- generate
 dotnet run --project Build.fsproj -- generate --check
+dotnet run --project Build.fsproj -- build
+dotnet run --project Build.fsproj -- test
+dotnet run --project Build.fsproj -- verify
+dotnet run --project Build.fsproj -- pack
 dotnet run --project Build.fsproj -- docs
 dotnet run --project Build.fsproj -- docs --watch
 ```
@@ -48,3 +52,8 @@ JavaScript, shared type identities, rejected invalid consumers, immutable option
 construction, deterministic generation and failed-promotion preservation.
 
 Package publication and site deployment are separate from local verification.
+
+Use Node 26.7.0 and run `npx playwright install --with-deps chromium` after restore.
+`verify` includes .NET/Fable positive and negative consumers, Node runtime witnesses,
+Chromium DOM/SVG/drag/scroll tests, an isolated installed NuGet consumer, and Nacara
+internal-link validation. `pack` verifies before writing `artifacts/packages`.

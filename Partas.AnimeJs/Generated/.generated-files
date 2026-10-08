@@ -1,5 +1,6 @@
 Dsl.fs
 Generated.props
+Package.fsproj
 Raw/CompilerLibAliases.fs
 Raw/Partas.AnimeJs.Raw.fs
 Raw/manifest.json

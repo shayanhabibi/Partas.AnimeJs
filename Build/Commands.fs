@@ -58,6 +58,7 @@ module Commands =
                         "run"
                     "--project"
                     "site.fsproj"
+                    if not watch then "-p:OutputPath=.superpowers/documentation-bin/"
                     "--"
                     if watch then "watch" else "build"
                 ])
@@ -79,5 +80,46 @@ module Commands =
         command "docs" {
             description "Compile documented examples and build or watch the Nacara site"
             documentation root
+        }
+        command "build" {
+            description "Build the complete repository"
+            stage "build solution" {
+                run (cmd $"dotnet" |> Cmd.args ["build"; "Partas.AnimeJs.slnx"; "-p:OutputPath=.superpowers/build-bin/"])
+            }
+        }
+        command "test" {
+            description "Run generation, consumer, negative, runtime and package tests"
+            stage "acceptance tests" {
+                run (cmd $"dotnet" |> Cmd.args ["test"; "tests/Partas.AnimeJs.Generation.Tests/Partas.AnimeJs.Generation.Tests.fsproj"; "-p:OutputPath=.superpowers/verification-bin/"])
+                run (cmd $"dotnet" |> Cmd.args ["test"; "Partas.AnimeJs.Tests/Partas.AnimeJs.Tests.fsproj"])
+            }
+        }
+        command "verify" {
+            description "Check generation, all acceptance tests, browser behavior and documentation"
+            pipeline "verify repository" {
+                stage "read-only generation check" {
+                    run (cmd $"dotnet" |> Cmd.args [Path.Combine(AppContext.BaseDirectory, "Build.dll"); "generate"; "--check"])
+                }
+                stage "complete build" {
+                    run (cmd $"dotnet" |> Cmd.args [Path.Combine(AppContext.BaseDirectory, "Build.dll"); "build"])
+                }
+                stage "complete acceptance suite" {
+                    run (cmd $"dotnet" |> Cmd.args [Path.Combine(AppContext.BaseDirectory, "Build.dll"); "test"])
+                }
+                stage "browser and documentation" {
+                    run (cmd $"dotnet" |> Cmd.args [Path.Combine(AppContext.BaseDirectory, "Build.dll"); "docs"])
+                }
+            }
+        }
+        command "pack" {
+            description "Verify the repository and create a local NuGet package"
+            pipeline "pack verified library" {
+                stage "validate" {
+                    run (cmd $"dotnet" |> Cmd.args [Path.Combine(AppContext.BaseDirectory, "Build.dll"); "verify"])
+                }
+                stage "local package" {
+                    run (cmd $"dotnet" |> Cmd.args ["pack"; "Partas.AnimeJs/Partas.AnimeJs.fsproj"; "-c"; "Release"; "-o"; "artifacts/packages"])
+                }
+            }
         }
     }

@@ -80,9 +80,12 @@ module Pipeline =
                     | Ok findings, Ok dsl ->
                         let rawArtifacts = raw.Artifacts |> List.map (fun artifact -> { artifact with RelativePath = "Raw/" + artifact.RelativePath })
                         let sources = rawArtifacts @ dsl
-                        let rawIncludes = rawArtifacts |> List.filter (fun artifact -> artifact.RelativePath.EndsWith(".fs")) |> List.map (fun artifact -> $"    <Compile Include=\"$(MSBuildThisFileDirectory){artifact.RelativePath}\" />")
-                        let props = { RelativePath = "Generated.props"; Content = String.concat "\n" (["<Project>"; "  <ItemGroup>"] @ rawIncludes @ ["    <Compile Include=\"$(MSBuildThisFileDirectory)../Dsl/Runtime.fs\" />"; "    <Compile Include=\"$(MSBuildThisFileDirectory)Dsl.fs\" />"; "    <Compile Include=\"$(MSBuildThisFileDirectory)../Dsl/Conveniences.fs\" />"; "  </ItemGroup>"; "</Project>"; ""]) }
-                        let artifacts = sources @ [props]
+                        let rawIncludes = rawArtifacts |> List.filter (fun artifact -> artifact.RelativePath.EndsWith(".fs")) |> List.map (fun artifact -> $"    <Compile Include=\"Generated/{artifact.RelativePath}\" />")
+                        let props = { RelativePath = "Generated.props"; Content = String.concat "\n" (["<Project>"; "  <ItemGroup>"] @ rawIncludes @ ["    <Compile Include=\"Dsl/Runtime.fs\" />"; "    <Compile Include=\"Generated/Dsl.fs\" />"; "    <Compile Include=\"Dsl/Conveniences.fs\" />"; "  </ItemGroup>"; "</Project>"; ""]) }
+                        // Fable's installed-package reader does not expand MSBuild imports.
+                        // Ship the same ordered inventory as a flat package project.
+                        let packageProject = { RelativePath = "Package.fsproj"; Content = props.Content }
+                        let artifacts = sources @ [props; packageProject]
                         let! validation = validateSources request sources
                         match validation with
                         | Error errors -> return Error errors

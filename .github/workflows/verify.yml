@@ -1,0 +1,44 @@
+name: Verify generated DSL
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            10.0.401
+            9.0.x
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.7.0
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            generation/package-lock.json
+      - uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('Directory.Packages.props', 'NuGet.Config', 'dotnet-tools.json', '**/*.fsproj', 'global.json') }}
+      - run: dotnet run --project Build.fsproj -- restore
+      - run: npx playwright install --with-deps chromium
+      - run: dotnet run --project Build.fsproj -- verify
+      - name: Retain failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-${{ runner.os }}
+          include-hidden-files: true
+          path: |
+            test-results/
+            .superpowers/
+            **/TestResults/
