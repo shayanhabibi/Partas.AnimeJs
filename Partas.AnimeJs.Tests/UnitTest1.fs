@@ -1,27 +1,14 @@
-﻿module Partas.AnimeJs.Tests.Main
+module Partas.AnimeJs.Tests.Main
 
-open Fli
-open FsUnit
-open FsUnitTyped
-open Partas.AnimeJs.Tests.Common
+open System
 open NUnit.Framework
 
-[<SetUpFixture>]
-type SetupUtils() =
-    inherit FSharpCustomMessageFormatter()
-    [<OneTimeSetUpAttribute>]
-    static member FableCompile () =
-        let dir = $"{__SOURCE_DIRECTORY__}/Tests"
-        cli {
-            Shell platformShell
-            WorkingDirectory dir
-            Command "fable -e .fs.js -o output --typedArrays false --run dotnet restore"
-        }
-        |> Command.execute
-        |> Output.toExitCode
-        |> shouldEqual 0
-
 [<Test>]
-let Test1 () =
-    System.Console.WriteLine ""
-    Assert.Pass()
+let ``shipped assembly uses maintained Xantham identities without generation tooling`` () =
+    let assembly = typeof<Partas.AnimeJs.Raw.JSAnimation>.Assembly
+    let dependencies = assembly.GetReferencedAssemblies() |> Array.map _.Name
+    Assert.That(dependencies, Does.Contain("Xantham.Fable.Core.TS"))
+    for forbidden in ["Xantham.Generator"; "Xantham.TypeScript.Wire"; "Partas.Build"; "Nacara.Core"; "Browser"] do
+        Assert.That(dependencies |> Array.exists (fun name -> name.StartsWith(forbidden, StringComparison.Ordinal)), Is.False, forbidden)
+    Assert.That(typeof<Partas.AnimeJs.Raw.JSAnimation>.GetInterfaces(), Does.Contain(typeof<Partas.AnimeJs.Raw.Timer>))
+    Assert.That(typeof<Partas.AnimeJs.Raw.Timer>.GetProperty("duration"), Is.Not.Null)

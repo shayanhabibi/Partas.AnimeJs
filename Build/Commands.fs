@@ -34,6 +34,21 @@ module Commands =
             }
         }
 
+    let documentation root = input {
+        let! watch = Input.option<bool> "--watch" |> Input.description "Serve documentation and watch sources"
+        return pipeline "documentation" {
+            stage "compile and exercise documented source" {
+                run (cmd $"dotnet" |> Cmd.args ["build"; "tests/Consumers/Positive/Positive.fsproj"])
+                run (cmd $"dotnet" |> Cmd.args ["fable"; "tests/Consumers/Positive/Positive.fsproj"; "-o"; "tests/Consumers/Positive/output"; "-e"; ".fs.js"])
+                run (cmd $"node" |> Cmd.args ["--test"; "tests/Consumers/Positive/witness.test.mjs"])
+            }
+            stage "Nacara site" {
+                workingDir (Path.Combine(root, "site"))
+                run (cmd $"dotnet" |> Cmd.args ["run"; "--project"; "site.fsproj"; "--"; (if watch then "watch" else "build")])
+            }
+        }
+    }
+
     let create (root: string) = Command.root {
         description "Partas.AnimeJs repository automation"
         workingDir root
@@ -44,5 +59,9 @@ module Commands =
         command "generate" {
             description "Generate and compile a candidate, then promote it transactionally"
             generation root
+        }
+        command "docs" {
+            description "Compile documented examples and build or watch the Nacara site"
+            documentation root
         }
     }

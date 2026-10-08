@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>Library</OutputType>
         <TargetFramework>net9.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Program.fs" />
+        <Compile Include="../../examples/GettingStarted.fs" />
     </ItemGroup>
 
     <ItemGroup>

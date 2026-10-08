@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup><Compile Include="Site.fs" /></ItemGroup>
+  <ItemGroup><ProjectReference Include="../Partas.AnimeJs/Partas.AnimeJs.fsproj" /></ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Nacara.Core" />
+    <PackageReference Include="FSharp.Compiler.Service" />
+    <PackageReference Include="Nacara.Plugin.FSharpApi" />
+    <PackageReference Include="Nacara.Plugin.Markdown" />
+    <PackageReference Include="Nacara.Plugin.Literate" />
+    <PackageReference Include="Nacara.Plugin.Highlight.TreeSitter" />
+    <PackageReference Include="Nacara.Plugin.LinkValidator" />
+    <PackageReference Include="Nacara.Theme.Default" />
+  </ItemGroup>
+</Project>

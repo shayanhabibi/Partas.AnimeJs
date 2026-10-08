@@ -10,36 +10,34 @@
         <RootNamespace>Partas.AnimeJs</RootNamespace>
         <AssemblyName>Partas.AnimeJs</AssemblyName>
         <Company>F# Community</Company>
-        <Description>Strongly opinionated bindings to AnimeJs for Fable F#</Description>
+        <Description>Generated, typed AnimeJs DSL for Fable F#, sharing Xantham CSS and DOM types</Description>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/shayanhabibi/Partas.AnimeJs</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>Partas;F#;FSharp;Fable;fable-javascript;Web;animejs;animation;ce</PackageTags>
         <Authors>Shayan Habibi</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>0.0.8</Version>
-        <PackageVersion>0.0.8</PackageVersion>
-        <PackageReleaseNotes>4.2.0</PackageReleaseNotes>
+        <Version>0.1.0</Version>
+        <PackageVersion>0.1.0</PackageVersion>
+        <PackageReleaseNotes>Fresh generated DSL targeting AnimeJs 4.5.0; replaces the handwritten computation expressions.</PackageReleaseNotes>
         <NpmDependencies>
-            <NpmPackage Name="animejs" Version=">= 4.2.0" />
+            <NpmPackage Name="animejs" Version="4.5.0" />
         </NpmDependencies>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Binding.fs" />
-        <Compile Include="Core.fs" />
         <None Include="package.json" />
-        <Compile Include="Style.fs" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Fable.Browser.Css" Version="2.5.0" />
-      <PackageReference Include="Fable.Browser.ResizeObserver" Version="1.0.0" />
-      <PackageReference Include="Fable.Browser.Svg" Version="2.4.0" />
-      <PackageReference Include="Fable.Core" Version="4.5.0" />
-        <PackageReference Include="Fable.Package.SDK" Version="1.3.2">
+      <PackageReference Include="Fable.Core" />
+      <PackageReference Include="Xantham.Fable.Core" />
+      <PackageReference Include="Xantham.Fable.Core.TS" />
+        <PackageReference Include="Fable.Package.SDK">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
     </ItemGroup>
 
+    <Import Project="Generated/Generated.props" />
 </Project>

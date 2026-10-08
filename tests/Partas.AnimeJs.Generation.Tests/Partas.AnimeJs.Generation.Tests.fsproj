@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Library</OutputType><UseCentralPackages>true</UseCentralPackages><IsPackable>false</IsPackable><GenerateProgramFile>false</GenerateProgramFile><IsTestProject>true</IsTestProject><GenerateDocumentationFile>true</GenerateDocumentationFile></PropertyGroup>
-  <ItemGroup><Compile Include="CssFixture.fs" /><Compile Include="PathsTests.fs" /><Compile Include="XanthamAdapterTests.fs" /><Compile Include="ProjectionTests.fs" /><Compile Include="CssMetadataTests.fs" /><Compile Include="RuntimeTests.fs" /><Compile Include="EmitTests.fs" /><Compile Include="CandidateTests.fs" /></ItemGroup>
+  <ItemGroup><Compile Include="CssFixture.fs" /><Compile Include="PathsTests.fs" /><Compile Include="XanthamAdapterTests.fs" /><Compile Include="ProjectionTests.fs" /><Compile Include="CssMetadataTests.fs" /><Compile Include="RuntimeTests.fs" /><Compile Include="EmitTests.fs" /><Compile Include="CandidateTests.fs" /><Compile Include="ShippingTests.fs" /></ItemGroup>
   <ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" /><PackageReference Include="NUnit" /><PackageReference Include="NUnit3TestAdapter" /><ProjectReference Include="../../Build.fsproj" /></ItemGroup>
   <ItemGroup><PackageReference Include="Xantham.Fable.Core.TS" GeneratePathProperty="true" /></ItemGroup>
   <ItemGroup><None Include="$(PkgXantham_Fable_Core_TS)/lib/net8.0/Xantham.Fable.Core.TS.xml" Link="Xantham.Fable.Core.TS.xml" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>

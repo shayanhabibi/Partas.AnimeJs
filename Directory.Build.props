@@ -1,8 +1,8 @@
 <Project>
-  <PropertyGroup Condition="'$(MSBuildProjectName)' != 'Partas.AnimeJs' and '$(MSBuildProjectName)' != 'Partas.AnimeJs.Tests' and '$(MSBuildProjectName)' != 'Tests'">
+  <PropertyGroup>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
   </PropertyGroup>
-  <ItemGroup Condition="'$(MSBuildProjectName)' != 'Partas.AnimeJs' and '$(MSBuildProjectName)' != 'Partas.AnimeJs.Tests' and '$(MSBuildProjectName)' != 'Tests'">
+  <ItemGroup>
     <PackageReference Include="FSharp.Core" />
   </ItemGroup>
 </Project>

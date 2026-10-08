@@ -1,32 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <IsPackable>false</IsPackable>
-        <GenerateProgramFile>false</GenerateProgramFile>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <Compile Include="Common.fs" />
-        <Compile Include="UnitTest1.fs" />
-        <Content Include="Tests\Tests.fsproj" />
-        <Compile Include="Tests\Program.fs" />
-        <Content Include="package.json" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="coverlet.collector" Version="6.0.2" />
-        <PackageReference Include="Fli" Version="1.111.11" />
-        <PackageReference Include="FsUnit" Version="7.0.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-        <PackageReference Include="NUnit" Version="4.2.2" />
-        <PackageReference Include="NUnit.Analyzers" Version="4.3.0" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\Partas.AnimeJs\Partas.AnimeJs.fsproj" />
-    </ItemGroup>
-
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net9.0</TargetFramework><IsPackable>false</IsPackable><GenerateProgramFile>false</GenerateProgramFile><IsTestProject>true</IsTestProject></PropertyGroup>
+  <ItemGroup><Compile Include="UnitTest1.fs" /></ItemGroup>
+  <ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" /><PackageReference Include="NUnit" /><PackageReference Include="NUnit3TestAdapter" /><ProjectReference Include="../Partas.AnimeJs/Partas.AnimeJs.fsproj" /></ItemGroup>
 </Project>

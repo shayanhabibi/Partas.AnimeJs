@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="Partas.AnimeJs.Tests/Partas.AnimeJs.Tests.fsproj" />
+  <Project Path="Partas.AnimeJs.Tests/Tests/Tests.fsproj" />
+  <Project Path="Partas.AnimeJs/Partas.AnimeJs.fsproj" />
+  <Project Path="tools/Partas.AnimeJs.Generation/Partas.AnimeJs.Generation.fsproj" />
+  <Project Path="Build.fsproj" />
+  <Project Path="tests/Partas.AnimeJs.Generation.Tests/Partas.AnimeJs.Generation.Tests.fsproj" />
+  <Project Path="tests/Consumers/Positive/Positive.fsproj" />
+  <Project Path="site/site.fsproj" />
+</Solution>
