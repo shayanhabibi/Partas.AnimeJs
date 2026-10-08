@@ -1,0 +1,7 @@
+{
+  "module": "Partas.AnimeJs.Raw",
+  "subpaths": [],
+  "lib": ["esnext", "dom"],
+  "groups": { "typescript/lib": "reference" },
+  "compilerLib": { "module": "Fable.Core.TS", "esModule": "Es", "domModule": "Dom", "autoOpenEs": true, "autoOpenDom": false }
+}

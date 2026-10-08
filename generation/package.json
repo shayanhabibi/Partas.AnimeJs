@@ -1,0 +1,6 @@
+{
+  "name": "partas-animejs-generation",
+  "private": true,
+  "type": "module",
+  "dependencies": { "animejs": "4.5.0", "typescript": "7.1.0-dev.20260902.1" }
+}

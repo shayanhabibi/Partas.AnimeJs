@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <RawDirectory Condition="'$(RawDirectory)' == ''">../../../obj/raw consumer with spaces</RawDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(RawDirectory)/CompilerLibAliases.fs" />
+    <Compile Include="$(RawDirectory)/Partas.AnimeJs.Raw.fs" />
+    <Compile Include="Program.fs" />
+  </ItemGroup>
+  <ItemGroup><PackageReference Include="Fable.Core" /><PackageReference Include="Xantham.Fable.Core" /><PackageReference Include="Xantham.Fable.Core.TS" /></ItemGroup>
+</Project>
