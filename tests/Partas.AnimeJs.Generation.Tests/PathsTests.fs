@@ -24,6 +24,7 @@ let ``unrelated working directory does not select itself`` () =
     let expected = Path.GetFullPath(Path.Combine(__SOURCE_DIRECTORY__, "../.."))
     Assert.That(Paths.findRoot (Path.GetTempPath()), Is.EqualTo(expected))
 
-[<Test>]
-let ``unknown restore option returns usage error`` () =
-    Assert.That(Program.main [| "restore"; "--not-an-option" |], Is.EqualTo(2))
+[<TestCase("restore")>]
+[<TestCase("generate")>]
+let ``unknown option returns usage error`` command =
+    Assert.That(Program.main [| command; "--not-an-option" |], Is.EqualTo(2))

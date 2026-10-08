@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "package": "animejs",
+  "module": "Partas.AnimeJs.Raw",
+  "counts": {
+    "exact": 92,
+    "ergonomic": 102,
+    "widened": 13,
+    "escape": 55
+  },
+  "passes": [
+    {
+      "pass": "SY - synthesize-anonymous",
+      "total": 52,
+      "exact": 52
+    },
+    {
+      "pass": "LU - classify-literal-unions",
+      "total": 4,
+      "exact": 4
+    },
+    {
+      "pass": "shape-callbacks",
+      "total": 139,
+      "exact": 1,
+      "ergonomic": 130,
+      "escape": 8
+    },
+    {
+      "pass": "SI - shape-interfaces",
+      "total": 1881,
+      "exact": 27,
+      "ergonomic": 1423,
+      "widened": 99,
+      "escape": 332
+    },
+    {
+      "pass": "SA - shape-aliases",
+      "total": 22,
+      "exact": 8,
+      "ergonomic": 9,
+      "widened": 4,
+      "escape": 1
+    },
+    {
+      "pass": "SC - shape-classes",
+      "total": 30,
+      "ergonomic": 30
+    },
+    {
+      "pass": "SE - shape-exports",
+      "total": 107,
+      "ergonomic": 94,
+      "widened": 1,
+      "escape": 12
+    },
+    {
+      "pass": "SP - synthesize-paramobjects",
+      "total": 124,
+      "ergonomic": 124
+    },
+    {
+      "pass": "DO - dedupe-overloads",
+      "total": 15,
+      "exact": 1,
+      "widened": 14
+    }
+  ]
+}

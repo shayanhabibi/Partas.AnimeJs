@@ -1,0 +1,9 @@
+<Project>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Raw/CompilerLibAliases.fs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Raw/Partas.AnimeJs.Raw.fs" />
+    <Compile Include="$(MSBuildThisFileDirectory)../Dsl/Runtime.fs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dsl.fs" />
+    <Compile Include="$(MSBuildThisFileDirectory)../Dsl/Conveniences.fs" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,7 @@
+Dsl.fs
+Generated.props
+Raw/CompilerLibAliases.fs
+Raw/Partas.AnimeJs.Raw.fs
+Raw/manifest.json
+Raw/symbols.jsonl
+provenance.json

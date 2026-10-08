@@ -25,6 +25,7 @@ module Projection =
         let aliases = declarations |> List.choose (function FsAbbrev item -> Some(item.Name, item) | _ -> None) |> Map.ofList
         let interfaces = declarations |> List.choose (function FsInterface item -> Some(item.Name, item) | _ -> None) |> Map.ofList
         let diagnostics = ResizeArray<Diagnostic>()
+        let dependencies = System.Collections.Generic.Dictionary<string, System.Collections.Generic.HashSet<string>>()
         let report code source message = diagnostics.Add { Code = code; Source = Some source; Message = message }
 
         let bind source (parameters: FsTypeParam list) arguments =
@@ -57,6 +58,8 @@ module Projection =
         and named source visited name arguments =
             match Map.tryFind name aliases with
             | Some alias when not (Set.contains name visited) ->
+                if not (dependencies.ContainsKey source) then dependencies[source] <- System.Collections.Generic.HashSet<string>()
+                dependencies[source].Add name |> ignore
                 let substitutions = bind source alias.TypeParameters arguments
                 convert source (Set.add name visited) substitutions alias.Target
             | _ -> if List.isEmpty arguments then Named name else Application(name, arguments)
@@ -144,4 +147,5 @@ module Projection =
                 TweenType = if Map.containsKey "TweenOptions" aliases then Some(Named "TweenOptions") else None
                 ReservedKeys = List.ofSeq reserved |> List.distinct |> List.sort; TypeDefinitions = definitions; CssProperties = []; CssFields = []
                 Transforms = policy.Transforms
-                ValueFields = if Map.containsKey "TweenKeyValue" interfaces then Map.ofList [ "TweenKeyValue", fields "Tween" Set.empty Map.empty (FsNamed "TweenKeyValue") |> deduplicate "Tween" ] else Map.empty }
+                ValueFields = if Map.containsKey "TweenKeyValue" interfaces then Map.ofList [ "TweenKeyValue", fields "Tween" Set.empty Map.empty (FsNamed "TweenKeyValue") |> deduplicate "Tween" ] else Map.empty
+                AliasDependencies = dependencies |> Seq.map (fun entry -> entry.Key, entry.Value |> Seq.sort |> Seq.toList) |> Map.ofSeq }

@@ -61,4 +61,18 @@ type DslModel = {
     CssFields: FieldSpec list
     Transforms: string list
     ValueFields: Map<string, FieldSpec list>
+    AliasDependencies: Map<string, string list>
 }
+
+type ReviewedFinding = { Source: string; Code: string; Reason: string; Review: string }
+type Provenance = {
+    SchemaVersion: int
+    Versions: Map<string, string>
+    InputIntegrity: string
+    InputHashes: Map<string, string>
+    ArtifactHashes: Map<string, string>
+    Findings: ReviewedFinding list
+    ExcludedFields: string list
+    CompilationDigest: string
+}
+type Candidate = { Artifacts: Artifact list; Diagnostics: Diagnostic list; Provenance: Provenance }
