@@ -31,3 +31,10 @@ scope and text splitting have generated option contexts. Timeline actions use
 Other stagger overloads, WAAPI, layout, utility and text-scrambling APIs retain their
 generated raw signatures. String alternatives widened upstream remain explicit string
 escapes, recorded in the fidelity baseline. No local DOM/CSS catalog is maintained.
+
+Typed fields whose callbacks return numeric arrays adapt those return values to ordinary
+JavaScript arrays, including draggable snap, container and padding callbacks. Event
+callbacks retain their identity. The fidelity gate follows factory signatures and
+reachable named raw contracts; raw `obj` members and layout timing intersections remain
+explicit unchecked boundaries. The generated animatable property indexer retains the
+setter overload; the upstream getter overload is a recorded raw limitation.

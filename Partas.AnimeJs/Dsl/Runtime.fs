@@ -9,6 +9,20 @@ type Options<'Context> = private Options of Field<'Context> list
 module internal Field =
     let create<'Context> key value : Field<'Context> = Field(key, value)
 
+module internal Callback =
+    // Only contracts that return a numeric array use this adapter. Event callbacks
+    // and other functions retain their original identity.
+    [<Emit("""(callback => {
+        if (typeof callback !== 'function') return callback;
+        const adapted = function (...args) {
+            const value = callback.apply(this, args);
+            return ArrayBuffer.isView(value) && !(value instanceof DataView) ? Array.from(value) : value;
+        };
+        Object.defineProperty(adapted, 'length', { value: callback.length });
+        return adapted;
+    })($0)""")>]
+    let normalizeNumericArrayResult (value: 'T) : 'T = jsNative
+
 module internal Options =
     [<Emit("""(() => {
         const seen = new WeakMap();

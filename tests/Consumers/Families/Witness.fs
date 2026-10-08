@@ -31,3 +31,13 @@ let gridOne = Stagger.parameters gridSpecification
 let gridTwo = Stagger.parameters gridSpecification
 let percentagePosition value = Keyframes.at value (percentageKeyframe { PercentageKeyframe.property("value", 0.) })
 let customProperty key = Animation.property key (Tween.number 1.)
+let callbackArraySpecification = draggable {
+    Draggable.snap (fun (_: Raw.Draggable) -> U2.Case2 [|0.; 100.|])
+    Draggable.container (fun (_: Raw.Draggable) -> U5.Case2 [|0.; 100.; 100.; 0.|])
+    Draggable.containerPadding (fun (_: Raw.Draggable) -> U2.Case2 [|1.; 2.; 3.; 4.|])
+}
+let callbackArrayOptions = Draggable.parameters callbackArraySpecification
+[<Emit("(function (handle) { return new Float64Array([this.offset, handle.offset]); })")>]
+let receiverCallback () : Raw.Draggable -> U2<float, float[]> = jsNative
+let receiverOptions = Draggable.parameters (draggable { Draggable.snap (U3.Case3 (receiverCallback ())) })
+let axisOptions = DragAxis.parameters (dragAxis { DragAxis.snap (fun (_: Raw.Draggable) -> U2.Case2 [|0.; 100.|]) })

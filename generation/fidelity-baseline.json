@@ -400,5 +400,797 @@
     "code": "TR.AnyToObj",
     "reason": "The dynamic property union includes an upstream JSAnimation callback returning any. Preserve the explicit obj-returning union arm without introducing a unit overload; all other arms retain upstream identity.",
     "review": "Animatable dynamic indexer declaration reviewed 2026-10-09"
+  },
+  {
+    "source": "ScopeCleanupCallback()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScopeMethod(args)",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScopeMethod()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Tween.Setter(target)",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Transforms.TraverseUp.Cb()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.then(callback)()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.then()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.then(callback)()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.then()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.call(callback)()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.then(callback)()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.then()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.isOutOfBounds(bounds)",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Spring.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.thresholds",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TweakRegister.defaultValue",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Scope.data",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TextSplitter.lines",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TextSplitter.words",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TextSplitter.chars",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TextSplitter.effects",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TextSplitter.effectsCleanups",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TextSplitter.resizeTimeout",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "TextSplitter.addEffect(effect)(args)",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "WAAPIAnimation.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "WAAPIAnimation._inlineStyles",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "WAAPIAnimation.forEach(callback)()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "WAAPIAnimation.then(callback)()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "WAAPIAnimation.then()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Tween._value",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimationParams.[]()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.Delay.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.Delay2.defaultValue",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Transforms.inlineTransforms",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.el",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.parentElement",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.x",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.y",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.width",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.height",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.GetBoundingClientRect.Result.top",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.GetBoundingClientRect.Result.right",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.GetBoundingClientRect.Result.bottom",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DOMProxy.GetBoundingClientRect.Result.left",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timer.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "JSAnimation.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Timeline.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onGrab()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onDrag()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onRelease()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onSettle()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onSnap()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onResize()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "Draggable.onAfterResize()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onSyncEnter()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onSyncLeave()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onSyncEnterForward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onSyncLeaveForward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onSyncEnterBackward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onSyncLeaveBackward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onEnter()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onLeave()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onEnterForward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onLeaveForward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onEnterBackward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onLeaveBackward()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onResize()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserver.onSyncComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationTimingsParams.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "Reachable easing contract permits named and parameterized strings. Preserve its raw string alternative and other concrete easing alternatives; do not claim literal validation.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutStateParams.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "Reachable easing contract permits named and parameterized strings. Preserve its raw string alternative and other concrete easing alternatives; do not claim literal validation.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutSpecificAnimationParams.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "Reachable easing contract permits named and parameterized strings. Preserve its raw string alternative and other concrete easing alternatives; do not claim literal validation.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "Reachable easing contract permits named and parameterized strings. Preserve its raw string alternative and other concrete easing alternatives; do not claim literal validation.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "Reachable easing contract permits named and parameterized strings. Preserve its raw string alternative and other concrete easing alternatives; do not claim literal validation.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "DurationKeyframes.Item.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "Reachable easing contract permits named and parameterized strings. Preserve its raw string alternative and other concrete easing alternatives; do not claim literal validation.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.delay",
+    "code": "TR.IntersectionOverNonObject",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.delay",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.delay",
+    "code": "TR.UnionWithObjArm",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.duration",
+    "code": "TR.IntersectionOverNonObject",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.duration",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.duration",
+    "code": "TR.UnionWithObjArm",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onBegin",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onBeforeUpdate",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onUpdate",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onLoop",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onPause",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onComplete",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "LayoutAnimationParams.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.delay",
+    "code": "TR.IntersectionOverNonObject",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.delay",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.delay",
+    "code": "TR.UnionWithObjArm",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.duration",
+    "code": "TR.IntersectionOverNonObject",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.duration",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.duration",
+    "code": "TR.UnionWithObjArm",
+    "reason": "Upstream intersects distinct animation timing callback signatures. Generator cannot preserve this intersection and widens the member to obj. This reachable layout contract stays exclusively raw; no typed layout DSL is generated.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onBegin",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onBeforeUpdate",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onUpdate",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onLoop",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onPause",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onComplete",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream callback intersection has two handle signatures; generator keeps the first Timer signature. Layout options remain raw and this partial overload contract is explicit.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AutoLayoutParams.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "Reachable raw handle or nested contract explicitly retains upstream any as obj. It remains an unchecked raw boundary; no narrower DSL value or callback result is claimed.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableObject.[]",
+    "code": "TR.CallbackOverloadsFromFirst",
+    "reason": "Upstream property member is both getter and setter; generator retains the setter overload. Generated DSL configures properties only; retrieving current values remains a documented raw overload limitation.",
+    "review": "Reachable raw contract closure reviewed 2026-10-09"
   }
 ]

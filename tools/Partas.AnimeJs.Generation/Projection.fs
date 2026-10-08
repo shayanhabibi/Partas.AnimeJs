@@ -178,11 +178,68 @@ module Projection =
             let definitions = aliases |> Map.map (fun name alias ->
                 let scope = alias.TypeParameters |> List.map (fun item -> item.Name, Variable item.Name) |> Map.ofList
                 convert name (Set.singleton name) scope alias.Target)
+            let valueFields = if Map.containsKey "TweenKeyValue" interfaces then Map.ofList [ "TweenKeyValue", fields "Tween" Set.empty Map.empty (FsNamed "TweenKeyValue") |> deduplicate "Tween" ] else Map.empty
+            // Follow structured declaration references, including methods, delegates,
+            // constraints and inherited members. No generated text is parsed.
+            let declarationMap = declarations |> List.choose (function
+                | FsInterface value -> Some(value.Name, FsInterface value)
+                | FsAbbrev value -> Some(value.Name, FsAbbrev value)
+                | FsDelegateType value -> Some(value.Name, FsDelegateType value)
+                | FsTaggedUnion value -> Some(value.Name, FsTaggedUnion value)
+                | FsPhantom value -> Some(value.Name, FsPhantom value)
+                | FsMeasure value -> Some(value.Name, FsMeasure value)
+                | FsStringEnum value -> Some(value.Name, FsStringEnum value)
+                | FsEnum value -> Some(value.Name, FsEnum value)
+                | FsExports _ -> None) |> Map.ofList
+            let rec references (value: obj) = seq {
+                match value with
+                | null -> ()
+                | :? FsTypeRef as reference -> yield reference
+                | _ ->
+                    let kind = value.GetType()
+                    if Microsoft.FSharp.Reflection.FSharpType.IsRecord kind then
+                        for field in Microsoft.FSharp.Reflection.FSharpValue.GetRecordFields value do yield! references field
+                    elif Microsoft.FSharp.Reflection.FSharpType.IsUnion kind then
+                        let _, items = Microsoft.FSharp.Reflection.FSharpValue.GetUnionFields(value, kind)
+                        for item in items do yield! references item
+            }
+            let reached = System.Collections.Generic.HashSet<string>()
+            let rec visitReference reference =
+                match reference with
+                | FsNamed name -> visitNamed name
+                | FsApp(name, arguments) -> visitNamed name; List.iter visitReference arguments
+                | FsOption value | FsArray value | FsBranded(value, _) -> visitReference value
+                | FsTuple values | FsErasedUnion values -> List.iter visitReference values
+                | FsFunc(argument, result) -> visitReference argument; visitReference result
+                | FsDelegate(arguments, result) -> List.iter visitReference arguments; visitReference result
+                | _ -> ()
+            and visitNamed name =
+                match Map.tryFind name declarationMap with
+                | Some declaration when reached.Add name -> references (box declaration) |> Seq.iter visitReference
+                | _ -> ()
+            let rec visitType kind =
+                match kind with
+                | Named name -> visitNamed name
+                | Application(name, arguments) -> visitNamed name; List.iter visitType arguments
+                | Optional value | Array value | Brand(value, _) -> visitType value
+                | Tuple values | Union values -> List.iter visitType values
+                | Function(argument, result) -> visitType argument; visitType result
+                | Delegate(arguments, result) -> List.iter visitType arguments; visitType result
+                | _ -> ()
+            for field in Seq.append selected (valueFields |> Map.toSeq |> Seq.collect snd) do visitType field.ValueType
+            for value in values do value.DynamicType |> Option.iter visitType
+            for factory in factories do
+                reached.Add(factory.ExportOwner + "." + factory.ExportName) |> ignore
+                factory.Arguments |> List.indexed |> List.filter (fun (index, _) -> index <> factory.ParameterIndex) |> List.iter (fun (_, argument) -> visitType argument.Type)
+                visitType factory.Result
+                factory.DynamicType |> Option.iter (snd >> visitType)
+                factory.Constraints |> List.iter (snd >> Option.iter visitType)
             Ok {
                 Fields = List.ofSeq selected; Factories = List.ofSeq factories; Values = List.ofSeq values; Diagnostics = []
                 ExcludedFields = List.ofSeq excluded |> List.distinct |> List.sort
                 TweenType = if Map.containsKey "TweenOptions" aliases then Some(Named "TweenOptions") else None
                 ReservedKeys = List.ofSeq reserved |> List.distinct |> List.sort; TypeDefinitions = definitions; CssProperties = []; CssFields = []
                 Transforms = policy.Transforms
-                ValueFields = if Map.containsKey "TweenKeyValue" interfaces then Map.ofList [ "TweenKeyValue", fields "Tween" Set.empty Map.empty (FsNamed "TweenKeyValue") |> deduplicate "Tween" ] else Map.empty
+                ValueFields = valueFields
+                ContractSources = reached |> Seq.sort |> Seq.toList
                 AliasDependencies = dependencies |> Seq.map (fun entry -> entry.Key, entry.Value |> Seq.sort |> Seq.toList) |> Map.ofSeq }

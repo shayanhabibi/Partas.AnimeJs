@@ -69,6 +69,33 @@ let ``unreviewed selected finding fails with source diagnostic`` () =
         Assert.That(diagnostics.Head.Code, Is.EqualTo("fidelity/unreviewed"))
 
 [<Test>]
+let ``selected export and reachable named contract findings require review`` () =
+    let arguments : Xantham.Generator.FsParam list = [
+        { Name = "target"; Optional = false; Rest = false; Type = Xantham.Generator.FsNamed "Argument" }
+        { Name = "parameters"; Optional = true; Rest = false; Type = Xantham.Generator.FsNamed "TimerParams" } ]
+    let exported =
+        match ProjectionTests.exported "createTimer" (Xantham.Generator.FsNamed "TimerParams") (Xantham.Generator.FsNamed "Result") with
+        | Xantham.Generator.FsExports container ->
+            let members = container.Members |> List.map (fun owned ->
+                { owned with Member = { owned.Member with Body = Xantham.Generator.ExportFunction(arguments, Xantham.Generator.FsNamed "Result") } })
+            Xantham.Generator.FsExports { container with Members = members }
+        | _ -> failwith "Expected exports"
+    let generated = ProjectionTests.raw [
+        ProjectionTests.interfaceDecl "Nested" [] [] [ProjectionTests.property "value" Xantham.Generator.FsObj]
+        ProjectionTests.interfaceDecl "Argument" [] [] [ProjectionTests.property "value" Xantham.Generator.FsObj]
+        ProjectionTests.interfaceDecl "Result" [] [] [ProjectionTests.property "value" Xantham.Generator.FsObj]
+        ProjectionTests.interfaceDecl "CallbackHandle" [] [] [ProjectionTests.property "value" Xantham.Generator.FsObj]
+        ProjectionTests.alias "NamedCallback" [] (Xantham.Generator.FsFunc(Xantham.Generator.FsNamed "CallbackHandle", Xantham.Generator.FsFloat))
+        ProjectionTests.interfaceDecl "TimerParams" [] [] [ProjectionTests.property "nested" (Xantham.Generator.FsNamed "Nested"); ProjectionTests.property "callback" (Xantham.Generator.FsNamed "NamedCallback")]
+        exported ]
+    let model = Projection.project generated (ProjectionTests.policy ["nested"; "callback"]) |> Result.toOption |> Option.get
+    for source in ["Exports.createTimer(target)"; "Exports.createTimer(parameters)"; "Exports.createTimer()"; "Nested.value"; "Argument.value"; "Result.value"; "NamedCallback()"; "CallbackHandle.value"] do
+        let finding = Xantham.Generator.Finding.make source Xantham.Generator.TypeReference.UnknownToObj
+        match Findings.validate model [finding] [] with
+        | Ok _ -> Assert.Fail("Unreviewed reachable contract accepted: " + source)
+        | Error diagnostics -> Assert.That(diagnostics.Head.Source, Is.EqualTo(Some source))
+
+[<Test>]
 let ``promotion removes stale owned artifacts and check remains read only`` () = withOutput (fun root ->
     let first = candidate [{ RelativePath = "Raw.fs"; Content = "raw" }; { RelativePath = "Nested/Old.fs"; Content = "old" }]
     Assert.That(Candidate.promote root first |> Result.isOk, Is.True)

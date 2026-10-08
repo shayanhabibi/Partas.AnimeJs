@@ -44,7 +44,20 @@ module Emit =
             let emitField (field: FieldSpec) =
                 docs field.Docs
                 let name = identifier field.Name
+                let rec numericArray kind =
+                    match kind with
+                    | Array Number -> true
+                    | Union arms -> List.exists numericArray arms
+                    | Optional value -> numericArray value
+                    | _ -> false
+                let rec arrayCallback kind =
+                    match kind with
+                    | Function(_, result) | Delegate(_, result) -> numericArray result
+                    | Union arms -> List.exists arrayCallback arms
+                    | Optional value -> arrayCallback value
+                    | _ -> false
                 let write name valueType value =
+                    let value = if arrayCallback valueType then "Callback.normalizeNumericArrayResult (" + value + ")" else value
                     line ("    static member " + name + " (value: " + typeText valueType + ") : " + fieldType field.Context + " = " + construct field.Context field.JsKey value)
                 match field.ValueType with
                 | Function(argument, Object) when field.Name.StartsWith("on", StringComparison.Ordinal) ->

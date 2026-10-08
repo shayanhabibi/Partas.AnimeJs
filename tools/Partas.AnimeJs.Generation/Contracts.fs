@@ -66,6 +66,7 @@ type DslModel = {
     Transforms: string list
     ValueFields: Map<string, FieldSpec list>
     AliasDependencies: Map<string, string list>
+    ContractSources: string list
 }
 
 type ReviewedFinding = { Source: string; Code: string; Reason: string; Review: string }
