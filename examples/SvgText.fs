@@ -3,6 +3,8 @@
 title: SVG and text
 order: 9
 ---
+*)
+(**
 SVG utilities retain their generated signatures. Targets use the shared Xantham SVG type directly.
 Text splitting keeps AnimeJs accessibility defaults; the browser fixture disables the extra accessibility span solely to count word spans.
 *)

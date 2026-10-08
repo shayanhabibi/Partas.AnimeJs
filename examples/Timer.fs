@@ -3,6 +3,8 @@
 title: Timer callbacks
 order: 2
 ---
+*)
+(**
 Timer fields preserve the timer handle type; creating a timer is an explicit call.
 *)
 module Partas.AnimeJs.Examples.Timer

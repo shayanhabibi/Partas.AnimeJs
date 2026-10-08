@@ -3,6 +3,8 @@
 title: Stagger values
 order: 4
 ---
+*)
+(**
 Numeric stagger returns the maintained five-argument delegate. Other overloads remain in Raw.
 *)
 module Partas.AnimeJs.Examples.Stagger

@@ -3,6 +3,8 @@
 title: Scroll and scope
 order: 8
 ---
+*)
+(**
 Scroll callbacks preserve the generated observer handle. Scope defaults reuse the shared defaults context.
 *)
 module Partas.AnimeJs.Examples.Scroll

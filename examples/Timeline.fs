@@ -3,6 +3,8 @@
 title: Timeline defaults and actions
 order: 3
 ---
+*)
+(**
 Use typed defaults and generated instance methods for timeline actions.
 *)
 module Partas.AnimeJs.Examples.Timeline

@@ -3,6 +3,8 @@
 title: Getting started
 order: 1
 ---
+*)
+(**
 
 Create reusable options with typed fields. Starting an animation is an explicit call
 to `Anime.animate`; building options has no animation effects. These examples compile

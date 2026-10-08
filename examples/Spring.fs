@@ -3,6 +3,8 @@
 title: Spring easing
 order: 6
 ---
+*)
+(**
 Spring configuration and the returned easing function use the generated upstream types.
 *)
 module Partas.AnimeJs.Examples.Spring
