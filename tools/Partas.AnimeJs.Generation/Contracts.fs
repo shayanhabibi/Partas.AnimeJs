@@ -48,6 +48,7 @@ type FactorySpec = {
 }
 type PolicyRoot = { Export: string; Name: string; Builder: string; Parameter: string; Fields: string list }
 type Policy = { Roots: PolicyRoot list; Transforms: string list }
+type CssProperty = { Name: string; JsKey: string; Source: string; Docs: string }
 type DslModel = {
     Fields: FieldSpec list
     Factories: FactorySpec list
@@ -56,4 +57,6 @@ type DslModel = {
     TweenType: DslType option
     ReservedKeys: string list
     TypeDefinitions: Map<string, DslType>
+    CssProperties: CssProperty list
+    CssFields: FieldSpec list
 }

@@ -87,7 +87,7 @@ module Projection =
                     inherited @ own
                 | _ -> report "projection/missing-root" name "Option root has no interface declaration."; []
 
-        let deduplicate context candidates =
+        let deduplicate context (candidates: FieldSpec list) =
             candidates |> List.groupBy _.JsKey |> List.map (fun (key, group) ->
                 let contracts = group |> List.map (fun field -> field.ValueType, field.Optional) |> List.distinct
                 if contracts.Length > 1 then report "projection/field-conflict" (context + "." + key) "Inherited properties disagree on value type or optionality."
@@ -142,4 +142,4 @@ module Projection =
                 Fields = List.ofSeq selected; Factories = List.ofSeq factories; Diagnostics = []
                 ExcludedFields = List.ofSeq excluded |> List.distinct |> List.sort
                 TweenType = if Map.containsKey "TweenOptions" aliases then Some(Named "TweenOptions") else None
-                ReservedKeys = List.ofSeq reserved |> List.distinct |> List.sort; TypeDefinitions = definitions }
+                ReservedKeys = List.ofSeq reserved |> List.distinct |> List.sort; TypeDefinitions = definitions; CssProperties = []; CssFields = [] }
