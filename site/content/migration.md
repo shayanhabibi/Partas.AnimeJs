@@ -22,3 +22,12 @@ raw tween contract. It rejects reserved option names. Raw APIs remain available 
 signatures whose fidelity findings require an explicit escape.
 
 See the [tested example](../../examples/GettingStarted.fs) and [generated reference](/reference/index.md).
+
+The superseded `Binding.fs`, `Core.fs`, and `Style.fs` catalogs are removed. CSS comes
+from Xantham metadata; all upstream factories and instance methods are available in
+`Raw.Exports`. Timer, timeline, numeric stagger, spring, animatable, draggable, scroll,
+scope and text splitting have generated option contexts. Timeline actions use
+`Animation.parameters`; SVG utilities use `Raw.Exports.svg` and `Target.svg`.
+Other stagger overloads, WAAPI, layout, utility and text-scrambling APIs retain their
+generated raw signatures. String alternatives widened upstream remain explicit string
+escapes, recorded in the fidelity baseline. No local DOM/CSS catalog is maintained.

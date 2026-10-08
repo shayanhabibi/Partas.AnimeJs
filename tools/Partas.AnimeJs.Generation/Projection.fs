@@ -110,6 +110,15 @@ module Projection =
         let selected = ResizeArray<FieldSpec>()
         let factories = ResizeArray<FactorySpec>()
         let values = ResizeArray<ValueSpec>()
+        let dynamicType reference =
+            let reference = match reference with FsOption kind -> kind | kind -> kind
+            match reference with
+            | FsNamed name -> Map.tryFind name interfaces |> Option.bind (fun declaration ->
+                declaration.Members |> List.tryPick (function
+                    | FsIndexer indexer when not indexer.ReadOnly && indexer.Key = FsString ->
+                        Some(name + ".[]()", convert (name + ".[]()") Set.empty Map.empty indexer.Value)
+                    | _ -> None))
+            | _ -> None
         let contexts = (policy.Roots |> List.map _.Name) @ (policy.Values |> List.map _.Name)
         if (List.distinct contexts).Length <> contexts.Length then report "policy/duplicate-context" "roots" "Each public option context must have a unique name."
         for root in policy.Roots do
@@ -146,6 +155,7 @@ module Projection =
                             Arguments = arguments |> List.map (fun item -> { Name = item.Name; Type = convert item.Type; Optional = item.Optional; Rest = item.Rest })
                             Result = convert result; Context = root.Name; ParameterIndex = index
                             ParameterType = (match convert parameter.Type with Optional value -> value | value -> value)
+                            DynamicType = if root.Name = "Animation" then None else dynamicType parameter.Type
                             Constraints = owned.Member.TypeParameters |> List.map (fun item -> item.Name, Option.map convert item.Constraint) }
                 | _ -> report "projection/factory-shape" root.Export "Selected export is not a function."
             | _ -> report "projection/ambiguous-factory" root.Export "Policy must select a unique factory signature."

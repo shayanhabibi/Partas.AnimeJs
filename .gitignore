@@ -12,3 +12,5 @@ tests/Consumers/**/input/
 tests/Consumers/Animation/Animation.fsproj
 site/output/
 site/.nacara/
+test-results/
+playwright-report/

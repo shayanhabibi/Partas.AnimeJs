@@ -74,7 +74,8 @@ let ``real AnimeJs factory roots project selected contexts`` () =
         match Projection.project generated language with
         | Error diagnostics -> Assert.Fail(sprintf "%A" diagnostics)
         | Ok model ->
-            Assert.That(model.Factories.Length, Is.EqualTo(4))
+            Assert.That(model.Factories |> List.map _.Name, Does.Contain("createSpring"))
+            Assert.That(model.Factories |> List.map _.Name, Does.Contain("createDraggable"))
             let callback = model.Fields |> List.find (fun field -> field.Context = "Animation" && field.JsKey = "onComplete")
             Assert.That(callback.ValueType, Is.EqualTo(Function(Named "JSAnimation", Object)))
             Assert.That(model.TweenType.IsSome, Is.True)

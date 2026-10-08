@@ -3,12 +3,24 @@
     { "export": "animate", "name": "Animation", "builder": "animation", "parameter": "parameters", "fields": [] },
     { "export": "createTimer", "name": "Timer", "builder": "timer", "parameter": "parameters", "fields": [] },
     { "export": "createTimeline", "name": "Timeline", "builder": "timeline", "parameter": "parameters", "fields": [] },
-    { "export": "stagger", "name": "Stagger", "builder": "stagger", "parameter": "params", "signature": "number", "fields": [] }
+    { "export": "stagger", "name": "Stagger", "builder": "stagger", "parameter": "params", "signature": "number", "fields": [] },
+    { "export": "createSpring", "name": "Spring", "builder": "spring", "parameter": "parameters", "fields": [] },
+    { "export": "createAnimatable", "name": "Animatable", "builder": "animatable", "parameter": "parameters", "fields": [] },
+    { "export": "createDraggable", "name": "Draggable", "builder": "draggable", "parameter": "parameters", "fields": [] },
+    { "export": "onScroll", "name": "Scroll", "builder": "scroll", "parameter": "parameters", "fields": [] },
+    { "export": "createScope", "name": "Scope", "builder": "scope", "parameter": "params", "fields": [] },
+    { "export": "splitText", "name": "TextSplitter", "builder": "textSplitter", "parameter": "parameters", "fields": [] }
   ],
   "values": [
     { "type": "DefaultsParams", "name": "Defaults", "builder": "defaults", "fields": [] },
     { "type": "DurationKeyframes.Item", "name": "DurationKeyframe", "builder": "durationKeyframe", "fields": [] },
-    { "type": "PercentageKeyframes.Item", "name": "PercentageKeyframe", "builder": "percentageKeyframe", "fields": [] }
+    { "type": "PercentageKeyframes.Item", "name": "PercentageKeyframe", "builder": "percentageKeyframe", "fields": [] },
+    { "type": "DraggableAxisParam", "name": "DragAxis", "builder": "dragAxis", "fields": [] },
+    { "type": "DraggableCursorParams", "name": "DragCursor", "builder": "dragCursor", "fields": [] },
+    { "type": "DraggableDragThresholdParams", "name": "DragThreshold", "builder": "dragThreshold", "fields": [] },
+    { "type": "AnimatablePropertyParamsOptions", "name": "AnimatableProperty", "builder": "animatableProperty", "fields": [] },
+    { "type": "ScrollThresholdParam", "name": "ScrollThreshold", "builder": "scrollThreshold", "fields": [] },
+    { "type": "SplitTemplateParams", "name": "SplitTemplate", "builder": "splitTemplate", "fields": [] }
   ],
   "transforms": ["x", "y", "z", "rotate", "rotateX", "rotateY", "rotateZ", "scale", "scaleX", "scaleY", "scaleZ", "skewX", "skewY", "translateX", "translateY", "translateZ"]
 }

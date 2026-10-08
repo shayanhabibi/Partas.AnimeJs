@@ -44,6 +44,7 @@ type FactorySpec = {
     Context: string
     ParameterIndex: int
     ParameterType: DslType
+    DynamicType: (string * DslType) option
     Constraints: (string * DslType option) list
 }
 type PolicyRoot = { Export: string; Name: string; Builder: string; Parameter: string; Fields: string list; Signature: string option }

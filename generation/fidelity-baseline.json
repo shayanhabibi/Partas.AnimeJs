@@ -1,39 +1,404 @@
 [
-  {"source":"TimerParams.onBegin()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimerParams.onBeforeUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimerParams.onUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimerParams.onLoop()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimerParams.onPause()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"DefaultsParams.onBegin()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"DefaultsParams.onBeforeUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"DefaultsParams.onUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"DefaultsParams.onLoop()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"DefaultsParams.onPause()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"DefaultsParams.onComplete()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"DefaultsParams.onRender()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"AnimationParams.onBegin()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"AnimationParams.onBeforeUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"AnimationParams.onUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"AnimationParams.onLoop()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"AnimationParams.onPause()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"AnimationParams.onRender()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimelineParams.onBegin()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimelineParams.onBeforeUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimelineParams.onUpdate()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimelineParams.onLoop()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimelineParams.onPause()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"TimelineParams.onRender()","code":"TR.AnyToObj","reason":"AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.","review":"Expanded callback surface reviewed 2026-10-08"},
-  {"source":"EasingParam","code":"TR.StringLiteralToString","reason":"The maintained easing contract accepts named and parameterized strings alongside typed function and spring alternatives. String inputs remain an explicit raw escape.","review":"Expanded easing contract reviewed 2026-10-08"},
-  {"source":"DefaultsParams.ease","code":"TR.StringLiteralToString","reason":"The maintained easing contract accepts named and parameterized strings alongside typed function and spring alternatives. String inputs remain an explicit raw escape.","review":"Expanded easing contract reviewed 2026-10-08"},
-  {"source":"DefaultsParams.composition","code":"TR.StringLiteralToString","reason":"The maintained composition union retains its numeric alternative and documents string names as a raw escape.","review":"Defaults raw composition boundary reviewed 2026-10-08"},
-  {"source":"StaggerParams.from","code":"TR.StringLiteralToString","reason":"Numeric stagger origins are tested. Named origins retain the maintained raw string contract and are documented as an explicit string escape.","review":"Stagger origin boundary reviewed 2026-10-08"},
-  {"source":"DefaultsParams.modifier(v)","code":"TR.AnyToObj","reason":"AnimeJs declares the default modifier input and output as any. Preserve the raw obj-to-obj function without adding a unit adapter or claiming a narrower value contract.","review":"Defaults modifier raw escape reviewed 2026-10-08"},
-  {"source":"DefaultsParams.modifier()","code":"TR.AnyToObj","reason":"AnimeJs declares the default modifier input and output as any. Preserve the raw obj-to-obj function without adding a unit adapter or claiming a narrower value contract.","review":"Defaults modifier raw escape reviewed 2026-10-08"},
-  { "source": "TweenComposition", "code": "TR.StringLiteralToString", "reason": "The maintained raw tween contract widens composition names to string. Typed tween values preserve its numeric alternative; composition strings remain a documented raw escape until a checked helper is generated.", "review": "Raw tween boundary reviewed 2026-10-08" },
-  { "source": "TweenParamsOptions.ease", "code": "TR.StringLiteralToString", "reason": "Inherited tween easing accepts named and parameterized strings. The raw easing union retains function alternatives and Ease.named rejects blank names.", "review": "Approved generated DSL design, inherited easing contract reviewed 2026-10-08" },
-  { "source": "AnimationParams.onComplete()", "code": "TR.AnyToObj", "reason": "AnimeJs declares callback returns as any. The DSL offers an explicit unit adapter and retains the raw object-returning callback contract.", "review": "Approved generated DSL design, callback adapter reviewed 2026-10-08" },
-  { "source": "TimerParams.onComplete()", "code": "TR.AnyToObj", "reason": "AnimeJs declares callback returns as any. The DSL offers an explicit unit adapter and retains the raw object-returning callback contract.", "review": "Approved generated DSL design, callback adapter reviewed 2026-10-08" },
-  { "source": "TimelineParams.onComplete()", "code": "TR.AnyToObj", "reason": "AnimeJs declares callback returns as any. The DSL offers an explicit unit adapter and retains the raw object-returning callback contract.", "review": "Approved generated DSL design, callback adapter reviewed 2026-10-08" },
-  { "source": "AnimationParams.ease", "code": "TR.StringLiteralToString", "reason": "AnimeJs accepts named and parameterized easing strings. Literal widening is retained through the raw easing union; Ease.named rejects blank names.", "review": "Approved generated DSL design, easing escape reviewed 2026-10-08" },
-  { "source": "TweenKeyValue.ease", "code": "TR.StringLiteralToString", "reason": "AnimeJs accepts named and parameterized easing strings. Literal widening is retained through the raw easing union; Ease.named rejects blank names.", "review": "Approved generated DSL design, easing escape reviewed 2026-10-08" }
+  {
+    "source": "TimerParams.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimerParams.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimerParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimerParams.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimerParams.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimelineParams.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimelineParams.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimelineParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimelineParams.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimelineParams.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "TimelineParams.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The generated on-event unit adapter preserves the concrete handle type and returns undefined; the Value member preserves the raw object-returning contract.",
+    "review": "Expanded callback surface reviewed 2026-10-08"
+  },
+  {
+    "source": "EasingParam",
+    "code": "TR.StringLiteralToString",
+    "reason": "The maintained easing contract accepts named and parameterized strings alongside typed function and spring alternatives. String inputs remain an explicit raw escape.",
+    "review": "Expanded easing contract reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "The maintained easing contract accepts named and parameterized strings alongside typed function and spring alternatives. String inputs remain an explicit raw escape.",
+    "review": "Expanded easing contract reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.composition",
+    "code": "TR.StringLiteralToString",
+    "reason": "The maintained composition union retains its numeric alternative and documents string names as a raw escape.",
+    "review": "Defaults raw composition boundary reviewed 2026-10-08"
+  },
+  {
+    "source": "StaggerParams.from",
+    "code": "TR.StringLiteralToString",
+    "reason": "Numeric stagger origins are tested. Named origins retain the maintained raw string contract and are documented as an explicit string escape.",
+    "review": "Stagger origin boundary reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.modifier(v)",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares the default modifier input and output as any. Preserve the raw obj-to-obj function without adding a unit adapter or claiming a narrower value contract.",
+    "review": "Defaults modifier raw escape reviewed 2026-10-08"
+  },
+  {
+    "source": "DefaultsParams.modifier()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares the default modifier input and output as any. Preserve the raw obj-to-obj function without adding a unit adapter or claiming a narrower value contract.",
+    "review": "Defaults modifier raw escape reviewed 2026-10-08"
+  },
+  {
+    "source": "TweenComposition",
+    "code": "TR.StringLiteralToString",
+    "reason": "The maintained raw tween contract widens composition names to string. Typed tween values preserve its numeric alternative; composition strings remain a documented raw escape until a checked helper is generated.",
+    "review": "Raw tween boundary reviewed 2026-10-08"
+  },
+  {
+    "source": "TweenParamsOptions.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "Inherited tween easing accepts named and parameterized strings. The raw easing union retains function alternatives and Ease.named rejects blank names.",
+    "review": "Approved generated DSL design, inherited easing contract reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The DSL offers an explicit unit adapter and retains the raw object-returning callback contract.",
+    "review": "Approved generated DSL design, callback adapter reviewed 2026-10-08"
+  },
+  {
+    "source": "TimerParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The DSL offers an explicit unit adapter and retains the raw object-returning callback contract.",
+    "review": "Approved generated DSL design, callback adapter reviewed 2026-10-08"
+  },
+  {
+    "source": "TimelineParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "AnimeJs declares callback returns as any. The DSL offers an explicit unit adapter and retains the raw object-returning callback contract.",
+    "review": "Approved generated DSL design, callback adapter reviewed 2026-10-08"
+  },
+  {
+    "source": "AnimationParams.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "AnimeJs accepts named and parameterized easing strings. Literal widening is retained through the raw easing union; Ease.named rejects blank names.",
+    "review": "Approved generated DSL design, easing escape reviewed 2026-10-08"
+  },
+  {
+    "source": "TweenKeyValue.ease",
+    "code": "TR.StringLiteralToString",
+    "reason": "AnimeJs accepts named and parameterized easing strings. Literal widening is retained through the raw easing union; Ease.named rejects blank names.",
+    "review": "Approved generated DSL design, easing escape reviewed 2026-10-08"
+  },
+  {
+    "source": "SpringParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.onBegin()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.onBeforeUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.onLoop()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.onPause()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.onComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.onRender()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onEnter()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onLeave()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onEnterForward()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onLeaveForward()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onEnterBackward()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onLeaveBackward()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onResize()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.onSyncComplete()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onGrab()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onDrag()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onRelease()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onUpdate()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onSettle()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onSnap()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onResize()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "DraggableParams.onAfterResize()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+    "review": "Browser factory callback declarations reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.axis",
+    "code": "TR.StringLiteralToString",
+    "reason": "Upstream x/y axis literals widen to string. Retain this documented raw string alternative and the typed callback alternatives.",
+    "review": "Scroll axis declaration reviewed 2026-10-09"
+  },
+  {
+    "source": "ScrollObserverParams.axis()",
+    "code": "TR.StringLiteralToString",
+    "reason": "Upstream x/y axis literals widen to string. Retain this documented raw string alternative and the typed callback alternatives.",
+    "review": "Scroll axis declaration reviewed 2026-10-09"
+  },
+  {
+    "source": "SplitFunctionValue()",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream template callback returns any. Keep obj result explicitly, with shared DOM input types and no unit adapter.",
+    "review": "Text template declaration reviewed 2026-10-09"
+  },
+  {
+    "source": "JSTarget",
+    "code": "TR.AnyToObj",
+    "reason": "Upstream dynamic target record values are any. Preserve Record<string,obj> as explicit object-target escape; DOM alternatives retain shared Xantham identities.",
+    "review": "Dynamic target record declaration reviewed 2026-10-09"
+  },
+  {
+    "source": "AnimatableParams.[]()",
+    "code": "TR.AnyToObj",
+    "reason": "The dynamic property union includes an upstream JSAnimation callback returning any. Preserve the explicit obj-returning union arm without introducing a unit overload; all other arms retain upstream identity.",
+    "review": "Animatable dynamic indexer declaration reviewed 2026-10-09"
+  }
 ]

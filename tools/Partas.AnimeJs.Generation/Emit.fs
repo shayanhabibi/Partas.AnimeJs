@@ -96,6 +96,18 @@ module Emit =
                 staticType factory.Context
                 model.Fields |> List.filter (fun field -> field.Context = factory.Context) |> List.iter emitField
                 line ("    static member parameters (options: Options<" + context factory.Context + ">) : " + typeText factory.ParameterType + " = Options.toObject options |> unbox")
+                match factory.DynamicType with
+                | Some (_, kind) ->
+                    let reserved = (model.Fields |> List.filter (fun field -> field.Context = factory.Context) |> List.map _.JsKey) @ ["__proto__"; "constructor"; "prototype"] |> List.map literal |> String.concat "; "
+                    let write arm expression =
+                        line ("    static member property (key: string, value: " + typeText arm + ") : " + fieldType factory.Context + " =")
+                        line ("        if System.String.IsNullOrWhiteSpace key || List.contains key [" + reserved + "] then invalidArg \"key\" \"Custom keys must be nonempty and cannot name an option.\"")
+                        line ("        Field.create<" + context factory.Context + "> key (box (" + expression + "))")
+                    write kind "value"
+                    match kind with
+                    | Union arms -> for arm in List.distinct arms do write arm (unionCase kind arm "value")
+                    | _ -> ()
+                | None -> ()
                 if factory.Context = "Animation" then
                     let reserved = model.ReservedKeys @ ["__proto__"; "constructor"; "prototype"] |> List.map literal |> String.concat "; "
                     line "    /// Animate a dynamic object property. The key does not prove target-property existence."
@@ -165,6 +177,8 @@ module Emit =
             line ("    static member ``object`` (value: " + typeText objectType + ") : Raw.TargetsParam = " + unionCase targets objectType "value")
             let element = Named "Fable.Core.TS.Dom.HTMLElement"
             line ("    static member element (value: " + typeText element + ") : Raw.TargetsParam = " + unionCase targets element "value")
+            let svgElement = Named "Fable.Core.TS.Dom.SVGElement"
+            line ("    static member svg (value: " + typeText svgElement + ") : Raw.TargetsParam = " + unionCase targets svgElement "value")
             line ""
             line "module Anime ="
             for factory in model.Factories do

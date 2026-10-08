@@ -9,9 +9,21 @@ type AnimationContext = private AnimationContext of unit
 type TimerContext = private TimerContext of unit
 type TimelineContext = private TimelineContext of unit
 type StaggerContext = private StaggerContext of unit
+type SpringContext = private SpringContext of unit
+type AnimatableContext = private AnimatableContext of unit
+type DraggableContext = private DraggableContext of unit
+type ScrollContext = private ScrollContext of unit
+type ScopeContext = private ScopeContext of unit
+type TextSplitterContext = private TextSplitterContext of unit
 type DefaultsContext = private DefaultsContext of unit
 type DurationKeyframeContext = private DurationKeyframeContext of unit
 type PercentageKeyframeContext = private PercentageKeyframeContext of unit
+type DragAxisContext = private DragAxisContext of unit
+type DragCursorContext = private DragCursorContext of unit
+type DragThresholdContext = private DragThresholdContext of unit
+type AnimatablePropertyContext = private AnimatablePropertyContext of unit
+type ScrollThresholdContext = private ScrollThresholdContext of unit
+type SplitTemplateContext = private SplitTemplateContext of unit
 type PercentageStop = private PercentageStop of string * Options<PercentageKeyframeContext>
 
 [<AutoOpen>]
@@ -20,9 +32,21 @@ module Builders =
     let ``timer`` = OptionsBuilder<TimerContext>()
     let ``timeline`` = OptionsBuilder<TimelineContext>()
     let ``stagger`` = OptionsBuilder<StaggerContext>()
+    let ``spring`` = OptionsBuilder<SpringContext>()
+    let ``animatable`` = OptionsBuilder<AnimatableContext>()
+    let ``draggable`` = OptionsBuilder<DraggableContext>()
+    let ``scroll`` = OptionsBuilder<ScrollContext>()
+    let ``scope`` = OptionsBuilder<ScopeContext>()
+    let ``textSplitter`` = OptionsBuilder<TextSplitterContext>()
     let ``defaults`` = OptionsBuilder<DefaultsContext>()
     let ``durationKeyframe`` = OptionsBuilder<DurationKeyframeContext>()
     let ``percentageKeyframe`` = OptionsBuilder<PercentageKeyframeContext>()
+    let ``dragAxis`` = OptionsBuilder<DragAxisContext>()
+    let ``dragCursor`` = OptionsBuilder<DragCursorContext>()
+    let ``dragThreshold`` = OptionsBuilder<DragThresholdContext>()
+    let ``animatableProperty`` = OptionsBuilder<AnimatablePropertyContext>()
+    let ``scrollThreshold`` = OptionsBuilder<ScrollThresholdContext>()
+    let ``splitTemplate`` = OptionsBuilder<SplitTemplateContext>()
 
 [<AbstractClass; Sealed>]
 type ``Animation`` private () =
@@ -267,6 +291,328 @@ type ``Stagger`` private () =
     static member parameters (options: Options<StaggerContext>) : Raw.StaggerParams = Options.toObject options |> unbox
 
 [<AbstractClass; Sealed>]
+type ``Spring`` private () =
+    /// - Mass, default 1
+    static member ``mass`` (value: float) : Field<SpringContext> = Field.create<SpringContext> "mass" (box (value))
+    /// - Stiffness, default 100
+    static member ``stiffness`` (value: float) : Field<SpringContext> = Field.create<SpringContext> "stiffness" (box (value))
+    /// - Damping, default 10
+    static member ``damping`` (value: float) : Field<SpringContext> = Field.create<SpringContext> "damping" (box (value))
+    /// - Initial velocity, default 0
+    static member ``velocity`` (value: float) : Field<SpringContext> = Field.create<SpringContext> "velocity" (box (value))
+    /// - Initial bounce, default 0
+    static member ``bounce`` (value: float) : Field<SpringContext> = Field.create<SpringContext> "bounce" (box (value))
+    /// - The perceived duration, default 0
+    static member ``duration`` (value: float) : Field<SpringContext> = Field.create<SpringContext> "duration" (box (value))
+    /// - Callback function called when the spring currentTime hits the perceived duration
+    static member ``onCompleteValue`` (value: (Raw.JSAnimation -> obj)) : Field<SpringContext> = Field.create<SpringContext> "onComplete" (box (value))
+    static member ``onComplete`` (value: (Raw.JSAnimation -> unit)) : Field<SpringContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<SpringContext> "onComplete" (box (callback))
+    static member parameters (options: Options<SpringContext>) : Raw.SpringParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``Animatable`` private () =
+    static member ``unit`` (value: string) : Field<AnimatableContext> = Field.create<AnimatableContext> "unit" (box (value))
+    static member ``duration`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<AnimatableContext> = Field.create<AnimatableContext> "duration" (box (value))
+    static member ``duration`` (value: string) : Field<AnimatableContext> = Field.create<AnimatableContext> "duration" (box (U6.Case1 value))
+    static member ``duration`` (value: float) : Field<AnimatableContext> = Field.create<AnimatableContext> "duration" (box (U6.Case2 value))
+    static member ``duration`` (value: (float -> float)) : Field<AnimatableContext> = Field.create<AnimatableContext> "duration" (box (U6.Case3 value))
+    static member ``duration`` (value: Raw.DurationKeyframes.Item.Duration) : Field<AnimatableContext> = Field.create<AnimatableContext> "duration" (box (U6.Case4 value))
+    static member ``duration`` (value: Raw.Spring) : Field<AnimatableContext> = Field.create<AnimatableContext> "duration" (box (U6.Case5 value))
+    static member ``duration`` (value: Raw.TweakRegister) : Field<AnimatableContext> = Field.create<AnimatableContext> "duration" (box (U6.Case6 value))
+    static member ``ease`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<AnimatableContext> = Field.create<AnimatableContext> "ease" (box (value))
+    static member ``ease`` (value: string) : Field<AnimatableContext> = Field.create<AnimatableContext> "ease" (box (U4.Case1 value))
+    static member ``ease`` (value: (float -> float)) : Field<AnimatableContext> = Field.create<AnimatableContext> "ease" (box (U4.Case2 value))
+    static member ``ease`` (value: Raw.Spring) : Field<AnimatableContext> = Field.create<AnimatableContext> "ease" (box (U4.Case3 value))
+    static member ``ease`` (value: Raw.TweakRegister) : Field<AnimatableContext> = Field.create<AnimatableContext> "ease" (box (U4.Case4 value))
+    static member ``modifier`` (value: (float -> U2<string, float>)) : Field<AnimatableContext> = Field.create<AnimatableContext> "modifier" (box (value))
+    static member ``composition`` (value: U2<float, string>) : Field<AnimatableContext> = Field.create<AnimatableContext> "composition" (box (value))
+    static member ``composition`` (value: float) : Field<AnimatableContext> = Field.create<AnimatableContext> "composition" (box (U2.Case1 value))
+    static member ``composition`` (value: string) : Field<AnimatableContext> = Field.create<AnimatableContext> "composition" (box (U2.Case2 value))
+    static member ``onBeginValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> = Field.create<AnimatableContext> "onBegin" (box (value))
+    static member ``onBegin`` (value: (Raw.JSAnimation -> unit)) : Field<AnimatableContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimatableContext> "onBegin" (box (callback))
+    static member ``onBeforeUpdateValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> = Field.create<AnimatableContext> "onBeforeUpdate" (box (value))
+    static member ``onBeforeUpdate`` (value: (Raw.JSAnimation -> unit)) : Field<AnimatableContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimatableContext> "onBeforeUpdate" (box (callback))
+    static member ``onUpdateValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> = Field.create<AnimatableContext> "onUpdate" (box (value))
+    static member ``onUpdate`` (value: (Raw.JSAnimation -> unit)) : Field<AnimatableContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimatableContext> "onUpdate" (box (callback))
+    static member ``onLoopValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> = Field.create<AnimatableContext> "onLoop" (box (value))
+    static member ``onLoop`` (value: (Raw.JSAnimation -> unit)) : Field<AnimatableContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimatableContext> "onLoop" (box (callback))
+    static member ``onPauseValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> = Field.create<AnimatableContext> "onPause" (box (value))
+    static member ``onPause`` (value: (Raw.JSAnimation -> unit)) : Field<AnimatableContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimatableContext> "onPause" (box (callback))
+    static member ``onCompleteValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> = Field.create<AnimatableContext> "onComplete" (box (value))
+    static member ``onComplete`` (value: (Raw.JSAnimation -> unit)) : Field<AnimatableContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimatableContext> "onComplete" (box (callback))
+    static member ``onRenderValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> = Field.create<AnimatableContext> "onRender" (box (value))
+    static member ``onRender`` (value: (Raw.JSAnimation -> unit)) : Field<AnimatableContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimatableContext> "onRender" (box (callback))
+    static member parameters (options: Options<AnimatableContext>) : Raw.AnimatableParams = Options.toObject options |> unbox
+    static member property (key: string, value: U9<string, float, Raw.AnimatablePropertyParamsOptions, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister, (float -> U2<string, float>), (Raw.JSAnimation -> obj)>) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (value))
+    static member property (key: string, value: string) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case1 (value)))
+    static member property (key: string, value: float) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case2 (value)))
+    static member property (key: string, value: Raw.AnimatablePropertyParamsOptions) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case3 (value)))
+    static member property (key: string, value: (float -> float)) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case4 (value)))
+    static member property (key: string, value: Raw.DurationKeyframes.Item.Duration) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case5 (value)))
+    static member property (key: string, value: Raw.Spring) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case6 (value)))
+    static member property (key: string, value: Raw.TweakRegister) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case7 (value)))
+    static member property (key: string, value: (float -> U2<string, float>)) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case8 (value)))
+    static member property (key: string, value: (Raw.JSAnimation -> obj)) : Field<AnimatableContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["unit"; "duration"; "ease"; "modifier"; "composition"; "onBegin"; "onBeforeUpdate"; "onUpdate"; "onLoop"; "onPause"; "onComplete"; "onRender"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<AnimatableContext> key (box (U9.Case9 (value)))
+
+[<AbstractClass; Sealed>]
+type ``Draggable`` private () =
+    static member ``trigger`` (value: U4<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>) : Field<DraggableContext> = Field.create<DraggableContext> "trigger" (box (value))
+    static member ``trigger`` (value: string) : Field<DraggableContext> = Field.create<DraggableContext> "trigger" (box (U4.Case1 value))
+    static member ``trigger`` (value: Fable.Core.TS.Dom.HTMLElement) : Field<DraggableContext> = Field.create<DraggableContext> "trigger" (box (U4.Case2 value))
+    static member ``trigger`` (value: Fable.Core.TS.Dom.NodeList) : Field<DraggableContext> = Field.create<DraggableContext> "trigger" (box (U4.Case3 value))
+    static member ``trigger`` (value: Fable.Core.TS.Dom.SVGElement) : Field<DraggableContext> = Field.create<DraggableContext> "trigger" (box (U4.Case4 value))
+    static member ``container`` (value: U6<string, (float)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement, (Raw.Draggable -> U5<string, (float)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)>) : Field<DraggableContext> = Field.create<DraggableContext> "container" (box (value))
+    static member ``container`` (value: string) : Field<DraggableContext> = Field.create<DraggableContext> "container" (box (U6.Case1 value))
+    static member ``container`` (value: (float)[]) : Field<DraggableContext> = Field.create<DraggableContext> "container" (box (U6.Case2 value))
+    static member ``container`` (value: Fable.Core.TS.Dom.HTMLElement) : Field<DraggableContext> = Field.create<DraggableContext> "container" (box (U6.Case3 value))
+    static member ``container`` (value: Fable.Core.TS.Dom.NodeList) : Field<DraggableContext> = Field.create<DraggableContext> "container" (box (U6.Case4 value))
+    static member ``container`` (value: Fable.Core.TS.Dom.SVGElement) : Field<DraggableContext> = Field.create<DraggableContext> "container" (box (U6.Case5 value))
+    static member ``container`` (value: (Raw.Draggable -> U5<string, (float)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)) : Field<DraggableContext> = Field.create<DraggableContext> "container" (box (U6.Case6 value))
+    static member ``x`` (value: U2<bool, Raw.DraggableAxisParam>) : Field<DraggableContext> = Field.create<DraggableContext> "x" (box (value))
+    static member ``x`` (value: bool) : Field<DraggableContext> = Field.create<DraggableContext> "x" (box (U2.Case1 value))
+    static member ``x`` (value: Raw.DraggableAxisParam) : Field<DraggableContext> = Field.create<DraggableContext> "x" (box (U2.Case2 value))
+    static member ``y`` (value: U2<bool, Raw.DraggableAxisParam>) : Field<DraggableContext> = Field.create<DraggableContext> "y" (box (value))
+    static member ``y`` (value: bool) : Field<DraggableContext> = Field.create<DraggableContext> "y" (box (U2.Case1 value))
+    static member ``y`` (value: Raw.DraggableAxisParam) : Field<DraggableContext> = Field.create<DraggableContext> "y" (box (U2.Case2 value))
+    static member ``modifier`` (value: (float -> U2<string, float>)) : Field<DraggableContext> = Field.create<DraggableContext> "modifier" (box (value))
+    static member ``snap`` (value: U3<float, (float)[], (Raw.Draggable -> U2<float, (float)[]>)>) : Field<DraggableContext> = Field.create<DraggableContext> "snap" (box (value))
+    static member ``snap`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "snap" (box (U3.Case1 value))
+    static member ``snap`` (value: (float)[]) : Field<DraggableContext> = Field.create<DraggableContext> "snap" (box (U3.Case2 value))
+    static member ``snap`` (value: (Raw.Draggable -> U2<float, (float)[]>)) : Field<DraggableContext> = Field.create<DraggableContext> "snap" (box (U3.Case3 value))
+    static member ``containerPadding`` (value: U3<float, (float)[], (Raw.Draggable -> U2<float, (float)[]>)>) : Field<DraggableContext> = Field.create<DraggableContext> "containerPadding" (box (value))
+    static member ``containerPadding`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "containerPadding" (box (U3.Case1 value))
+    static member ``containerPadding`` (value: (float)[]) : Field<DraggableContext> = Field.create<DraggableContext> "containerPadding" (box (U3.Case2 value))
+    static member ``containerPadding`` (value: (Raw.Draggable -> U2<float, (float)[]>)) : Field<DraggableContext> = Field.create<DraggableContext> "containerPadding" (box (U3.Case3 value))
+    static member ``containerFriction`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "containerFriction" (box (value))
+    static member ``containerFriction`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "containerFriction" (box (U2.Case1 value))
+    static member ``containerFriction`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "containerFriction" (box (U2.Case2 value))
+    static member ``releaseContainerFriction`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "releaseContainerFriction" (box (value))
+    static member ``releaseContainerFriction`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "releaseContainerFriction" (box (U2.Case1 value))
+    static member ``releaseContainerFriction`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "releaseContainerFriction" (box (U2.Case2 value))
+    static member ``dragSpeed`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "dragSpeed" (box (value))
+    static member ``dragSpeed`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "dragSpeed" (box (U2.Case1 value))
+    static member ``dragSpeed`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "dragSpeed" (box (U2.Case2 value))
+    static member ``dragThreshold`` (value: U3<float, Raw.DraggableDragThresholdParams, (Raw.Draggable -> U2<float, Raw.DraggableDragThresholdParams>)>) : Field<DraggableContext> = Field.create<DraggableContext> "dragThreshold" (box (value))
+    static member ``dragThreshold`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "dragThreshold" (box (U3.Case1 value))
+    static member ``dragThreshold`` (value: Raw.DraggableDragThresholdParams) : Field<DraggableContext> = Field.create<DraggableContext> "dragThreshold" (box (U3.Case2 value))
+    static member ``dragThreshold`` (value: (Raw.Draggable -> U2<float, Raw.DraggableDragThresholdParams>)) : Field<DraggableContext> = Field.create<DraggableContext> "dragThreshold" (box (U3.Case3 value))
+    static member ``scrollSpeed`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "scrollSpeed" (box (value))
+    static member ``scrollSpeed`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "scrollSpeed" (box (U2.Case1 value))
+    static member ``scrollSpeed`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "scrollSpeed" (box (U2.Case2 value))
+    static member ``scrollThreshold`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "scrollThreshold" (box (value))
+    static member ``scrollThreshold`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "scrollThreshold" (box (U2.Case1 value))
+    static member ``scrollThreshold`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "scrollThreshold" (box (U2.Case2 value))
+    static member ``minVelocity`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "minVelocity" (box (value))
+    static member ``minVelocity`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "minVelocity" (box (U2.Case1 value))
+    static member ``minVelocity`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "minVelocity" (box (U2.Case2 value))
+    static member ``maxVelocity`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "maxVelocity" (box (value))
+    static member ``maxVelocity`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "maxVelocity" (box (U2.Case1 value))
+    static member ``maxVelocity`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "maxVelocity" (box (U2.Case2 value))
+    static member ``velocityMultiplier`` (value: U2<float, (Raw.Draggable -> float)>) : Field<DraggableContext> = Field.create<DraggableContext> "velocityMultiplier" (box (value))
+    static member ``velocityMultiplier`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "velocityMultiplier" (box (U2.Case1 value))
+    static member ``velocityMultiplier`` (value: (Raw.Draggable -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "velocityMultiplier" (box (U2.Case2 value))
+    static member ``releaseMass`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "releaseMass" (box (value))
+    static member ``releaseStiffness`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "releaseStiffness" (box (value))
+    static member ``releaseDamping`` (value: float) : Field<DraggableContext> = Field.create<DraggableContext> "releaseDamping" (box (value))
+    static member ``releaseEase`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<DraggableContext> = Field.create<DraggableContext> "releaseEase" (box (value))
+    static member ``releaseEase`` (value: string) : Field<DraggableContext> = Field.create<DraggableContext> "releaseEase" (box (U4.Case1 value))
+    static member ``releaseEase`` (value: (float -> float)) : Field<DraggableContext> = Field.create<DraggableContext> "releaseEase" (box (U4.Case2 value))
+    static member ``releaseEase`` (value: Raw.Spring) : Field<DraggableContext> = Field.create<DraggableContext> "releaseEase" (box (U4.Case3 value))
+    static member ``releaseEase`` (value: Raw.TweakRegister) : Field<DraggableContext> = Field.create<DraggableContext> "releaseEase" (box (U4.Case4 value))
+    static member ``cursor`` (value: U3<bool, Raw.DraggableCursorParams, (Raw.Draggable -> U2<bool, Raw.DraggableCursorParams>)>) : Field<DraggableContext> = Field.create<DraggableContext> "cursor" (box (value))
+    static member ``cursor`` (value: bool) : Field<DraggableContext> = Field.create<DraggableContext> "cursor" (box (U3.Case1 value))
+    static member ``cursor`` (value: Raw.DraggableCursorParams) : Field<DraggableContext> = Field.create<DraggableContext> "cursor" (box (U3.Case2 value))
+    static member ``cursor`` (value: (Raw.Draggable -> U2<bool, Raw.DraggableCursorParams>)) : Field<DraggableContext> = Field.create<DraggableContext> "cursor" (box (U3.Case3 value))
+    static member ``onGrabValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onGrab" (box (value))
+    static member ``onGrab`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onGrab" (box (callback))
+    static member ``onDragValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onDrag" (box (value))
+    static member ``onDrag`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onDrag" (box (callback))
+    static member ``onReleaseValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onRelease" (box (value))
+    static member ``onRelease`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onRelease" (box (callback))
+    static member ``onUpdateValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onUpdate" (box (value))
+    static member ``onUpdate`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onUpdate" (box (callback))
+    static member ``onSettleValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onSettle" (box (value))
+    static member ``onSettle`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onSettle" (box (callback))
+    static member ``onSnapValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onSnap" (box (value))
+    static member ``onSnap`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onSnap" (box (callback))
+    static member ``onResizeValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onResize" (box (value))
+    static member ``onResize`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onResize" (box (callback))
+    static member ``onAfterResizeValue`` (value: (Raw.Draggable -> obj)) : Field<DraggableContext> = Field.create<DraggableContext> "onAfterResize" (box (value))
+    static member ``onAfterResize`` (value: (Raw.Draggable -> unit)) : Field<DraggableContext> =
+        let callback (handle: Raw.Draggable) : obj = value handle; box ()
+        Field.create<DraggableContext> "onAfterResize" (box (callback))
+    static member parameters (options: Options<DraggableContext>) : Raw.DraggableParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``Scroll`` private () =
+    static member ``id`` (value: U2<string, float>) : Field<ScrollContext> = Field.create<ScrollContext> "id" (box (value))
+    static member ``id`` (value: string) : Field<ScrollContext> = Field.create<ScrollContext> "id" (box (U2.Case1 value))
+    static member ``id`` (value: float) : Field<ScrollContext> = Field.create<ScrollContext> "id" (box (U2.Case2 value))
+    static member ``sync`` (value: U6<string, float, bool, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<ScrollContext> = Field.create<ScrollContext> "sync" (box (value))
+    static member ``sync`` (value: string) : Field<ScrollContext> = Field.create<ScrollContext> "sync" (box (U6.Case1 value))
+    static member ``sync`` (value: float) : Field<ScrollContext> = Field.create<ScrollContext> "sync" (box (U6.Case2 value))
+    static member ``sync`` (value: bool) : Field<ScrollContext> = Field.create<ScrollContext> "sync" (box (U6.Case3 value))
+    static member ``sync`` (value: (float -> float)) : Field<ScrollContext> = Field.create<ScrollContext> "sync" (box (U6.Case4 value))
+    static member ``sync`` (value: Raw.Spring) : Field<ScrollContext> = Field.create<ScrollContext> "sync" (box (U6.Case5 value))
+    static member ``sync`` (value: Raw.TweakRegister) : Field<ScrollContext> = Field.create<ScrollContext> "sync" (box (U6.Case6 value))
+    static member ``container`` (value: U6<string, (U5<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>) : Field<ScrollContext> = Field.create<ScrollContext> "container" (box (value))
+    static member ``container`` (value: string) : Field<ScrollContext> = Field.create<ScrollContext> "container" (box (U6.Case1 value))
+    static member ``container`` (value: (U5<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)[]) : Field<ScrollContext> = Field.create<ScrollContext> "container" (box (U6.Case2 value))
+    static member ``container`` (value: Fable.Core.TS.Dom.HTMLElement) : Field<ScrollContext> = Field.create<ScrollContext> "container" (box (U6.Case3 value))
+    static member ``container`` (value: Fable.Core.JS.JS.Record<string, obj>) : Field<ScrollContext> = Field.create<ScrollContext> "container" (box (U6.Case4 value))
+    static member ``container`` (value: Fable.Core.TS.Dom.NodeList) : Field<ScrollContext> = Field.create<ScrollContext> "container" (box (U6.Case5 value))
+    static member ``container`` (value: Fable.Core.TS.Dom.SVGElement) : Field<ScrollContext> = Field.create<ScrollContext> "container" (box (U6.Case6 value))
+    static member ``target`` (value: U6<string, (U5<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>) : Field<ScrollContext> = Field.create<ScrollContext> "target" (box (value))
+    static member ``target`` (value: string) : Field<ScrollContext> = Field.create<ScrollContext> "target" (box (U6.Case1 value))
+    static member ``target`` (value: (U5<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)[]) : Field<ScrollContext> = Field.create<ScrollContext> "target" (box (U6.Case2 value))
+    static member ``target`` (value: Fable.Core.TS.Dom.HTMLElement) : Field<ScrollContext> = Field.create<ScrollContext> "target" (box (U6.Case3 value))
+    static member ``target`` (value: Fable.Core.JS.JS.Record<string, obj>) : Field<ScrollContext> = Field.create<ScrollContext> "target" (box (U6.Case4 value))
+    static member ``target`` (value: Fable.Core.TS.Dom.NodeList) : Field<ScrollContext> = Field.create<ScrollContext> "target" (box (U6.Case5 value))
+    static member ``target`` (value: Fable.Core.TS.Dom.SVGElement) : Field<ScrollContext> = Field.create<ScrollContext> "target" (box (U6.Case6 value))
+    static member ``axis`` (value: U3<string, (Raw.ScrollObserver -> Raw.ScrollObserverAxisCallback.Result), (Raw.ScrollObserver -> U2<string, (Raw.ScrollObserver -> Raw.ScrollObserverAxisCallback.Result)>)>) : Field<ScrollContext> = Field.create<ScrollContext> "axis" (box (value))
+    static member ``axis`` (value: string) : Field<ScrollContext> = Field.create<ScrollContext> "axis" (box (U3.Case1 value))
+    static member ``axis`` (value: (Raw.ScrollObserver -> Raw.ScrollObserverAxisCallback.Result)) : Field<ScrollContext> = Field.create<ScrollContext> "axis" (box (U3.Case2 value))
+    static member ``axis`` (value: (Raw.ScrollObserver -> U2<string, (Raw.ScrollObserver -> Raw.ScrollObserverAxisCallback.Result)>)) : Field<ScrollContext> = Field.create<ScrollContext> "axis" (box (U3.Case3 value))
+    static member ``enter`` (value: U5<string, float, (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>), Raw.ScrollThresholdParam, (Raw.ScrollObserver -> U4<string, float, (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>), Raw.ScrollThresholdParam>)>) : Field<ScrollContext> = Field.create<ScrollContext> "enter" (box (value))
+    static member ``enter`` (value: string) : Field<ScrollContext> = Field.create<ScrollContext> "enter" (box (U5.Case1 value))
+    static member ``enter`` (value: float) : Field<ScrollContext> = Field.create<ScrollContext> "enter" (box (U5.Case2 value))
+    static member ``enter`` (value: (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>)) : Field<ScrollContext> = Field.create<ScrollContext> "enter" (box (U5.Case3 value))
+    static member ``enter`` (value: Raw.ScrollThresholdParam) : Field<ScrollContext> = Field.create<ScrollContext> "enter" (box (U5.Case4 value))
+    static member ``enter`` (value: (Raw.ScrollObserver -> U4<string, float, (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>), Raw.ScrollThresholdParam>)) : Field<ScrollContext> = Field.create<ScrollContext> "enter" (box (U5.Case5 value))
+    static member ``leave`` (value: U5<string, float, (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>), Raw.ScrollThresholdParam, (Raw.ScrollObserver -> U4<string, float, (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>), Raw.ScrollThresholdParam>)>) : Field<ScrollContext> = Field.create<ScrollContext> "leave" (box (value))
+    static member ``leave`` (value: string) : Field<ScrollContext> = Field.create<ScrollContext> "leave" (box (U5.Case1 value))
+    static member ``leave`` (value: float) : Field<ScrollContext> = Field.create<ScrollContext> "leave" (box (U5.Case2 value))
+    static member ``leave`` (value: (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>)) : Field<ScrollContext> = Field.create<ScrollContext> "leave" (box (U5.Case3 value))
+    static member ``leave`` (value: Raw.ScrollThresholdParam) : Field<ScrollContext> = Field.create<ScrollContext> "leave" (box (U5.Case4 value))
+    static member ``leave`` (value: (Raw.ScrollObserver -> U4<string, float, (Raw.ScrollObserver -> U3<string, float, Raw.ScrollThresholdParam>), Raw.ScrollThresholdParam>)) : Field<ScrollContext> = Field.create<ScrollContext> "leave" (box (U5.Case5 value))
+    static member ``repeat`` (value: U2<bool, (Raw.ScrollObserver -> bool)>) : Field<ScrollContext> = Field.create<ScrollContext> "repeat" (box (value))
+    static member ``repeat`` (value: bool) : Field<ScrollContext> = Field.create<ScrollContext> "repeat" (box (U2.Case1 value))
+    static member ``repeat`` (value: (Raw.ScrollObserver -> bool)) : Field<ScrollContext> = Field.create<ScrollContext> "repeat" (box (U2.Case2 value))
+    static member ``debug`` (value: bool) : Field<ScrollContext> = Field.create<ScrollContext> "debug" (box (value))
+    static member ``onEnterValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onEnter" (box (value))
+    static member ``onEnter`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onEnter" (box (callback))
+    static member ``onLeaveValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onLeave" (box (value))
+    static member ``onLeave`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onLeave" (box (callback))
+    static member ``onEnterForwardValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onEnterForward" (box (value))
+    static member ``onEnterForward`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onEnterForward" (box (callback))
+    static member ``onLeaveForwardValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onLeaveForward" (box (value))
+    static member ``onLeaveForward`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onLeaveForward" (box (callback))
+    static member ``onEnterBackwardValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onEnterBackward" (box (value))
+    static member ``onEnterBackward`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onEnterBackward" (box (callback))
+    static member ``onLeaveBackwardValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onLeaveBackward" (box (value))
+    static member ``onLeaveBackward`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onLeaveBackward" (box (callback))
+    static member ``onUpdateValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onUpdate" (box (value))
+    static member ``onUpdate`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onUpdate" (box (callback))
+    static member ``onResizeValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onResize" (box (value))
+    static member ``onResize`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onResize" (box (callback))
+    static member ``onSyncCompleteValue`` (value: (Raw.ScrollObserver -> obj)) : Field<ScrollContext> = Field.create<ScrollContext> "onSyncComplete" (box (value))
+    static member ``onSyncComplete`` (value: (Raw.ScrollObserver -> unit)) : Field<ScrollContext> =
+        let callback (handle: Raw.ScrollObserver) : obj = value handle; box ()
+        Field.create<ScrollContext> "onSyncComplete" (box (callback))
+    static member parameters (options: Options<ScrollContext>) : Raw.ScrollObserverParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``Scope`` private () =
+    static member ``root`` (value: U6<string, Raw.AngularRef, Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.NodeList, Raw.ReactRef, Fable.Core.TS.Dom.SVGElement>) : Field<ScopeContext> = Field.create<ScopeContext> "root" (box (value))
+    static member ``root`` (value: string) : Field<ScopeContext> = Field.create<ScopeContext> "root" (box (U6.Case1 value))
+    static member ``root`` (value: Raw.AngularRef) : Field<ScopeContext> = Field.create<ScopeContext> "root" (box (U6.Case2 value))
+    static member ``root`` (value: Fable.Core.TS.Dom.HTMLElement) : Field<ScopeContext> = Field.create<ScopeContext> "root" (box (U6.Case3 value))
+    static member ``root`` (value: Fable.Core.TS.Dom.NodeList) : Field<ScopeContext> = Field.create<ScopeContext> "root" (box (U6.Case4 value))
+    static member ``root`` (value: Raw.ReactRef) : Field<ScopeContext> = Field.create<ScopeContext> "root" (box (U6.Case5 value))
+    static member ``root`` (value: Fable.Core.TS.Dom.SVGElement) : Field<ScopeContext> = Field.create<ScopeContext> "root" (box (U6.Case6 value))
+    static member ``defaults`` (value: Raw.DefaultsParams) : Field<ScopeContext> = Field.create<ScopeContext> "defaults" (box (value))
+    static member ``mediaQueries`` (value: Fable.Core.JS.JS.Record<string, string>) : Field<ScopeContext> = Field.create<ScopeContext> "mediaQueries" (box (value))
+    static member parameters (options: Options<ScopeContext>) : Raw.ScopeParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``TextSplitter`` private () =
+    static member ``lines`` (value: U4<string, bool, ((U2<Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.Node>) option -> obj), Raw.SplitTemplateParams>) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "lines" (box (value))
+    static member ``lines`` (value: string) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "lines" (box (U4.Case1 value))
+    static member ``lines`` (value: bool) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "lines" (box (U4.Case2 value))
+    static member ``lines`` (value: ((U2<Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.Node>) option -> obj)) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "lines" (box (U4.Case3 value))
+    static member ``lines`` (value: Raw.SplitTemplateParams) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "lines" (box (U4.Case4 value))
+    static member ``words`` (value: U4<string, bool, ((U2<Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.Node>) option -> obj), Raw.SplitTemplateParams>) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "words" (box (value))
+    static member ``words`` (value: string) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "words" (box (U4.Case1 value))
+    static member ``words`` (value: bool) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "words" (box (U4.Case2 value))
+    static member ``words`` (value: ((U2<Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.Node>) option -> obj)) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "words" (box (U4.Case3 value))
+    static member ``words`` (value: Raw.SplitTemplateParams) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "words" (box (U4.Case4 value))
+    static member ``chars`` (value: U4<string, bool, ((U2<Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.Node>) option -> obj), Raw.SplitTemplateParams>) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "chars" (box (value))
+    static member ``chars`` (value: string) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "chars" (box (U4.Case1 value))
+    static member ``chars`` (value: bool) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "chars" (box (U4.Case2 value))
+    static member ``chars`` (value: ((U2<Fable.Core.TS.Dom.HTMLElement, Fable.Core.TS.Dom.Node>) option -> obj)) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "chars" (box (U4.Case3 value))
+    static member ``chars`` (value: Raw.SplitTemplateParams) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "chars" (box (U4.Case4 value))
+    static member ``accessible`` (value: bool) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "accessible" (box (value))
+    static member ``includeSpaces`` (value: bool) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "includeSpaces" (box (value))
+    static member ``debug`` (value: bool) : Field<TextSplitterContext> = Field.create<TextSplitterContext> "debug" (box (value))
+    static member parameters (options: Options<TextSplitterContext>) : Raw.TextSplitterParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
 type ``Defaults`` private () =
     static member ``id`` (value: U2<string, float>) : Field<DefaultsContext> = Field.create<DefaultsContext> "id" (box (value))
     static member ``id`` (value: string) : Field<DefaultsContext> = Field.create<DefaultsContext> "id" (box (U2.Case1 value))
@@ -427,6 +773,71 @@ type ``PercentageKeyframe`` private () =
     static member property (key: string, value: Raw.TweakRegister) : Field<PercentageKeyframeContext> =
         if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
         Field.create<PercentageKeyframeContext> key (box (U6.Case6 (value)))
+
+[<AbstractClass; Sealed>]
+type ``DragAxis`` private () =
+    static member ``mapTo`` (value: string) : Field<DragAxisContext> = Field.create<DragAxisContext> "mapTo" (box (value))
+    static member ``modifier`` (value: (float -> U2<string, float>)) : Field<DragAxisContext> = Field.create<DragAxisContext> "modifier" (box (value))
+    static member ``composition`` (value: U2<float, string>) : Field<DragAxisContext> = Field.create<DragAxisContext> "composition" (box (value))
+    static member ``composition`` (value: float) : Field<DragAxisContext> = Field.create<DragAxisContext> "composition" (box (U2.Case1 value))
+    static member ``composition`` (value: string) : Field<DragAxisContext> = Field.create<DragAxisContext> "composition" (box (U2.Case2 value))
+    static member ``snap`` (value: U3<float, (float)[], (Raw.Draggable -> U2<float, (float)[]>)>) : Field<DragAxisContext> = Field.create<DragAxisContext> "snap" (box (value))
+    static member ``snap`` (value: float) : Field<DragAxisContext> = Field.create<DragAxisContext> "snap" (box (U3.Case1 value))
+    static member ``snap`` (value: (float)[]) : Field<DragAxisContext> = Field.create<DragAxisContext> "snap" (box (U3.Case2 value))
+    static member ``snap`` (value: (Raw.Draggable -> U2<float, (float)[]>)) : Field<DragAxisContext> = Field.create<DragAxisContext> "snap" (box (U3.Case3 value))
+    static member parameters (options: Options<DragAxisContext>) : Raw.DraggableAxisParam = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``DragCursor`` private () =
+    static member ``onHover`` (value: string) : Field<DragCursorContext> = Field.create<DragCursorContext> "onHover" (box (value))
+    static member ``onGrab`` (value: string) : Field<DragCursorContext> = Field.create<DragCursorContext> "onGrab" (box (value))
+    static member parameters (options: Options<DragCursorContext>) : Raw.DraggableCursorParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``DragThreshold`` private () =
+    static member ``mouse`` (value: float) : Field<DragThresholdContext> = Field.create<DragThresholdContext> "mouse" (box (value))
+    static member ``touch`` (value: float) : Field<DragThresholdContext> = Field.create<DragThresholdContext> "touch" (box (value))
+    static member parameters (options: Options<DragThresholdContext>) : Raw.DraggableDragThresholdParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``AnimatableProperty`` private () =
+    static member ``unit`` (value: string) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "unit" (box (value))
+    static member ``duration`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "duration" (box (value))
+    static member ``duration`` (value: string) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "duration" (box (U6.Case1 value))
+    static member ``duration`` (value: float) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "duration" (box (U6.Case2 value))
+    static member ``duration`` (value: (float -> float)) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "duration" (box (U6.Case3 value))
+    static member ``duration`` (value: Raw.DurationKeyframes.Item.Duration) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "duration" (box (U6.Case4 value))
+    static member ``duration`` (value: Raw.Spring) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "duration" (box (U6.Case5 value))
+    static member ``duration`` (value: Raw.TweakRegister) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "duration" (box (U6.Case6 value))
+    static member ``ease`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "ease" (box (value))
+    static member ``ease`` (value: string) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "ease" (box (U4.Case1 value))
+    static member ``ease`` (value: (float -> float)) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "ease" (box (U4.Case2 value))
+    static member ``ease`` (value: Raw.Spring) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "ease" (box (U4.Case3 value))
+    static member ``ease`` (value: Raw.TweakRegister) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "ease" (box (U4.Case4 value))
+    static member ``modifier`` (value: (float -> U2<string, float>)) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "modifier" (box (value))
+    static member ``composition`` (value: U2<float, string>) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "composition" (box (value))
+    static member ``composition`` (value: float) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "composition" (box (U2.Case1 value))
+    static member ``composition`` (value: string) : Field<AnimatablePropertyContext> = Field.create<AnimatablePropertyContext> "composition" (box (U2.Case2 value))
+    static member parameters (options: Options<AnimatablePropertyContext>) : Raw.AnimatablePropertyParamsOptions = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``ScrollThreshold`` private () =
+    static member ``target`` (value: U2<string, float>) : Field<ScrollThresholdContext> = Field.create<ScrollThresholdContext> "target" (box (value))
+    static member ``target`` (value: string) : Field<ScrollThresholdContext> = Field.create<ScrollThresholdContext> "target" (box (U2.Case1 value))
+    static member ``target`` (value: float) : Field<ScrollThresholdContext> = Field.create<ScrollThresholdContext> "target" (box (U2.Case2 value))
+    static member ``container`` (value: U2<string, float>) : Field<ScrollThresholdContext> = Field.create<ScrollThresholdContext> "container" (box (value))
+    static member ``container`` (value: string) : Field<ScrollThresholdContext> = Field.create<ScrollThresholdContext> "container" (box (U2.Case1 value))
+    static member ``container`` (value: float) : Field<ScrollThresholdContext> = Field.create<ScrollThresholdContext> "container" (box (U2.Case2 value))
+    static member parameters (options: Options<ScrollThresholdContext>) : Raw.ScrollThresholdParam = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``SplitTemplate`` private () =
+    static member ``class`` (value: U2<string, bool>) : Field<SplitTemplateContext> = Field.create<SplitTemplateContext> "class" (box (value))
+    static member ``class`` (value: string) : Field<SplitTemplateContext> = Field.create<SplitTemplateContext> "class" (box (U2.Case1 value))
+    static member ``class`` (value: bool) : Field<SplitTemplateContext> = Field.create<SplitTemplateContext> "class" (box (U2.Case2 value))
+    static member ``wrap`` (value: Raw.SplitTemplateParams.Wrap) : Field<SplitTemplateContext> = Field.create<SplitTemplateContext> "wrap" (box (value))
+    static member ``clone`` (value: Raw.SplitTemplateParams.Clone) : Field<SplitTemplateContext> = Field.create<SplitTemplateContext> "clone" (box (value))
+    static member parameters (options: Options<SplitTemplateContext>) : Raw.SplitTemplateParams = Options.toObject options |> unbox
 
 [<AbstractClass; Sealed>]
 type ``Keyframes`` private () =
@@ -1540,6 +1951,7 @@ type ``Target`` private () =
     static member selector (value: string) : Raw.TargetsParam = U6.Case1 (value)
     static member ``object`` (value: Fable.Core.JS.JS.Record<string, obj>) : Raw.TargetsParam = U6.Case4 (value)
     static member element (value: Fable.Core.TS.Dom.HTMLElement) : Raw.TargetsParam = U6.Case3 (value)
+    static member svg (value: Fable.Core.TS.Dom.SVGElement) : Raw.TargetsParam = U6.Case6 (value)
 
 module Anime =
     let ``animate`` (``targets``: U6<string, (U5<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>) (options: Options<AnimationContext>) : Raw.JSAnimation =
@@ -1554,3 +1966,21 @@ module Anime =
     let ``stagger`` (``val``: float) (options: Options<StaggerContext>) : Raw.Utils.Stagger.Result =
         let parameters = Options.toObject options |> unbox<Raw.StaggerParams>
         Raw.Exports.``stagger``(``val`` = ``val``, ``params`` = parameters)
+    let ``createSpring`` (options: Options<SpringContext>) : Raw.Spring =
+        let parameters = Options.toObject options |> unbox<Raw.SpringParams>
+        Raw.Exports.``createSpring``(``parameters`` = parameters)
+    let ``createAnimatable`` (``targets``: U6<string, (U5<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>) (options: Options<AnimatableContext>) : Raw.AnimatableObject =
+        let parameters = Options.toObject options |> unbox<Raw.AnimatableParams>
+        Raw.Exports.``createAnimatable``(``targets`` = ``targets``, ``parameters`` = parameters)
+    let ``createDraggable`` (``target``: U6<string, (U5<string, Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>)[], Fable.Core.TS.Dom.HTMLElement, Fable.Core.JS.JS.Record<string, obj>, Fable.Core.TS.Dom.NodeList, Fable.Core.TS.Dom.SVGElement>) (options: Options<DraggableContext>) : Raw.Draggable =
+        let parameters = Options.toObject options |> unbox<Raw.DraggableParams>
+        Raw.Exports.``createDraggable``(``target`` = ``target``, ``parameters`` = parameters)
+    let ``onScroll`` (options: Options<ScrollContext>) : Raw.ScrollObserver =
+        let parameters = Options.toObject options |> unbox<Raw.ScrollObserverParams>
+        Raw.Exports.``onScroll``(``parameters`` = parameters)
+    let ``createScope`` (options: Options<ScopeContext>) : Raw.Scope =
+        let parameters = Options.toObject options |> unbox<Raw.ScopeParams>
+        Raw.Exports.``createScope``(``params`` = parameters)
+    let ``splitText`` (``target``: U4<string, (Fable.Core.TS.Dom.Element)[], Fable.Core.TS.Dom.Element, Fable.Core.TS.Dom.NodeList>) (options: Options<TextSplitterContext>) : Raw.TextSplitter =
+        let parameters = Options.toObject options |> unbox<Raw.TextSplitterParams>
+        Raw.Exports.``splitText``(``target`` = ``target``, ``parameters`` = parameters)

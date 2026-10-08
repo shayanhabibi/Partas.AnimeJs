@@ -105,23 +105,23 @@
     "animejs/dist/modules/waapi/index.d.ts": "75128b333a2a44b60655c37c696071f4117f67dff47b05b1fdb1e224ab04372f",
     "animejs/dist/modules/waapi/waapi.d.ts": "043fa2b450325e141d62790289bc0a51d8ab9405adb95c3a847bcfe2bb271955",
     "dotnet-tools.json": "de001e86c0c3bb291b08e1346230cc84e9ebd53616f525b54987b642ff87cee8",
-    "generation/dsl-policy.json": "b22a62b8e2f62763ae31eb49ee84864e644b3feb9c25515ab6130c5d80d02718",
-    "generation/fidelity-baseline.json": "a71e1a72cc3f3f57ff634a4c273e193e48b382e2f0c5fbb6c7d1148ce2d2ad4f",
+    "generation/dsl-policy.json": "49425d16e942d7d5da1719993edf54163faf62d4d37387157685521854483999",
+    "generation/fidelity-baseline.json": "89e811eef0e2f842175fb78a0541f91fab8ff88c3bc472dce96399404d83a03a",
     "generation/package-lock.json": "e72a5a8bc62c612823ab0325b5ba6a01798b845bb040897dc98d644a3aec15a1",
     "generation/xantham.json": "bef1f177ffbf7ade2bfdebadb871bf8f9fd7c9a8f16fa833df463b655fab82d1",
     "global.json": "20c93ca7812d0a9825eef71217156f95ab2f4fe5aadfeb22ebc1c24b630018d3",
     "tools/Partas.AnimeJs.Generation/Candidate.fs": "5e3d252c74c6d545f9c878c6082e950f410d7e962f2edd220763706fe7b93174",
-    "tools/Partas.AnimeJs.Generation/Contracts.fs": "2f6a057b980b13b824626331f1c2d678836ebb08283aa4775e39da1f89e12cc2",
+    "tools/Partas.AnimeJs.Generation/Contracts.fs": "a69177e2f053c2be80a6cbd4c0160c71791e9867b86a618df35615c8cab25fa4",
     "tools/Partas.AnimeJs.Generation/CssMetadata.fs": "1b547f64eb465d6a87fbe2650b6470f00b135b520e162413e47bd30821967324",
-    "tools/Partas.AnimeJs.Generation/Emit.fs": "0142dbab0bb4f248992ea2284279fe66721d33863ba4ef662d79379778f7c7c4",
-    "tools/Partas.AnimeJs.Generation/Findings.fs": "57e157d76e364ae2a0cff54736a1859c6c427595bbabd19b7b0a6b692c3b5a4a",
+    "tools/Partas.AnimeJs.Generation/Emit.fs": "9b3342678dcee8df5a38c179d2b5fa074bf21c63eea9bd98f3854631b6e117a1",
+    "tools/Partas.AnimeJs.Generation/Findings.fs": "06f0386acfab325ef1c8ea032c5d91d3d37902cd2f085b88633029e8af766400",
     "tools/Partas.AnimeJs.Generation/Library.fs": "2e9f19922c5980752ca8b71a7bb2e8673738f896c2a186ad4c80a8b7c8a6bf18",
     "tools/Partas.AnimeJs.Generation/Pipeline.fs": "1712d90e6fd6e8f9fcab503f0492f8f4162426d9e2cad9881752be545d87f9fc",
-    "tools/Partas.AnimeJs.Generation/Projection.fs": "87013bfff6d2bebb718a736ed037d830cc1a402bb95893af34b787b809b8acbd",
+    "tools/Partas.AnimeJs.Generation/Projection.fs": "29939279db743720763a1e3eecbf7460394175b962963d294f34e840b577b99a",
     "tools/Partas.AnimeJs.Generation/XanthamAdapter.fs": "812c7acd1f04e8f504bdbb00efbf986d96fd5a5dff5dafbb3994cecd06b01b73"
   },
   "ArtifactHashes": {
-    "Dsl.fs": "dfbb9a1928e96e7ba8dddcba487fb6af2af4df3d6cb2fee74ebda626f5621462",
+    "Dsl.fs": "f590e4b5cb0e1a99d1d8d083f389d28cae00f9ac12edce2cdbd2c7fedbc142c7",
     "Generated.props": "efc32adbe4dd4e1fef68d5536abfbd5abc452e8bbe97e40946526bb5f810d92d",
     "Raw/CompilerLibAliases.fs": "c6bf415e9d33e2b9dbb17ab62c77050daff342da55ea4a65258246cfa2668eb7",
     "Raw/Partas.AnimeJs.Raw.fs": "721e7eecc35aa72118b5afee25fc90a9193a2851bd527ccc375b1f06034ec27a",
@@ -338,8 +338,188 @@
       "Code": "TR.AnyToObj",
       "Reason": "AnimeJs declares callback returns as any. The DSL offers an explicit unit adapter and retains the raw object-returning callback contract.",
       "Review": "Approved generated DSL design, callback adapter reviewed 2026-10-08"
+    },
+    {
+      "Source": "SpringParams.onComplete()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.onBegin()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.onBeforeUpdate()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.onUpdate()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.onLoop()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.onPause()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.onComplete()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.onRender()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onEnter()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onLeave()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onEnterForward()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onLeaveForward()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onEnterBackward()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onLeaveBackward()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onUpdate()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onResize()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.onSyncComplete()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onGrab()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onDrag()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onRelease()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onUpdate()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onSettle()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onSnap()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onResize()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "DraggableParams.onAfterResize()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream event returns any. Preserve concrete callback handle identity, offer explicit unit adapter and retain Value raw return contract.",
+      "Review": "Browser factory callback declarations reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.axis",
+      "Code": "TR.StringLiteralToString",
+      "Reason": "Upstream x/y axis literals widen to string. Retain this documented raw string alternative and the typed callback alternatives.",
+      "Review": "Scroll axis declaration reviewed 2026-10-09"
+    },
+    {
+      "Source": "ScrollObserverParams.axis()",
+      "Code": "TR.StringLiteralToString",
+      "Reason": "Upstream x/y axis literals widen to string. Retain this documented raw string alternative and the typed callback alternatives.",
+      "Review": "Scroll axis declaration reviewed 2026-10-09"
+    },
+    {
+      "Source": "SplitFunctionValue()",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream template callback returns any. Keep obj result explicitly, with shared DOM input types and no unit adapter.",
+      "Review": "Text template declaration reviewed 2026-10-09"
+    },
+    {
+      "Source": "JSTarget",
+      "Code": "TR.AnyToObj",
+      "Reason": "Upstream dynamic target record values are any. Preserve Record\u003Cstring,obj\u003E as explicit object-target escape; DOM alternatives retain shared Xantham identities.",
+      "Review": "Dynamic target record declaration reviewed 2026-10-09"
+    },
+    {
+      "Source": "AnimatableParams.[]()",
+      "Code": "TR.AnyToObj",
+      "Reason": "The dynamic property union includes an upstream JSAnimation callback returning any. Preserve the explicit obj-returning union arm without introducing a unit overload; all other arms retain upstream identity.",
+      "Review": "Animatable dynamic indexer declaration reviewed 2026-10-09"
     }
   ],
   "ExcludedFields": [],
-  "CompilationDigest": "698fc70250d1b60b5cbdbf09b771bc428d905249571b24b728dc25542fb3d133"
+  "CompilationDigest": "6c8d3751ffb72d3d71786ce7d425c2a10c03446f0ce773f9b88532eb4c504711"
 }

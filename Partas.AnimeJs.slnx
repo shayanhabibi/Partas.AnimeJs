@@ -7,5 +7,6 @@
   <Project Path="tests/Partas.AnimeJs.Generation.Tests/Partas.AnimeJs.Generation.Tests.fsproj" />
   <Project Path="tests/Consumers/Positive/Positive.fsproj" />
   <Project Path="tests/Consumers/Families/Families.fsproj" />
+  <Project Path="tests/Consumers/Browser/Browser.fsproj" />
   <Project Path="site/site.fsproj" />
 </Solution>

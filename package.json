@@ -1,1 +1,1 @@
-{ "name": "partas-animejs-workspace", "private": true, "type": "module", "dependencies": { "animejs": "4.5.0" } }
+{"name":"partas-animejs-workspace","private":true,"type":"module","dependencies":{"animejs":"4.5.0"},"devDependencies":{"@playwright/test":"1.64.0"}}

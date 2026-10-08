@@ -49,6 +49,9 @@ let ``emitted first slice compiles and drives actual AnimeJs`` () =
 [<TestCase("Readonly", "FS0810", "pathLength")>]
 [<TestCase("KeyframeShape", "FS0193", "PercentageKeyframeContext")>]
 [<TestCase("TimelineCallback", "FS0001", "JSAnimation")>]
+[<TestCase("SvgTarget", "FS0001", "SVGElement")>]
+[<TestCase("DraggableNested", "FS0041", "DraggableAxisParam")>]
+[<TestCase("SharedDomReadonly", "FS0810", "tagName")>]
 let ``invalid DSL consumers fail for the intended contract`` (fixture: string) code expected =
     let raw, files = generate ()
     let root = AnimeJs.Build.Paths.findRoot __SOURCE_DIRECTORY__

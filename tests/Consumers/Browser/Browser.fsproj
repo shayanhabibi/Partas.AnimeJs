@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net9.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../examples/Spring.fs" />
+    <Compile Include="../../../examples/Draggable.fs" />
+    <Compile Include="../../../examples/Scroll.fs" />
+    <Compile Include="../../../examples/SvgText.fs" />
+    <Compile Include="Witness.fs" />
+    <ProjectReference Include="../../../Partas.AnimeJs/Partas.AnimeJs.fsproj" />
+  </ItemGroup>
+</Project>

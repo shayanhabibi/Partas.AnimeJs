@@ -1,0 +1,22 @@
+import { test, expect } from '@playwright/test';
+test('generated factories interact with real DOM, SVG, pointer and scroll events', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  await expect.poll(() => page.evaluate(() => Boolean(window.witnesses))).toBe(true);
+  await expect(page.locator('#box')).toHaveCSS('opacity', '0.5');
+  await expect(page.locator('#split span')).toHaveCount(2);
+  const witnesses = await page.evaluate(() => ({ svg: window.witnesses.svgHasDrawable, spring: window.witnesses.springFinite, animatable: window.witnesses.animatableReady, scope: window.witnesses.scopeReady }));
+  expect(witnesses).toEqual({ svg: true, spring: true, animatable: true, scope: true });
+  const box = await page.locator('#drag').boundingBox();
+  await page.mouse.move(box.x + 20, box.y + 20);
+  await page.mouse.down();
+  await page.mouse.move(box.x + 60, box.y + 20, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(() => page.evaluate(() => window.witnesses.dragCount())).toBe(1);
+  const before = await page.evaluate(() => window.witnesses.scrollCount());
+  await page.locator('#scroll').hover();
+  await page.mouse.wheel(0, 200);
+  await expect.poll(() => page.evaluate(() => window.witnesses.scrollCount())).toBeGreaterThan(before);
+  expect(errors).toEqual([]);
+});

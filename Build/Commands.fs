@@ -44,15 +44,18 @@ module Commands =
                 run (cmd $"dotnet" |> Cmd.args ["build"; "tests/Consumers/Families/Families.fsproj"])
                 run (cmd $"dotnet" |> Cmd.args ["fable"; "tests/Consumers/Families/Families.fsproj"; "-o"; "tests/Consumers/Families/output"; "-e"; ".fs.js"])
                 run (cmd $"node" |> Cmd.args ["--test"; "tests/Consumers/Families/witness.test.mjs"])
+                run (cmd $"dotnet" |> Cmd.args ["build"; "tests/Consumers/Browser/Browser.fsproj"])
+                run (cmd $"dotnet" |> Cmd.args ["fable"; "tests/Consumers/Browser/Browser.fsproj"; "-o"; "tests/Consumers/Browser/output"; "-e"; ".fs.js"])
+                run (cmd $"npx" |> Cmd.args ["playwright"; "test"])
             }
             stage "Nacara site" {
                 workingDir (Path.Combine(root, "site"))
                 run (cmd $"dotnet" |> Cmd.args [
                     if watch then
                         "watch"
+                        "--no-hot-reload"
                     else
                         "run"
-                        "--no-hot-reload"
                     "--project"
                     "site.fsproj"
                     "--"

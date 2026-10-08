@@ -24,6 +24,10 @@ let theme =
         Menu.page "examples/Timeline"
         Menu.page "examples/Keyframes"
         Menu.page "examples/Stagger"
+        Menu.page "examples/Spring"
+        Menu.page "examples/Draggable"
+        Menu.page "examples/Scroll"
+        Menu.page "examples/SvgText"
         Menu.page "migration"
         Menu.page "regeneration"
     ]
