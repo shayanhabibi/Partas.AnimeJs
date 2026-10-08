@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><UseCentralPackages>true</UseCentralPackages><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup><Compile Include="Library.fs" /></ItemGroup>
+  <ItemGroup><PackageReference Include="Xantham.Generator" /><PackageReference Include="Xantham.TypeScript.Wire" /></ItemGroup>
+</Project>

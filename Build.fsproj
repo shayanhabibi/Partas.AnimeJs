@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Exe</OutputType><UseCentralPackages>true</UseCentralPackages><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup><Compile Include="Build/Paths.fs" /><Compile Include="Build/Stages.fs" /><Compile Include="Build/Commands.fs" /><Compile Include="Build/Program.fs" /></ItemGroup>
+  <ItemGroup><PackageReference Include="Partas.Build" /><PackageReference Include="Partas.Build.Baked" /><ProjectReference Include="tools/Partas.AnimeJs.Generation/Partas.AnimeJs.Generation.fsproj" /></ItemGroup>
+</Project>

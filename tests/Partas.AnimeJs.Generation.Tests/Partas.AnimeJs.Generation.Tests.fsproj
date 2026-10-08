@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><OutputType>Library</OutputType><UseCentralPackages>true</UseCentralPackages><IsPackable>false</IsPackable><GenerateProgramFile>false</GenerateProgramFile><IsTestProject>true</IsTestProject></PropertyGroup>
+  <ItemGroup><Compile Include="PathsTests.fs" /></ItemGroup>
+  <ItemGroup><PackageReference Include="Microsoft.NET.Test.Sdk" /><PackageReference Include="NUnit" /><PackageReference Include="NUnit3TestAdapter" /><ProjectReference Include="../../Build.fsproj" /></ItemGroup>
+</Project>
