@@ -46,12 +46,15 @@ type FactorySpec = {
     ParameterType: DslType
     Constraints: (string * DslType option) list
 }
-type PolicyRoot = { Export: string; Name: string; Builder: string; Parameter: string; Fields: string list }
-type Policy = { Roots: PolicyRoot list; Transforms: string list }
+type PolicyRoot = { Export: string; Name: string; Builder: string; Parameter: string; Fields: string list; Signature: string option }
+type PolicyValue = { Type: string; Name: string; Builder: string; Fields: string list }
+type Policy = { Roots: PolicyRoot list; Values: PolicyValue list; Transforms: string list }
+type ValueSpec = { Name: string; Builder: string; Type: DslType; DynamicType: DslType option }
 type CssProperty = { Name: string; JsKey: string; Source: string; Docs: string }
 type DslModel = {
     Fields: FieldSpec list
     Factories: FactorySpec list
+    Values: ValueSpec list
     Diagnostics: Diagnostic list
     ExcludedFields: string list
     TweenType: DslType option

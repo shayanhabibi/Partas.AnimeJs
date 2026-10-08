@@ -7,7 +7,7 @@ open Partas.AnimeJs.Generation
 
 module Commands =
     let private fail (diagnostics: Diagnostic list) =
-        diagnostics |> List.map (fun diagnostic -> diagnostic.Code + ": " + diagnostic.Message) |> String.concat "\n" |> invalidOp
+        diagnostics |> List.map (fun diagnostic -> diagnostic.Code + (diagnostic.Source |> Option.map (fun source -> " [" + source + "]") |> Option.defaultValue "") + ": " + diagnostic.Message) |> String.concat "\n" |> invalidOp
 
     let generation root =
         let check = Input.option<bool> "--check" |> Input.description "Validate output without changing tracked artifacts"
@@ -41,10 +41,23 @@ module Commands =
                 run (cmd $"dotnet" |> Cmd.args ["build"; "tests/Consumers/Positive/Positive.fsproj"])
                 run (cmd $"dotnet" |> Cmd.args ["fable"; "tests/Consumers/Positive/Positive.fsproj"; "-o"; "tests/Consumers/Positive/output"; "-e"; ".fs.js"])
                 run (cmd $"node" |> Cmd.args ["--test"; "tests/Consumers/Positive/witness.test.mjs"])
+                run (cmd $"dotnet" |> Cmd.args ["build"; "tests/Consumers/Families/Families.fsproj"])
+                run (cmd $"dotnet" |> Cmd.args ["fable"; "tests/Consumers/Families/Families.fsproj"; "-o"; "tests/Consumers/Families/output"; "-e"; ".fs.js"])
+                run (cmd $"node" |> Cmd.args ["--test"; "tests/Consumers/Families/witness.test.mjs"])
             }
             stage "Nacara site" {
                 workingDir (Path.Combine(root, "site"))
-                run (cmd $"dotnet" |> Cmd.args ["run"; "--project"; "site.fsproj"; "--"; (if watch then "watch" else "build")])
+                run (cmd $"dotnet" |> Cmd.args [
+                    if watch then
+                        "watch"
+                    else
+                        "run"
+                        "--no-hot-reload"
+                    "--project"
+                    "site.fsproj"
+                    "--"
+                    if watch then "watch" else "build"
+                ])
             }
         }
     }

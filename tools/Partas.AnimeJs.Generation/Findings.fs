@@ -2,7 +2,9 @@ namespace Partas.AnimeJs.Generation
 
 module Findings =
     let validate (model: DslModel) (findings: Xantham.Generator.Finding list) (reviews: ReviewedFinding list) : Result<ReviewedFinding list, Diagnostic list> =
-        let sources = model.Fields @ model.CssFields @ (model.ValueFields |> Map.toList |> List.collect snd) |> List.map _.Source
+        let fields = model.Fields @ model.CssFields @ (model.ValueFields |> Map.toList |> List.collect snd) |> List.map _.Source
+        let indexers = model.Values |> List.choose (fun value -> match value.Type, value.DynamicType with Named name, Some _ -> Some(name + ".[]()") | _ -> None)
+        let sources = fields @ indexers
         let aliases = sources |> List.collect (fun source -> Map.tryFind source model.AliasDependencies |> Option.defaultValue []) |> List.distinct
         let selected = findings |> List.filter (fun finding ->
             (sources @ aliases) |> List.exists (fun source -> finding.Symbol = source || finding.Symbol.StartsWith(source + "(")))

@@ -20,7 +20,7 @@ let raw declarations = {
         ModuleName = "Partas.AnimeJs.Raw"; PackageName = LanguagePrimitives.StringWithMeasure "animejs"
         RuntimePackage = LanguagePrimitives.StringWithMeasure "animejs"; PackageDir = LanguagePrimitives.StringWithMeasure "/input"
         Decls = declarations; Findings = []; Files = []; ShadowedByLib = 0 } }
-let policy fields = { Roots = [{ Export = "createTimer"; Name = "Timer"; Builder = "timer"; Parameter = "parameters"; Fields = fields }]; Transforms = [] }
+let policy fields = { Roots = [{ Export = "createTimer"; Name = "Timer"; Builder = "timer"; Parameter = "parameters"; Fields = fields; Signature = None }]; Values = []; Transforms = [] }
 let result declarations fields =
     match Projection.project (raw declarations) (policy fields) with
     | Ok value -> value
@@ -74,7 +74,7 @@ let ``real AnimeJs factory roots project selected contexts`` () =
         match Projection.project generated language with
         | Error diagnostics -> Assert.Fail(sprintf "%A" diagnostics)
         | Ok model ->
-            Assert.That(model.Factories.Length, Is.EqualTo(3))
+            Assert.That(model.Factories.Length, Is.EqualTo(4))
             let callback = model.Fields |> List.find (fun field -> field.Context = "Animation" && field.JsKey = "onComplete")
             Assert.That(callback.ValueType, Is.EqualTo(Function(Named "JSAnimation", Object)))
             Assert.That(model.TweenType.IsSome, Is.True)

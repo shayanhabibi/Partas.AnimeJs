@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net9.0</TargetFramework></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../../examples/Timer.fs" />
+    <Compile Include="../../../examples/Timeline.fs" />
+    <Compile Include="../../../examples/Stagger.fs" />
+    <Compile Include="../../../examples/Keyframes.fs" />
+    <Compile Include="Witness.fs" />
+    <ProjectReference Include="../../../Partas.AnimeJs/Partas.AnimeJs.fsproj" />
+  </ItemGroup>
+</Project>

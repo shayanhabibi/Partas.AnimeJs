@@ -3,19 +3,32 @@ namespace Partas.AnimeJs
 
 open Fable.Core
 open Fable.Core.JsInterop
+open Fable.Core.JS
 
 type AnimationContext = private AnimationContext of unit
 type TimerContext = private TimerContext of unit
 type TimelineContext = private TimelineContext of unit
+type StaggerContext = private StaggerContext of unit
+type DefaultsContext = private DefaultsContext of unit
+type DurationKeyframeContext = private DurationKeyframeContext of unit
+type PercentageKeyframeContext = private PercentageKeyframeContext of unit
+type PercentageStop = private PercentageStop of string * Options<PercentageKeyframeContext>
 
 [<AutoOpen>]
 module Builders =
     let ``animation`` = OptionsBuilder<AnimationContext>()
     let ``timer`` = OptionsBuilder<TimerContext>()
     let ``timeline`` = OptionsBuilder<TimelineContext>()
+    let ``stagger`` = OptionsBuilder<StaggerContext>()
+    let ``defaults`` = OptionsBuilder<DefaultsContext>()
+    let ``durationKeyframe`` = OptionsBuilder<DurationKeyframeContext>()
+    let ``percentageKeyframe`` = OptionsBuilder<PercentageKeyframeContext>()
 
 [<AbstractClass; Sealed>]
 type ``Animation`` private () =
+    static member ``id`` (value: U2<string, float>) : Field<AnimationContext> = Field.create<AnimationContext> "id" (box (value))
+    static member ``id`` (value: string) : Field<AnimationContext> = Field.create<AnimationContext> "id" (box (U2.Case1 value))
+    static member ``id`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "id" (box (U2.Case2 value))
     static member ``duration`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<AnimationContext> = Field.create<AnimationContext> "duration" (box (value))
     static member ``duration`` (value: string) : Field<AnimationContext> = Field.create<AnimationContext> "duration" (box (U6.Case1 value))
     static member ``duration`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "duration" (box (U6.Case2 value))
@@ -23,26 +36,82 @@ type ``Animation`` private () =
     static member ``duration`` (value: Raw.DurationKeyframes.Item.Duration) : Field<AnimationContext> = Field.create<AnimationContext> "duration" (box (U6.Case4 value))
     static member ``duration`` (value: Raw.Spring) : Field<AnimationContext> = Field.create<AnimationContext> "duration" (box (U6.Case5 value))
     static member ``duration`` (value: Raw.TweakRegister) : Field<AnimationContext> = Field.create<AnimationContext> "duration" (box (U6.Case6 value))
+    static member ``delay`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<AnimationContext> = Field.create<AnimationContext> "delay" (box (value))
+    static member ``delay`` (value: string) : Field<AnimationContext> = Field.create<AnimationContext> "delay" (box (U6.Case1 value))
+    static member ``delay`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "delay" (box (U6.Case2 value))
+    static member ``delay`` (value: (float -> float)) : Field<AnimationContext> = Field.create<AnimationContext> "delay" (box (U6.Case3 value))
+    static member ``delay`` (value: Raw.DurationKeyframes.Item.Duration) : Field<AnimationContext> = Field.create<AnimationContext> "delay" (box (U6.Case4 value))
+    static member ``delay`` (value: Raw.Spring) : Field<AnimationContext> = Field.create<AnimationContext> "delay" (box (U6.Case5 value))
+    static member ``delay`` (value: Raw.TweakRegister) : Field<AnimationContext> = Field.create<AnimationContext> "delay" (box (U6.Case6 value))
+    static member ``loopDelay`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "loopDelay" (box (value))
+    static member ``reversed`` (value: bool) : Field<AnimationContext> = Field.create<AnimationContext> "reversed" (box (value))
+    static member ``alternate`` (value: bool) : Field<AnimationContext> = Field.create<AnimationContext> "alternate" (box (value))
+    static member ``loop`` (value: U2<float, bool>) : Field<AnimationContext> = Field.create<AnimationContext> "loop" (box (value))
+    static member ``loop`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "loop" (box (U2.Case1 value))
+    static member ``loop`` (value: bool) : Field<AnimationContext> = Field.create<AnimationContext> "loop" (box (U2.Case2 value))
     static member ``autoplay`` (value: U2<bool, Raw.ScrollObserver>) : Field<AnimationContext> = Field.create<AnimationContext> "autoplay" (box (value))
     static member ``autoplay`` (value: bool) : Field<AnimationContext> = Field.create<AnimationContext> "autoplay" (box (U2.Case1 value))
     static member ``autoplay`` (value: Raw.ScrollObserver) : Field<AnimationContext> = Field.create<AnimationContext> "autoplay" (box (U2.Case2 value))
+    static member ``frameRate`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "frameRate" (box (value))
+    static member ``playbackRate`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "playbackRate" (box (value))
+    static member ``priority`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "priority" (box (value))
+    static member ``keyframes`` (value: U2<(Raw.DurationKeyframes.Item)[], Fable.Core.JS.JS.Record<string, Raw.PercentageKeyframes.Item>>) : Field<AnimationContext> = Field.create<AnimationContext> "keyframes" (box (value))
+    static member ``keyframes`` (value: (Raw.DurationKeyframes.Item)[]) : Field<AnimationContext> = Field.create<AnimationContext> "keyframes" (box (U2.Case1 value))
+    static member ``keyframes`` (value: Fable.Core.JS.JS.Record<string, Raw.PercentageKeyframes.Item>) : Field<AnimationContext> = Field.create<AnimationContext> "keyframes" (box (U2.Case2 value))
+    static member ``playbackEase`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<AnimationContext> = Field.create<AnimationContext> "playbackEase" (box (value))
+    static member ``playbackEase`` (value: string) : Field<AnimationContext> = Field.create<AnimationContext> "playbackEase" (box (U4.Case1 value))
+    static member ``playbackEase`` (value: (float -> float)) : Field<AnimationContext> = Field.create<AnimationContext> "playbackEase" (box (U4.Case2 value))
+    static member ``playbackEase`` (value: Raw.Spring) : Field<AnimationContext> = Field.create<AnimationContext> "playbackEase" (box (U4.Case3 value))
+    static member ``playbackEase`` (value: Raw.TweakRegister) : Field<AnimationContext> = Field.create<AnimationContext> "playbackEase" (box (U4.Case4 value))
     static member ``ease`` (value: U5<string, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<AnimationContext> = Field.create<AnimationContext> "ease" (box (value))
     static member ``ease`` (value: string) : Field<AnimationContext> = Field.create<AnimationContext> "ease" (box (U5.Case1 value))
     static member ``ease`` (value: (float -> float)) : Field<AnimationContext> = Field.create<AnimationContext> "ease" (box (U5.Case2 value))
     static member ``ease`` (value: Raw.DurationKeyframes.Item.Duration) : Field<AnimationContext> = Field.create<AnimationContext> "ease" (box (U5.Case3 value))
     static member ``ease`` (value: Raw.Spring) : Field<AnimationContext> = Field.create<AnimationContext> "ease" (box (U5.Case4 value))
     static member ``ease`` (value: Raw.TweakRegister) : Field<AnimationContext> = Field.create<AnimationContext> "ease" (box (U5.Case5 value))
+    static member ``modifier`` (value: (float -> U2<string, float>)) : Field<AnimationContext> = Field.create<AnimationContext> "modifier" (box (value))
+    static member ``composition`` (value: U2<float, string>) : Field<AnimationContext> = Field.create<AnimationContext> "composition" (box (value))
+    static member ``composition`` (value: float) : Field<AnimationContext> = Field.create<AnimationContext> "composition" (box (U2.Case1 value))
+    static member ``composition`` (value: string) : Field<AnimationContext> = Field.create<AnimationContext> "composition" (box (U2.Case2 value))
+    static member ``onBeginValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimationContext> = Field.create<AnimationContext> "onBegin" (box (value))
+    static member ``onBegin`` (value: (Raw.JSAnimation -> unit)) : Field<AnimationContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimationContext> "onBegin" (box (callback))
+    static member ``onBeforeUpdateValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimationContext> = Field.create<AnimationContext> "onBeforeUpdate" (box (value))
+    static member ``onBeforeUpdate`` (value: (Raw.JSAnimation -> unit)) : Field<AnimationContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimationContext> "onBeforeUpdate" (box (callback))
+    static member ``onUpdateValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimationContext> = Field.create<AnimationContext> "onUpdate" (box (value))
+    static member ``onUpdate`` (value: (Raw.JSAnimation -> unit)) : Field<AnimationContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimationContext> "onUpdate" (box (callback))
+    static member ``onLoopValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimationContext> = Field.create<AnimationContext> "onLoop" (box (value))
+    static member ``onLoop`` (value: (Raw.JSAnimation -> unit)) : Field<AnimationContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimationContext> "onLoop" (box (callback))
+    static member ``onPauseValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimationContext> = Field.create<AnimationContext> "onPause" (box (value))
+    static member ``onPause`` (value: (Raw.JSAnimation -> unit)) : Field<AnimationContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimationContext> "onPause" (box (callback))
     static member ``onCompleteValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimationContext> = Field.create<AnimationContext> "onComplete" (box (value))
     static member ``onComplete`` (value: (Raw.JSAnimation -> unit)) : Field<AnimationContext> =
         let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
         Field.create<AnimationContext> "onComplete" (box (callback))
+    static member ``onRenderValue`` (value: (Raw.JSAnimation -> obj)) : Field<AnimationContext> = Field.create<AnimationContext> "onRender" (box (value))
+    static member ``onRender`` (value: (Raw.JSAnimation -> unit)) : Field<AnimationContext> =
+        let callback (handle: Raw.JSAnimation) : obj = value handle; box ()
+        Field.create<AnimationContext> "onRender" (box (callback))
+    static member parameters (options: Options<AnimationContext>) : Raw.AnimationParams = Options.toObject options |> unbox
     /// Animate a dynamic object property. The key does not prove target-property existence.
     static member property (key: string) (value: Raw.TweenOptions) : Field<AnimationContext> =
-        if System.String.IsNullOrWhiteSpace key || List.contains key ["alternate"; "autoplay"; "composition"; "defaults"; "delay"; "duration"; "ease"; "frameRate"; "id"; "keyframes"; "loop"; "loopDelay"; "modifier"; "onBeforeUpdate"; "onBegin"; "onComplete"; "onLoop"; "onPause"; "onRender"; "onUpdate"; "playbackEase"; "playbackRate"; "priority"; "reversed"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["alternate"; "autoplay"; "composition"; "delay"; "duration"; "ease"; "frameRate"; "id"; "keyframes"; "loop"; "loopDelay"; "modifier"; "onBeforeUpdate"; "onBegin"; "onComplete"; "onLoop"; "onPause"; "onRender"; "onUpdate"; "playbackEase"; "playbackRate"; "priority"; "reversed"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
         Field.create<AnimationContext> key (box value)
 
 [<AbstractClass; Sealed>]
 type ``Timer`` private () =
+    static member ``id`` (value: U2<string, float>) : Field<TimerContext> = Field.create<TimerContext> "id" (box (value))
+    static member ``id`` (value: string) : Field<TimerContext> = Field.create<TimerContext> "id" (box (U2.Case1 value))
+    static member ``id`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "id" (box (U2.Case2 value))
     static member ``duration`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<TimerContext> = Field.create<TimerContext> "duration" (box (value))
     static member ``duration`` (value: string) : Field<TimerContext> = Field.create<TimerContext> "duration" (box (U6.Case1 value))
     static member ``duration`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "duration" (box (U6.Case2 value))
@@ -50,23 +119,323 @@ type ``Timer`` private () =
     static member ``duration`` (value: Raw.DurationKeyframes.Item.Duration) : Field<TimerContext> = Field.create<TimerContext> "duration" (box (U6.Case4 value))
     static member ``duration`` (value: Raw.Spring) : Field<TimerContext> = Field.create<TimerContext> "duration" (box (U6.Case5 value))
     static member ``duration`` (value: Raw.TweakRegister) : Field<TimerContext> = Field.create<TimerContext> "duration" (box (U6.Case6 value))
+    static member ``delay`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<TimerContext> = Field.create<TimerContext> "delay" (box (value))
+    static member ``delay`` (value: string) : Field<TimerContext> = Field.create<TimerContext> "delay" (box (U6.Case1 value))
+    static member ``delay`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "delay" (box (U6.Case2 value))
+    static member ``delay`` (value: (float -> float)) : Field<TimerContext> = Field.create<TimerContext> "delay" (box (U6.Case3 value))
+    static member ``delay`` (value: Raw.DurationKeyframes.Item.Duration) : Field<TimerContext> = Field.create<TimerContext> "delay" (box (U6.Case4 value))
+    static member ``delay`` (value: Raw.Spring) : Field<TimerContext> = Field.create<TimerContext> "delay" (box (U6.Case5 value))
+    static member ``delay`` (value: Raw.TweakRegister) : Field<TimerContext> = Field.create<TimerContext> "delay" (box (U6.Case6 value))
+    static member ``loopDelay`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "loopDelay" (box (value))
+    static member ``reversed`` (value: bool) : Field<TimerContext> = Field.create<TimerContext> "reversed" (box (value))
+    static member ``alternate`` (value: bool) : Field<TimerContext> = Field.create<TimerContext> "alternate" (box (value))
+    static member ``loop`` (value: U2<float, bool>) : Field<TimerContext> = Field.create<TimerContext> "loop" (box (value))
+    static member ``loop`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "loop" (box (U2.Case1 value))
+    static member ``loop`` (value: bool) : Field<TimerContext> = Field.create<TimerContext> "loop" (box (U2.Case2 value))
     static member ``autoplay`` (value: U2<bool, Raw.ScrollObserver>) : Field<TimerContext> = Field.create<TimerContext> "autoplay" (box (value))
     static member ``autoplay`` (value: bool) : Field<TimerContext> = Field.create<TimerContext> "autoplay" (box (U2.Case1 value))
     static member ``autoplay`` (value: Raw.ScrollObserver) : Field<TimerContext> = Field.create<TimerContext> "autoplay" (box (U2.Case2 value))
+    static member ``frameRate`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "frameRate" (box (value))
+    static member ``playbackRate`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "playbackRate" (box (value))
+    static member ``priority`` (value: float) : Field<TimerContext> = Field.create<TimerContext> "priority" (box (value))
+    static member ``onBeginValue`` (value: (Raw.Timer -> obj)) : Field<TimerContext> = Field.create<TimerContext> "onBegin" (box (value))
+    static member ``onBegin`` (value: (Raw.Timer -> unit)) : Field<TimerContext> =
+        let callback (handle: Raw.Timer) : obj = value handle; box ()
+        Field.create<TimerContext> "onBegin" (box (callback))
+    static member ``onBeforeUpdateValue`` (value: (Raw.Timer -> obj)) : Field<TimerContext> = Field.create<TimerContext> "onBeforeUpdate" (box (value))
+    static member ``onBeforeUpdate`` (value: (Raw.Timer -> unit)) : Field<TimerContext> =
+        let callback (handle: Raw.Timer) : obj = value handle; box ()
+        Field.create<TimerContext> "onBeforeUpdate" (box (callback))
+    static member ``onUpdateValue`` (value: (Raw.Timer -> obj)) : Field<TimerContext> = Field.create<TimerContext> "onUpdate" (box (value))
+    static member ``onUpdate`` (value: (Raw.Timer -> unit)) : Field<TimerContext> =
+        let callback (handle: Raw.Timer) : obj = value handle; box ()
+        Field.create<TimerContext> "onUpdate" (box (callback))
+    static member ``onLoopValue`` (value: (Raw.Timer -> obj)) : Field<TimerContext> = Field.create<TimerContext> "onLoop" (box (value))
+    static member ``onLoop`` (value: (Raw.Timer -> unit)) : Field<TimerContext> =
+        let callback (handle: Raw.Timer) : obj = value handle; box ()
+        Field.create<TimerContext> "onLoop" (box (callback))
+    static member ``onPauseValue`` (value: (Raw.Timer -> obj)) : Field<TimerContext> = Field.create<TimerContext> "onPause" (box (value))
+    static member ``onPause`` (value: (Raw.Timer -> unit)) : Field<TimerContext> =
+        let callback (handle: Raw.Timer) : obj = value handle; box ()
+        Field.create<TimerContext> "onPause" (box (callback))
     static member ``onCompleteValue`` (value: (Raw.Timer -> obj)) : Field<TimerContext> = Field.create<TimerContext> "onComplete" (box (value))
     static member ``onComplete`` (value: (Raw.Timer -> unit)) : Field<TimerContext> =
         let callback (handle: Raw.Timer) : obj = value handle; box ()
         Field.create<TimerContext> "onComplete" (box (callback))
+    static member parameters (options: Options<TimerContext>) : Raw.TimerParams = Options.toObject options |> unbox
 
 [<AbstractClass; Sealed>]
 type ``Timeline`` private () =
+    static member ``id`` (value: U2<string, float>) : Field<TimelineContext> = Field.create<TimelineContext> "id" (box (value))
+    static member ``id`` (value: string) : Field<TimelineContext> = Field.create<TimelineContext> "id" (box (U2.Case1 value))
+    static member ``id`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "id" (box (U2.Case2 value))
+    static member ``duration`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<TimelineContext> = Field.create<TimelineContext> "duration" (box (value))
+    static member ``duration`` (value: string) : Field<TimelineContext> = Field.create<TimelineContext> "duration" (box (U6.Case1 value))
+    static member ``duration`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "duration" (box (U6.Case2 value))
+    static member ``duration`` (value: (float -> float)) : Field<TimelineContext> = Field.create<TimelineContext> "duration" (box (U6.Case3 value))
+    static member ``duration`` (value: Raw.DurationKeyframes.Item.Duration) : Field<TimelineContext> = Field.create<TimelineContext> "duration" (box (U6.Case4 value))
+    static member ``duration`` (value: Raw.Spring) : Field<TimelineContext> = Field.create<TimelineContext> "duration" (box (U6.Case5 value))
+    static member ``duration`` (value: Raw.TweakRegister) : Field<TimelineContext> = Field.create<TimelineContext> "duration" (box (U6.Case6 value))
+    static member ``delay`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<TimelineContext> = Field.create<TimelineContext> "delay" (box (value))
+    static member ``delay`` (value: string) : Field<TimelineContext> = Field.create<TimelineContext> "delay" (box (U6.Case1 value))
+    static member ``delay`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "delay" (box (U6.Case2 value))
+    static member ``delay`` (value: (float -> float)) : Field<TimelineContext> = Field.create<TimelineContext> "delay" (box (U6.Case3 value))
+    static member ``delay`` (value: Raw.DurationKeyframes.Item.Duration) : Field<TimelineContext> = Field.create<TimelineContext> "delay" (box (U6.Case4 value))
+    static member ``delay`` (value: Raw.Spring) : Field<TimelineContext> = Field.create<TimelineContext> "delay" (box (U6.Case5 value))
+    static member ``delay`` (value: Raw.TweakRegister) : Field<TimelineContext> = Field.create<TimelineContext> "delay" (box (U6.Case6 value))
+    static member ``loopDelay`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "loopDelay" (box (value))
+    static member ``reversed`` (value: bool) : Field<TimelineContext> = Field.create<TimelineContext> "reversed" (box (value))
+    static member ``alternate`` (value: bool) : Field<TimelineContext> = Field.create<TimelineContext> "alternate" (box (value))
+    static member ``loop`` (value: U2<float, bool>) : Field<TimelineContext> = Field.create<TimelineContext> "loop" (box (value))
+    static member ``loop`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "loop" (box (U2.Case1 value))
+    static member ``loop`` (value: bool) : Field<TimelineContext> = Field.create<TimelineContext> "loop" (box (U2.Case2 value))
     static member ``autoplay`` (value: U2<bool, Raw.ScrollObserver>) : Field<TimelineContext> = Field.create<TimelineContext> "autoplay" (box (value))
     static member ``autoplay`` (value: bool) : Field<TimelineContext> = Field.create<TimelineContext> "autoplay" (box (U2.Case1 value))
     static member ``autoplay`` (value: Raw.ScrollObserver) : Field<TimelineContext> = Field.create<TimelineContext> "autoplay" (box (U2.Case2 value))
+    static member ``frameRate`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "frameRate" (box (value))
+    static member ``playbackRate`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "playbackRate" (box (value))
+    static member ``priority`` (value: float) : Field<TimelineContext> = Field.create<TimelineContext> "priority" (box (value))
+    static member ``defaults`` (value: Raw.DefaultsParams) : Field<TimelineContext> = Field.create<TimelineContext> "defaults" (box (value))
+    static member ``playbackEase`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<TimelineContext> = Field.create<TimelineContext> "playbackEase" (box (value))
+    static member ``playbackEase`` (value: string) : Field<TimelineContext> = Field.create<TimelineContext> "playbackEase" (box (U4.Case1 value))
+    static member ``playbackEase`` (value: (float -> float)) : Field<TimelineContext> = Field.create<TimelineContext> "playbackEase" (box (U4.Case2 value))
+    static member ``playbackEase`` (value: Raw.Spring) : Field<TimelineContext> = Field.create<TimelineContext> "playbackEase" (box (U4.Case3 value))
+    static member ``playbackEase`` (value: Raw.TweakRegister) : Field<TimelineContext> = Field.create<TimelineContext> "playbackEase" (box (U4.Case4 value))
+    static member ``composition`` (value: bool) : Field<TimelineContext> = Field.create<TimelineContext> "composition" (box (value))
+    static member ``onBeginValue`` (value: (Raw.Timeline -> obj)) : Field<TimelineContext> = Field.create<TimelineContext> "onBegin" (box (value))
+    static member ``onBegin`` (value: (Raw.Timeline -> unit)) : Field<TimelineContext> =
+        let callback (handle: Raw.Timeline) : obj = value handle; box ()
+        Field.create<TimelineContext> "onBegin" (box (callback))
+    static member ``onBeforeUpdateValue`` (value: (Raw.Timeline -> obj)) : Field<TimelineContext> = Field.create<TimelineContext> "onBeforeUpdate" (box (value))
+    static member ``onBeforeUpdate`` (value: (Raw.Timeline -> unit)) : Field<TimelineContext> =
+        let callback (handle: Raw.Timeline) : obj = value handle; box ()
+        Field.create<TimelineContext> "onBeforeUpdate" (box (callback))
+    static member ``onUpdateValue`` (value: (Raw.Timeline -> obj)) : Field<TimelineContext> = Field.create<TimelineContext> "onUpdate" (box (value))
+    static member ``onUpdate`` (value: (Raw.Timeline -> unit)) : Field<TimelineContext> =
+        let callback (handle: Raw.Timeline) : obj = value handle; box ()
+        Field.create<TimelineContext> "onUpdate" (box (callback))
+    static member ``onLoopValue`` (value: (Raw.Timeline -> obj)) : Field<TimelineContext> = Field.create<TimelineContext> "onLoop" (box (value))
+    static member ``onLoop`` (value: (Raw.Timeline -> unit)) : Field<TimelineContext> =
+        let callback (handle: Raw.Timeline) : obj = value handle; box ()
+        Field.create<TimelineContext> "onLoop" (box (callback))
+    static member ``onPauseValue`` (value: (Raw.Timeline -> obj)) : Field<TimelineContext> = Field.create<TimelineContext> "onPause" (box (value))
+    static member ``onPause`` (value: (Raw.Timeline -> unit)) : Field<TimelineContext> =
+        let callback (handle: Raw.Timeline) : obj = value handle; box ()
+        Field.create<TimelineContext> "onPause" (box (callback))
     static member ``onCompleteValue`` (value: (Raw.Timeline -> obj)) : Field<TimelineContext> = Field.create<TimelineContext> "onComplete" (box (value))
     static member ``onComplete`` (value: (Raw.Timeline -> unit)) : Field<TimelineContext> =
         let callback (handle: Raw.Timeline) : obj = value handle; box ()
         Field.create<TimelineContext> "onComplete" (box (callback))
+    static member ``onRenderValue`` (value: (Raw.Timeline -> obj)) : Field<TimelineContext> = Field.create<TimelineContext> "onRender" (box (value))
+    static member ``onRender`` (value: (Raw.Timeline -> unit)) : Field<TimelineContext> =
+        let callback (handle: Raw.Timeline) : obj = value handle; box ()
+        Field.create<TimelineContext> "onRender" (box (callback))
+    static member parameters (options: Options<TimelineContext>) : Raw.TimelineParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``Stagger`` private () =
+    static member ``start`` (value: U2<string, float>) : Field<StaggerContext> = Field.create<StaggerContext> "start" (box (value))
+    static member ``start`` (value: string) : Field<StaggerContext> = Field.create<StaggerContext> "start" (box (U2.Case1 value))
+    static member ``start`` (value: float) : Field<StaggerContext> = Field.create<StaggerContext> "start" (box (U2.Case2 value))
+    static member ``from`` (value: U3<float, string, (float)[]>) : Field<StaggerContext> = Field.create<StaggerContext> "from" (box (value))
+    static member ``from`` (value: float) : Field<StaggerContext> = Field.create<StaggerContext> "from" (box (U3.Case1 value))
+    static member ``from`` (value: string) : Field<StaggerContext> = Field.create<StaggerContext> "from" (box (U3.Case2 value))
+    static member ``from`` (value: (float)[]) : Field<StaggerContext> = Field.create<StaggerContext> "from" (box (U3.Case3 value))
+    static member ``reversed`` (value: bool) : Field<StaggerContext> = Field.create<StaggerContext> "reversed" (box (value))
+    static member ``grid`` (value: U2<bool, (float)[]>) : Field<StaggerContext> = Field.create<StaggerContext> "grid" (box (value))
+    static member ``grid`` (value: bool) : Field<StaggerContext> = Field.create<StaggerContext> "grid" (box (U2.Case1 value))
+    static member ``grid`` (value: (float)[]) : Field<StaggerContext> = Field.create<StaggerContext> "grid" (box (U2.Case2 value))
+    static member ``axis`` (value: Raw.StaggerParams.Axis) : Field<StaggerContext> = Field.create<StaggerContext> "axis" (box (value))
+    static member ``use`` (value: U2<string, Raw.Method>) : Field<StaggerContext> = Field.create<StaggerContext> "use" (box (value))
+    static member ``use`` (value: string) : Field<StaggerContext> = Field.create<StaggerContext> "use" (box (U2.Case1 value))
+    static member ``use`` (value: Raw.Method) : Field<StaggerContext> = Field.create<StaggerContext> "use" (box (U2.Case2 value))
+    static member ``total`` (value: float) : Field<StaggerContext> = Field.create<StaggerContext> "total" (box (value))
+    static member ``ease`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<StaggerContext> = Field.create<StaggerContext> "ease" (box (value))
+    static member ``ease`` (value: string) : Field<StaggerContext> = Field.create<StaggerContext> "ease" (box (U4.Case1 value))
+    static member ``ease`` (value: (float -> float)) : Field<StaggerContext> = Field.create<StaggerContext> "ease" (box (U4.Case2 value))
+    static member ``ease`` (value: Raw.Spring) : Field<StaggerContext> = Field.create<StaggerContext> "ease" (box (U4.Case3 value))
+    static member ``ease`` (value: Raw.TweakRegister) : Field<StaggerContext> = Field.create<StaggerContext> "ease" (box (U4.Case4 value))
+    static member ``modifier`` (value: (float -> U2<string, float>)) : Field<StaggerContext> = Field.create<StaggerContext> "modifier" (box (value))
+    /// Additive uniform noise on the computed stagger value. Number form gives flat `+/-jitter`; tuple form ramps the magnitude `start -&gt; end` across the from/axis/grid ordering and respects `ease`.
+    static member ``jitter`` (value: U2<float, (float * float)>) : Field<StaggerContext> = Field.create<StaggerContext> "jitter" (box (value))
+    static member ``jitter`` (value: float) : Field<StaggerContext> = Field.create<StaggerContext> "jitter" (box (U2.Case1 value))
+    static member ``jitter`` (value: (float * float)) : Field<StaggerContext> = Field.create<StaggerContext> "jitter" (box (U2.Case2 value))
+    /// Seed for jitter draws and `from: &apos;random&apos;` shuffling. `false` (default) uses Math.random. `true` seeds with `0`. A number is used directly as the seed.
+    static member ``seed`` (value: U2<float, bool>) : Field<StaggerContext> = Field.create<StaggerContext> "seed" (box (value))
+    static member ``seed`` (value: float) : Field<StaggerContext> = Field.create<StaggerContext> "seed" (box (U2.Case1 value))
+    static member ``seed`` (value: bool) : Field<StaggerContext> = Field.create<StaggerContext> "seed" (box (U2.Case2 value))
+    static member parameters (options: Options<StaggerContext>) : Raw.StaggerParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``Defaults`` private () =
+    static member ``id`` (value: U2<string, float>) : Field<DefaultsContext> = Field.create<DefaultsContext> "id" (box (value))
+    static member ``id`` (value: string) : Field<DefaultsContext> = Field.create<DefaultsContext> "id" (box (U2.Case1 value))
+    static member ``id`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "id" (box (U2.Case2 value))
+    static member ``keyframes`` (value: U2<(Raw.DurationKeyframes.Item)[], Fable.Core.JS.JS.Record<string, Raw.PercentageKeyframes.Item>>) : Field<DefaultsContext> = Field.create<DefaultsContext> "keyframes" (box (value))
+    static member ``keyframes`` (value: (Raw.DurationKeyframes.Item)[]) : Field<DefaultsContext> = Field.create<DefaultsContext> "keyframes" (box (U2.Case1 value))
+    static member ``keyframes`` (value: Fable.Core.JS.JS.Record<string, Raw.PercentageKeyframes.Item>) : Field<DefaultsContext> = Field.create<DefaultsContext> "keyframes" (box (U2.Case2 value))
+    static member ``playbackEase`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<DefaultsContext> = Field.create<DefaultsContext> "playbackEase" (box (value))
+    static member ``playbackEase`` (value: string) : Field<DefaultsContext> = Field.create<DefaultsContext> "playbackEase" (box (U4.Case1 value))
+    static member ``playbackEase`` (value: (float -> float)) : Field<DefaultsContext> = Field.create<DefaultsContext> "playbackEase" (box (U4.Case2 value))
+    static member ``playbackEase`` (value: Raw.Spring) : Field<DefaultsContext> = Field.create<DefaultsContext> "playbackEase" (box (U4.Case3 value))
+    static member ``playbackEase`` (value: Raw.TweakRegister) : Field<DefaultsContext> = Field.create<DefaultsContext> "playbackEase" (box (U4.Case4 value))
+    static member ``playbackRate`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "playbackRate" (box (value))
+    static member ``frameRate`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "frameRate" (box (value))
+    static member ``loop`` (value: U2<float, bool>) : Field<DefaultsContext> = Field.create<DefaultsContext> "loop" (box (value))
+    static member ``loop`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "loop" (box (U2.Case1 value))
+    static member ``loop`` (value: bool) : Field<DefaultsContext> = Field.create<DefaultsContext> "loop" (box (U2.Case2 value))
+    static member ``reversed`` (value: bool) : Field<DefaultsContext> = Field.create<DefaultsContext> "reversed" (box (value))
+    static member ``alternate`` (value: bool) : Field<DefaultsContext> = Field.create<DefaultsContext> "alternate" (box (value))
+    static member ``persist`` (value: bool) : Field<DefaultsContext> = Field.create<DefaultsContext> "persist" (box (value))
+    static member ``autoplay`` (value: U2<bool, Raw.ScrollObserver>) : Field<DefaultsContext> = Field.create<DefaultsContext> "autoplay" (box (value))
+    static member ``autoplay`` (value: bool) : Field<DefaultsContext> = Field.create<DefaultsContext> "autoplay" (box (U2.Case1 value))
+    static member ``autoplay`` (value: Raw.ScrollObserver) : Field<DefaultsContext> = Field.create<DefaultsContext> "autoplay" (box (U2.Case2 value))
+    static member ``duration`` (value: U2<float, Raw.DurationKeyframes.Item.Duration>) : Field<DefaultsContext> = Field.create<DefaultsContext> "duration" (box (value))
+    static member ``duration`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "duration" (box (U2.Case1 value))
+    static member ``duration`` (value: Raw.DurationKeyframes.Item.Duration) : Field<DefaultsContext> = Field.create<DefaultsContext> "duration" (box (U2.Case2 value))
+    static member ``delay`` (value: U2<float, Raw.DurationKeyframes.Item.Duration>) : Field<DefaultsContext> = Field.create<DefaultsContext> "delay" (box (value))
+    static member ``delay`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "delay" (box (U2.Case1 value))
+    static member ``delay`` (value: Raw.DurationKeyframes.Item.Duration) : Field<DefaultsContext> = Field.create<DefaultsContext> "delay" (box (U2.Case2 value))
+    static member ``loopDelay`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "loopDelay" (box (value))
+    static member ``ease`` (value: U5<string, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<DefaultsContext> = Field.create<DefaultsContext> "ease" (box (value))
+    static member ``ease`` (value: string) : Field<DefaultsContext> = Field.create<DefaultsContext> "ease" (box (U5.Case1 value))
+    static member ``ease`` (value: (float -> float)) : Field<DefaultsContext> = Field.create<DefaultsContext> "ease" (box (U5.Case2 value))
+    static member ``ease`` (value: Raw.DurationKeyframes.Item.Duration) : Field<DefaultsContext> = Field.create<DefaultsContext> "ease" (box (U5.Case3 value))
+    static member ``ease`` (value: Raw.Spring) : Field<DefaultsContext> = Field.create<DefaultsContext> "ease" (box (U5.Case4 value))
+    static member ``ease`` (value: Raw.TweakRegister) : Field<DefaultsContext> = Field.create<DefaultsContext> "ease" (box (U5.Case5 value))
+    static member ``composition`` (value: U2<float, string>) : Field<DefaultsContext> = Field.create<DefaultsContext> "composition" (box (value))
+    static member ``composition`` (value: float) : Field<DefaultsContext> = Field.create<DefaultsContext> "composition" (box (U2.Case1 value))
+    static member ``composition`` (value: string) : Field<DefaultsContext> = Field.create<DefaultsContext> "composition" (box (U2.Case2 value))
+    static member ``modifier`` (value: (obj -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "modifier" (box (value))
+    static member ``onBeginValue`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "onBegin" (box (value))
+    static member ``onBegin`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> unit)) : Field<DefaultsContext> =
+        let callback (handle: U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer>) : obj = value handle; box ()
+        Field.create<DefaultsContext> "onBegin" (box (callback))
+    static member ``onBeforeUpdateValue`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "onBeforeUpdate" (box (value))
+    static member ``onBeforeUpdate`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> unit)) : Field<DefaultsContext> =
+        let callback (handle: U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer>) : obj = value handle; box ()
+        Field.create<DefaultsContext> "onBeforeUpdate" (box (callback))
+    static member ``onUpdateValue`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "onUpdate" (box (value))
+    static member ``onUpdate`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> unit)) : Field<DefaultsContext> =
+        let callback (handle: U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer>) : obj = value handle; box ()
+        Field.create<DefaultsContext> "onUpdate" (box (callback))
+    static member ``onLoopValue`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "onLoop" (box (value))
+    static member ``onLoop`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> unit)) : Field<DefaultsContext> =
+        let callback (handle: U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer>) : obj = value handle; box ()
+        Field.create<DefaultsContext> "onLoop" (box (callback))
+    static member ``onPauseValue`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "onPause" (box (value))
+    static member ``onPause`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> unit)) : Field<DefaultsContext> =
+        let callback (handle: U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer>) : obj = value handle; box ()
+        Field.create<DefaultsContext> "onPause" (box (callback))
+    static member ``onCompleteValue`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "onComplete" (box (value))
+    static member ``onComplete`` (value: (U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer> -> unit)) : Field<DefaultsContext> =
+        let callback (handle: U3<Raw.JSAnimation, Raw.Timeline, Raw.Timer>) : obj = value handle; box ()
+        Field.create<DefaultsContext> "onComplete" (box (callback))
+    static member ``onRenderValue`` (value: (U2<Raw.JSAnimation, Raw.Timeline> -> obj)) : Field<DefaultsContext> = Field.create<DefaultsContext> "onRender" (box (value))
+    static member ``onRender`` (value: (U2<Raw.JSAnimation, Raw.Timeline> -> unit)) : Field<DefaultsContext> =
+        let callback (handle: U2<Raw.JSAnimation, Raw.Timeline>) : obj = value handle; box ()
+        Field.create<DefaultsContext> "onRender" (box (callback))
+    static member parameters (options: Options<DefaultsContext>) : Raw.DefaultsParams = Options.toObject options |> unbox
+
+[<AbstractClass; Sealed>]
+type ``DurationKeyframe`` private () =
+    static member ``duration`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "duration" (box (value))
+    static member ``duration`` (value: string) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "duration" (box (U6.Case1 value))
+    static member ``duration`` (value: float) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "duration" (box (U6.Case2 value))
+    static member ``duration`` (value: (float -> float)) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "duration" (box (U6.Case3 value))
+    static member ``duration`` (value: Raw.DurationKeyframes.Item.Duration) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "duration" (box (U6.Case4 value))
+    static member ``duration`` (value: Raw.Spring) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "duration" (box (U6.Case5 value))
+    static member ``duration`` (value: Raw.TweakRegister) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "duration" (box (U6.Case6 value))
+    static member ``delay`` (value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "delay" (box (value))
+    static member ``delay`` (value: string) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "delay" (box (U6.Case1 value))
+    static member ``delay`` (value: float) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "delay" (box (U6.Case2 value))
+    static member ``delay`` (value: (float -> float)) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "delay" (box (U6.Case3 value))
+    static member ``delay`` (value: Raw.DurationKeyframes.Item.Duration) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "delay" (box (U6.Case4 value))
+    static member ``delay`` (value: Raw.Spring) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "delay" (box (U6.Case5 value))
+    static member ``delay`` (value: Raw.TweakRegister) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "delay" (box (U6.Case6 value))
+    static member ``ease`` (value: U5<string, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "ease" (box (value))
+    static member ``ease`` (value: string) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "ease" (box (U5.Case1 value))
+    static member ``ease`` (value: (float -> float)) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "ease" (box (U5.Case2 value))
+    static member ``ease`` (value: Raw.DurationKeyframes.Item.Duration) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "ease" (box (U5.Case3 value))
+    static member ``ease`` (value: Raw.Spring) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "ease" (box (U5.Case4 value))
+    static member ``ease`` (value: Raw.TweakRegister) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "ease" (box (U5.Case5 value))
+    static member ``modifier`` (value: (float -> U2<string, float>)) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "modifier" (box (value))
+    static member ``composition`` (value: U2<float, string>) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "composition" (box (value))
+    static member ``composition`` (value: float) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "composition" (box (U2.Case1 value))
+    static member ``composition`` (value: string) : Field<DurationKeyframeContext> = Field.create<DurationKeyframeContext> "composition" (box (U2.Case2 value))
+    static member parameters (options: Options<DurationKeyframeContext>) : Raw.DurationKeyframes.Item = Options.toObject options |> unbox
+    static member property (key: string, value: Raw.U10<string, float, bool, (U8<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister, (U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister> * U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>), Raw.TweenKeyValue>)[], (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister, (float -> U2<string, float>), Raw.TweenKeyValue>) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (value))
+    static member property (key: string, value: string) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case1 (value)))
+    static member property (key: string, value: float) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case2 (value)))
+    static member property (key: string, value: bool) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case3 (value)))
+    static member property (key: string, value: (U8<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister, (U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister> * U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>), Raw.TweenKeyValue>)[]) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case4 (value)))
+    static member property (key: string, value: (float -> float)) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case5 (value)))
+    static member property (key: string, value: Raw.DurationKeyframes.Item.Duration) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case6 (value)))
+    static member property (key: string, value: Raw.Spring) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case7 (value)))
+    static member property (key: string, value: Raw.TweakRegister) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case8 (value)))
+    static member property (key: string, value: (float -> U2<string, float>)) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case9 (value)))
+    static member property (key: string, value: Raw.TweenKeyValue) : Field<DurationKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["duration"; "delay"; "ease"; "modifier"; "composition"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<DurationKeyframeContext> key (box (Raw.U10.Case10 (value)))
+
+[<AbstractClass; Sealed>]
+type ``PercentageKeyframe`` private () =
+    static member ``ease`` (value: U4<string, (float -> float), Raw.Spring, Raw.TweakRegister>) : Field<PercentageKeyframeContext> = Field.create<PercentageKeyframeContext> "ease" (box (value))
+    static member ``ease`` (value: string) : Field<PercentageKeyframeContext> = Field.create<PercentageKeyframeContext> "ease" (box (U4.Case1 value))
+    static member ``ease`` (value: (float -> float)) : Field<PercentageKeyframeContext> = Field.create<PercentageKeyframeContext> "ease" (box (U4.Case2 value))
+    static member ``ease`` (value: Raw.Spring) : Field<PercentageKeyframeContext> = Field.create<PercentageKeyframeContext> "ease" (box (U4.Case3 value))
+    static member ``ease`` (value: Raw.TweakRegister) : Field<PercentageKeyframeContext> = Field.create<PercentageKeyframeContext> "ease" (box (U4.Case4 value))
+    static member parameters (options: Options<PercentageKeyframeContext>) : Raw.PercentageKeyframes.Item = Options.toObject options |> unbox
+    static member property (key: string, value: U6<string, float, (float -> float), Raw.DurationKeyframes.Item.Duration, Raw.Spring, Raw.TweakRegister>) : Field<PercentageKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<PercentageKeyframeContext> key (box (value))
+    static member property (key: string, value: string) : Field<PercentageKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<PercentageKeyframeContext> key (box (U6.Case1 (value)))
+    static member property (key: string, value: float) : Field<PercentageKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<PercentageKeyframeContext> key (box (U6.Case2 (value)))
+    static member property (key: string, value: (float -> float)) : Field<PercentageKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<PercentageKeyframeContext> key (box (U6.Case3 (value)))
+    static member property (key: string, value: Raw.DurationKeyframes.Item.Duration) : Field<PercentageKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<PercentageKeyframeContext> key (box (U6.Case4 (value)))
+    static member property (key: string, value: Raw.Spring) : Field<PercentageKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<PercentageKeyframeContext> key (box (U6.Case5 (value)))
+    static member property (key: string, value: Raw.TweakRegister) : Field<PercentageKeyframeContext> =
+        if System.String.IsNullOrWhiteSpace key || List.contains key ["ease"; "__proto__"; "constructor"; "prototype"] then invalidArg "key" "Custom keys must be nonempty and cannot name an option."
+        Field.create<PercentageKeyframeContext> key (box (U6.Case6 (value)))
+
+[<AbstractClass; Sealed>]
+type ``Keyframes`` private () =
+    static member duration (frames: Options<DurationKeyframeContext> list) : (Raw.DurationKeyframes.Item)[] = frames |> List.map DurationKeyframe.parameters |> List.toArray
+    static member at (percent: float) (options: Options<PercentageKeyframeContext>) : PercentageStop =
+        if System.Double.IsNaN percent || System.Double.IsInfinity percent || percent < 0. || percent > 100. then invalidArg "percent" "Percentage must be finite and between zero and 100."
+        PercentageStop (percent.ToString("0.################", System.Globalization.CultureInfo.InvariantCulture) + "%", options)
+    static member percentage (frames: PercentageStop list) : Fable.Core.JS.JS.Record<string, Raw.PercentageKeyframes.Item> =
+        frames |> List.map (fun (PercentageStop (key, options)) -> key, box (``PercentageKeyframe``.parameters options)) |> createObj |> unbox
 
 [<AbstractClass; Sealed>]
 type ``Css`` private () =
@@ -1182,3 +1551,6 @@ module Anime =
     let ``createTimeline`` (options: Options<TimelineContext>) : Raw.Timeline =
         let parameters = Options.toObject options |> unbox<Raw.TimelineParams>
         Raw.Exports.``createTimeline``(``parameters`` = parameters)
+    let ``stagger`` (``val``: float) (options: Options<StaggerContext>) : Raw.Utils.Stagger.Result =
+        let parameters = Options.toObject options |> unbox<Raw.StaggerParams>
+        Raw.Exports.``stagger``(``val`` = ``val``, ``params`` = parameters)

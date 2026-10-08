@@ -15,9 +15,10 @@ module internal Options =
         const copy = value => {
             if (value === null || typeof value !== 'object') return value;
             const prototype = Object.getPrototypeOf(value);
-            if (!Array.isArray(value) && prototype !== Object.prototype && prototype !== null) return value;
+            const array = Array.isArray(value) || (ArrayBuffer.isView(value) && !(value instanceof DataView));
+            if (!array && prototype !== Object.prototype && prototype !== null) return value;
             if (seen.has(value)) return seen.get(value);
-            const result = Array.isArray(value) ? [] : Object.create(prototype);
+            const result = array ? [] : Object.create(prototype);
             seen.set(value, result);
             for (const key of Object.keys(value)) Object.defineProperty(result, key, {
                 value: copy(value[key]), enumerable: true, writable: true, configurable: true

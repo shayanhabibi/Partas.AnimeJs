@@ -15,8 +15,14 @@ module Policy =
                   Name = root.GetProperty("name").GetString()
                   Builder = root.GetProperty("builder").GetString()
                   Parameter = root.GetProperty("parameter").GetString()
-                  Fields = strings (root.GetProperty("fields")) }) |> Seq.toList
-            Ok { Roots = roots; Transforms = strings (document.RootElement.GetProperty("transforms")) }
+                  Fields = strings (root.GetProperty("fields"))
+                  Signature = match root.TryGetProperty "signature" with true, value -> Some(value.GetString()) | _ -> None }) |> Seq.toList
+            let values = match document.RootElement.TryGetProperty "values" with
+                         | true, values -> values.EnumerateArray() |> Seq.map (fun value -> {
+                             Type = value.GetProperty("type").GetString(); Name = value.GetProperty("name").GetString()
+                             Builder = value.GetProperty("builder").GetString(); Fields = strings (value.GetProperty("fields")) }) |> Seq.toList
+                         | _ -> []
+            Ok { Roots = roots; Values = values; Transforms = strings (document.RootElement.GetProperty("transforms")) }
         with error -> Error [{ Code = "policy/invalid"; Source = Some "generation/dsl-policy.json"; Message = error.Message }]
 
 module Projection =
@@ -103,10 +109,17 @@ module Projection =
         let reserved = ResizeArray<string>()
         let selected = ResizeArray<FieldSpec>()
         let factories = ResizeArray<FactorySpec>()
-        let contexts = policy.Roots |> List.map _.Name
+        let values = ResizeArray<ValueSpec>()
+        let contexts = (policy.Roots |> List.map _.Name) @ (policy.Values |> List.map _.Name)
         if (List.distinct contexts).Length <> contexts.Length then report "policy/duplicate-context" "roots" "Each public option context must have a unique name."
         for root in policy.Roots do
-            let matching = exports |> List.filter (fun (_, owned) -> owned.ExportName = root.Export)
+            let matching = exports |> List.filter (fun (_, owned) ->
+                owned.ExportName = root.Export &&
+                match root.Signature, owned.Member.Body with
+                | None, _ -> true
+                | Some "number", ExportFunction(first :: _, _) -> first.Type = FsFloat
+                | Some "text", ExportFunction(first :: _, _) -> first.Type = FsString
+                | Some _, _ -> false)
             match matching with
             | [] -> report "projection/missing-factory" root.Export "No matching root export."
             | [owner, owned] ->
@@ -118,7 +131,7 @@ module Projection =
                         let parameter = arguments[index]
                         let candidates = fields root.Name Set.empty Map.empty parameter.Type |> deduplicate root.Name
                         for field in candidates do
-                            reserved.Add field.JsKey
+                            if root.Name = "Animation" then reserved.Add field.JsKey
                             if root.Fields.IsEmpty || List.contains field.JsKey root.Fields then
                                 if field.ValueType = Object then report "projection/unsupported-field" field.Source "Selected field has an unstructured object contract; retain raw access."
                                 else selected.Add field
@@ -136,13 +149,27 @@ module Projection =
                             Constraints = owned.Member.TypeParameters |> List.map (fun item -> item.Name, Option.map convert item.Constraint) }
                 | _ -> report "projection/factory-shape" root.Export "Selected export is not a function."
             | _ -> report "projection/ambiguous-factory" root.Export "Policy must select a unique factory signature."
+        for root in policy.Values do
+            let candidates = fields root.Name Set.empty Map.empty (FsNamed root.Type) |> deduplicate root.Name
+            for field in candidates do
+                if root.Fields.IsEmpty || List.contains field.JsKey root.Fields then
+                    if field.ValueType = Object then report "projection/unsupported-field" field.Source "Selected field has an unstructured object contract; retain raw access."
+                    else selected.Add field
+                else excluded.Add field.Source
+            for key in root.Fields do
+                if not (candidates |> List.exists (fun field -> field.JsKey = key)) then report "projection/missing-field" (root.Name + "." + key) "Selected field is absent from upstream value root."
+            let dynamic = Map.tryFind root.Type interfaces |> Option.bind (fun declaration ->
+                declaration.Members |> List.tryPick (function
+                    | FsIndexer indexer when not indexer.ReadOnly && indexer.Key = FsString -> Some(convert (root.Type + ".[]()") Set.empty Map.empty indexer.Value)
+                    | _ -> None))
+            values.Add { Name = root.Name; Builder = root.Builder; Type = Named root.Type; DynamicType = dynamic }
         if diagnostics.Count > 0 then Error(List.ofSeq diagnostics)
         else
             let definitions = aliases |> Map.map (fun name alias ->
                 let scope = alias.TypeParameters |> List.map (fun item -> item.Name, Variable item.Name) |> Map.ofList
                 convert name (Set.singleton name) scope alias.Target)
             Ok {
-                Fields = List.ofSeq selected; Factories = List.ofSeq factories; Diagnostics = []
+                Fields = List.ofSeq selected; Factories = List.ofSeq factories; Values = List.ofSeq values; Diagnostics = []
                 ExcludedFields = List.ofSeq excluded |> List.distinct |> List.sort
                 TweenType = if Map.containsKey "TweenOptions" aliases then Some(Named "TweenOptions") else None
                 ReservedKeys = List.ofSeq reserved |> List.distinct |> List.sort; TypeDefinitions = definitions; CssProperties = []; CssFields = []

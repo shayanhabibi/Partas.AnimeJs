@@ -6,6 +6,7 @@ open System.Text.Json
 open System.Text.RegularExpressions
 
 module Emit =
+    let private unionName count = (if count > 9 then "Raw.U" else "U") + string count
     let private identifier name =
         if String.IsNullOrEmpty name || name.Contains("``") || name |> Seq.exists Char.IsControl then invalidArg "name" "Unspellable F# identifier."
         "``" + name + "``"
@@ -24,7 +25,7 @@ module Emit =
         | Optional item -> "(" + print item + ") option"
         | Array item -> "(" + print item + ")[]"
         | Tuple items -> "(" + (items |> List.map print |> String.concat " * ") + ")"
-        | Union arms -> "U" + string arms.Length + "<" + (arms |> List.map print |> String.concat ", ") + ">"
+        | Union arms -> unionName arms.Length + "<" + (arms |> List.map print |> String.concat ", ") + ">"
         | Function(argument, result) -> "(" + print argument + " -> " + print result + ")"
         | Delegate(arguments, Unit) -> "System.Action<" + (arguments |> List.map print |> String.concat ", ") + ">"
         | Delegate([], result) -> "System.Func<" + print result + ">"
@@ -46,7 +47,7 @@ module Emit =
                 let write name valueType value =
                     line ("    static member " + name + " (value: " + typeText valueType + ") : " + fieldType field.Context + " = " + construct field.Context field.JsKey value)
                 match field.ValueType with
-                | Function(argument, Object) ->
+                | Function(argument, Object) when field.Name.StartsWith("on", StringComparison.Ordinal) ->
                     write (identifier (field.Name + "Value")) field.ValueType "value"
                     line ("    static member " + name + " (value: " + typeText (Function(argument, Unit)) + ") : " + fieldType field.Context + " =")
                     line ("        let callback (handle: " + typeText argument + ") : obj = value handle; box ()")
@@ -56,14 +57,14 @@ module Emit =
                     let types = arms |> List.map typeText
                     for index, arm in List.indexed arms do
                         if (types |> List.filter ((=) (typeText arm))).Length = 1 then
-                            write name arm ("U" + string arms.Length + ".Case" + string(index + 1) + " value")
+                            write name arm (unionName arms.Length + ".Case" + string(index + 1) + " value")
                 | kind -> write name kind "value"
             let staticType name = line "[<AbstractClass; Sealed>]"; line ("type " + identifier name + " private () =")
             let unionCase kind arm value =
                 match kind with
                 | Union arms ->
                     match List.tryFindIndex ((=) arm) arms with
-                    | Some index -> "U" + string arms.Length + ".Case" + string(index + 1) + " (" + value + ")"
+                    | Some index -> unionName arms.Length + ".Case" + string(index + 1) + " (" + value + ")"
                     | None -> invalidOp ("Convenience arm absent: " + typeText arm)
                 | valueType when valueType = arm -> value
                 | _ -> invalidOp "Convenience is not supported by the projected value contract."
@@ -73,25 +74,62 @@ module Emit =
             line ""
             line "open Fable.Core"
             line "open Fable.Core.JsInterop"
+            line "open Fable.Core.JS"
             line ""
             for factory in model.Factories do
                 if not (Regex.IsMatch(factory.Context, "^[A-Za-z_][A-Za-z0-9_]*$")) then invalidOp "Invalid context name in policy."
                 line ("type " + context factory.Context + " = private " + context factory.Context + " of unit")
+            for value in model.Values do
+                if not (Regex.IsMatch(value.Name, "^[A-Za-z_][A-Za-z0-9_]*$")) then invalidOp "Invalid value context name in policy."
+                line ("type " + context value.Name + " = private " + context value.Name + " of unit")
+            if model.Values |> List.exists (fun value -> value.Name = "PercentageKeyframe") then
+                line "type PercentageStop = private PercentageStop of string * Options<PercentageKeyframeContext>"
             line ""
             line "[<AutoOpen>]"
             line "module Builders ="
             for factory in model.Factories do
                 line ("    let " + identifier factory.Builder + " = OptionsBuilder<" + context factory.Context + ">()")
+            for value in model.Values do
+                line ("    let " + identifier value.Builder + " = OptionsBuilder<" + context value.Name + ">()")
             line ""
             for factory in model.Factories do
                 staticType factory.Context
                 model.Fields |> List.filter (fun field -> field.Context = factory.Context) |> List.iter emitField
+                line ("    static member parameters (options: Options<" + context factory.Context + ">) : " + typeText factory.ParameterType + " = Options.toObject options |> unbox")
                 if factory.Context = "Animation" then
-                    let reserved = model.ReservedKeys |> List.map literal |> String.concat "; "
+                    let reserved = model.ReservedKeys @ ["__proto__"; "constructor"; "prototype"] |> List.map literal |> String.concat "; "
                     line "    /// Animate a dynamic object property. The key does not prove target-property existence."
                     line "    static member property (key: string) (value: Raw.TweenOptions) : Field<AnimationContext> ="
                     line ("        if System.String.IsNullOrWhiteSpace key || List.contains key [" + reserved + "] then invalidArg \"key\" \"Custom keys must be nonempty and cannot name an option.\"")
                     line ("        " + "Field.create<AnimationContext> key (box value)")
+                line ""
+            for value in model.Values do
+                staticType value.Name
+                let fields = model.Fields |> List.filter (fun field -> field.Context = value.Name)
+                fields |> List.iter emitField
+                line ("    static member parameters (options: Options<" + context value.Name + ">) : " + typeText value.Type + " = Options.toObject options |> unbox")
+                match value.DynamicType with
+                | None -> ()
+                | Some kind ->
+                    let reserved = (fields |> List.map _.JsKey) @ ["__proto__"; "constructor"; "prototype"] |> List.map literal |> String.concat "; "
+                    let write kind expression =
+                        line ("    static member property (key: string, value: " + typeText kind + ") : " + fieldType value.Name + " =")
+                        line ("        if System.String.IsNullOrWhiteSpace key || List.contains key [" + reserved + "] then invalidArg \"key\" \"Custom keys must be nonempty and cannot name an option.\"")
+                        line ("        Field.create<" + context value.Name + "> key (box (" + expression + "))")
+                    write kind "value"
+                    match kind with
+                    | Union arms -> for arm in List.distinct arms do write arm (unionCase kind arm "value")
+                    | _ -> ()
+                line ""
+            if model.Values |> List.exists (fun value -> value.Name = "DurationKeyframe") then
+                staticType "Keyframes"
+                let percentage = model.Values |> List.find (fun value -> value.Name = "PercentageKeyframe")
+                line ("    static member duration (frames: Options<DurationKeyframeContext> list) : " + typeText (definition "DurationKeyframes") + " = frames |> List.map DurationKeyframe.parameters |> List.toArray")
+                line "    static member at (percent: float) (options: Options<PercentageKeyframeContext>) : PercentageStop ="
+                line "        if System.Double.IsNaN percent || System.Double.IsInfinity percent || percent < 0. || percent > 100. then invalidArg \"percent\" \"Percentage must be finite and between zero and 100.\""
+                line "        PercentageStop (percent.ToString(\"0.################\", System.Globalization.CultureInfo.InvariantCulture) + \"%\", options)"
+                line ("    static member percentage (frames: PercentageStop list) : " + typeText (definition "PercentageKeyframes") + " =")
+                line ("        frames |> List.map (fun (PercentageStop (key, options)) -> key, box (" + identifier percentage.Name + ".parameters options)) |> createObj |> unbox")
                 line ""
             staticType "Css"
             model.CssFields |> List.iter emitField

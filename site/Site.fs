@@ -17,7 +17,16 @@ let apiOptions = {
 let theme =
     Theme.defaults
     |> Theme.navbar [NavbarSection("Guide", "content", "/"); NavbarSection("Reference", "reference", "/reference/")]
-    |> Theme.menu "content" [Menu.page "content/index"; Menu.page "examples/GettingStarted"; Menu.page "content/migration"; Menu.page "content/regeneration"]
+    |> Theme.menu "content" [
+        Menu.page "index"
+        Menu.page "examples/GettingStarted"
+        Menu.page "examples/Timer"
+        Menu.page "examples/Timeline"
+        Menu.page "examples/Keyframes"
+        Menu.page "examples/Stagger"
+        Menu.page "migration"
+        Menu.page "regeneration"
+    ]
 
 let reference =
     FSharpApi.collection "reference" DocFrontMatter.decoder apiOptions
@@ -26,12 +35,16 @@ let reference =
 
 let examples =
     Theme.docs theme "examples"
-    |> Collection.source "../examples" ["GettingStarted.fs"]
-    |> Collection.route (fun page -> Route.create page.Locale ["getting-started"])
+    |> Collection.source "../examples" ["*.fs"]
+    |> Collection.route (fun page ->
+        let name = Path.GetFileNameWithoutExtension(RelativePath.value page.RelativePath)
+        let slug = System.Text.RegularExpressions.Regex.Replace(name, "([a-z])([A-Z])", "$1-$2").ToLowerInvariant()
+        Route.create page.Locale [slug])
 
 let site =
     Site.create "Partas.AnimeJs"
     |> Site.origin "https://shayanhabibi.github.io"
+    |> Site.baseUrl "/Partas.AnimeJs/"
     |> Site.output "output"
     |> Markdown.register
     |> TreeSitter.register
