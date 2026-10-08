@@ -12,7 +12,7 @@ module Pipeline =
     let private hash bytes = SHA256.HashData(bytes: byte array) |> Convert.ToHexString |> _.ToLowerInvariant()
     let private textHash (text: string) = Encoding.UTF8.GetBytes text |> hash
     let private fileHash path = (File.ReadAllText path).Replace("\r\n", "\n") |> textHash
-    let private json value = JsonSerializer.Serialize(value, JsonSerializerOptions(WriteIndented = true)) + "\n"
+    let private json value = JsonSerializer.Serialize(value, JsonSerializerOptions(WriteIndented = true, NewLine = "\n")) + "\n"
     let private reviews path =
         use document = JsonDocument.Parse(File.ReadAllText path)
         document.RootElement.EnumerateArray() |> Seq.map (fun entry ->

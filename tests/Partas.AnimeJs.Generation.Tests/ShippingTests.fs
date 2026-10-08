@@ -18,7 +18,8 @@ let ``Nacara publishes tested guide migration and API reference`` () =
     let code, output = XanthamAdapterTests.run root "dotnet" [Path.Combine(System.AppContext.BaseDirectory, "Build.dll"); "docs"]
     Assert.That(code, Is.Zero, output)
     let site = Path.Combine(root, "site/output")
-    Assert.That(File.Exists(Path.Combine(site, "getting-started/index.html")), Is.True)
-    Assert.That(File.Exists(Path.Combine(site, "migration/index.html")), Is.True)
+    Assert.That(File.Exists(Path.Combine(site, "guide/getting-started/index.html")), Is.True)
+    Assert.That(File.Exists(Path.Combine(site, "guide/migration/index.html")), Is.True)
     Assert.That(Directory.EnumerateFiles(Path.Combine(site, "reference"), "*.html", SearchOption.AllDirectories) |> Seq.length, Is.GreaterThan(3))
-    Assert.That(File.ReadAllText(Path.Combine(site, "getting-started/index.html")), Does.Contain("Tween.fromTo"))
+    Assert.That(File.ReadAllText(Path.Combine(site, "guide/getting-started/index.html")), Does.Contain("Tween.fromTo"))
+    Assert.That(File.ReadAllText(Path.Combine(site, "guide/timer/index.html")), Does.Contain("creating a timer is an explicit call"))
