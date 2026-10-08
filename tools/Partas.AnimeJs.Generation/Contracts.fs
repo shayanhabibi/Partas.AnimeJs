@@ -14,3 +14,46 @@ type RawGeneration = {
     Artifacts: Artifact list
     Model: Xantham.Generator.RenderModel
 }
+
+[<StructuralEquality; StructuralComparison>]
+type DslType =
+    | Boolean | Text | Number | BigInteger | Unit | Object
+    | Named of string | Variable of string
+    | Application of string * DslType list
+    | Optional of DslType | Array of DslType | Tuple of DslType list
+    | Union of DslType list | Function of DslType * DslType
+    | Delegate of DslType list * DslType | Brand of DslType * string
+
+type FieldSpec = {
+    Context: string
+    Name: string
+    JsKey: string
+    ValueType: DslType
+    Docs: string
+    Source: string
+    Optional: bool
+}
+type FactoryArgument = { Name: string; Type: DslType; Optional: bool; Rest: bool }
+type FactorySpec = {
+    Name: string
+    Builder: string
+    ExportOwner: string
+    ExportName: string
+    Arguments: FactoryArgument list
+    Result: DslType
+    Context: string
+    ParameterIndex: int
+    ParameterType: DslType
+    Constraints: (string * DslType option) list
+}
+type PolicyRoot = { Export: string; Name: string; Builder: string; Parameter: string; Fields: string list }
+type Policy = { Roots: PolicyRoot list; Transforms: string list }
+type DslModel = {
+    Fields: FieldSpec list
+    Factories: FactorySpec list
+    Diagnostics: Diagnostic list
+    ExcludedFields: string list
+    TweenType: DslType option
+    ReservedKeys: string list
+    TypeDefinitions: Map<string, DslType>
+}
