@@ -16,13 +16,13 @@ let ``packed NuGet sources compile and run in an isolated consumer`` () =
     try
         let feed = Path.Combine(scratch, "feed")
         run root "dotnet" ["pack"; "Partas.AnimeJs/Partas.AnimeJs.fsproj"; "-c"; "Release"; "-o"; feed]
-        let package = Path.Combine(feed, "Partas.AnimeJs.0.1.0.nupkg")
+        let package = Path.Combine(feed, "Partas.AnimeJs.0.1.1.nupkg")
         use archive = ZipFile.OpenRead package
         let sources = archive.Entries |> Seq.filter (fun entry -> entry.FullName.StartsWith("fable/") && entry.FullName.EndsWith(".fs")) |> Seq.map _.FullName |> Seq.toList
         Assert.That(sources |> List.exists (fun name -> name.EndsWith("Dsl.fs")), Is.True, "DSL source must ship")
         Assert.That(sources |> List.exists (fun name -> name.EndsWith("Runtime.fs")), Is.True, "Runtime source must ship")
         archive.Dispose()
-        File.WriteAllText(Path.Combine(scratch, "Consumer.fsproj"), """<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net9.0</TargetFramework><RestorePackagesPath>packages</RestorePackagesPath><DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference></PropertyGroup><ItemGroup><Compile Include="Witness.fs"/><PackageReference Include="Partas.AnimeJs" Version="0.1.0"/><PackageReference Include="FSharp.Core" Version="10.1.401"/></ItemGroup></Project>""")
+        File.WriteAllText(Path.Combine(scratch, "Consumer.fsproj"), """<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFramework>net9.0</TargetFramework><RestorePackagesPath>packages</RestorePackagesPath><DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference></PropertyGroup><ItemGroup><Compile Include="Witness.fs"/><PackageReference Include="Partas.AnimeJs" Version="0.1.1"/><PackageReference Include="FSharp.Core" Version="10.1.401"/></ItemGroup></Project>""")
         let escape value = System.Security.SecurityElement.Escape value
         File.WriteAllText(Path.Combine(scratch, "NuGet.Config"), $"""<configuration><packageSources><clear/><add key="local" value="{escape feed}"/><add key="nuget.org" value="https://api.nuget.org/v3/index.json"/><add key="xantham" value="https://nuget.cloudsmith.io/shayanhabibi/xantham/v3/index.json"/></packageSources><packageSourceMapping><packageSource key="local"><package pattern="Partas.AnimeJs"/></packageSource><packageSource key="xantham"><package pattern="Xantham.*"/></packageSource><packageSource key="nuget.org"><package pattern="*"/></packageSource></packageSourceMapping></configuration>""")
         for source, destination in ["tests/Consumers/Positive/Witness.fs", "Witness.fs"; "tests/Consumers/Positive/witness.test.mjs", "witness.test.mjs"; "global.json", "global.json"; "package.json", "package.json"; "package-lock.json", "package-lock.json"] do

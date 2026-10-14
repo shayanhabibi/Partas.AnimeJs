@@ -18,9 +18,9 @@
         <PackageTags>Partas;F#;FSharp;Fable;fable-javascript;Web;animejs;animation;ce</PackageTags>
         <Authors>Shayan Habibi</Authors>
         <Copyright>Copyright (c) Shayan Habibi 2025</Copyright>
-        <Version>0.1.0</Version>
-        <PackageVersion>0.1.0</PackageVersion>
-        <PackageReleaseNotes>Fresh generated DSL targeting AnimeJs 4.5.0; replaces the handwritten computation expressions.</PackageReleaseNotes>
+        <Version>0.1.1</Version>
+        <PackageVersion>0.1.1</PackageVersion>
+        <PackageReleaseNotes>Ships a flat fable/Partas.AnimeJs.fsproj, so Fable compiles the package sources (0.1.0 listed them behind an MSBuild import Fable does not follow).</PackageReleaseNotes>
         <NpmDependencies>
             <NpmPackage Name="animejs" Version="4.5.0" />
         </NpmDependencies>
